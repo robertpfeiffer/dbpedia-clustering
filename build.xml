@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="clustering" basedir=".">
+
+  <property file="build.properties" />
+
+  <path id="compile.classpath">
+    <!-- default: include all libs from the lib directory -->
+    <fileset dir="${dir.lib}">
+      <include name="**/*.jar" />
+    </fileset>
+  </path>
+
+  <target name="prepare" description="Prepares the build process">
+    <mkdir dir="${dir.dist}" />
+    <mkdir dir="${dir.classes}" />
+  </target>
+
+  <target name="compile" 
+	  depends="prepare" 
+	  description="Compiles the sources">
+
+    <javac srcdir="${dir.src}" 
+	   destdir="${dir.classes}" 
+	   includes="**/*.java" 
+	   classpathref="compile.classpath"
+	   debug="true"
+	   deprecation="true" />
+  </target>
+
+  <target name="clean"
+	  description="Delete generated resources">
+    <delete dir="${dir.classes}" />
+    <delete dir="${dir.dist}" />
+    <delete dir="out" />
+  </target>
+  
+
+  <target name="jar" 
+	  depends="compile">
+    <jar destfile="${dir.dist}/${project.name}.jar" 
+	 manifest="${dir.src}/MANIFEST.MF"
+	 basedir="${dir.classes}"/>
+    <manifest>
+        <attribute name="Main-Class" value="Main-Class: de.myhpi.dbpedia_clustering.ClusterDriver"/>
+      </manifest>
+  </target>
+</project>

@@ -1,2 +1,0 @@
-Manivest-version: 1.0
-Main-Class: de.myhpi.dbpedia_clustering.ClusterDriver
