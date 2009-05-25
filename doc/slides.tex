@@ -8,15 +8,15 @@
 \usepackage{xunicode,fontspec,xltxtra}
 
 \setromanfont[Alternate=1,Ligatures={Common}]{Hoefler Text}
-\setsansfont{Linux Biolinum O}
+\setsansfont{Futura}%{Linux Biolinum O}
 \setmonofont{Inconsolata}
 
 \mode<presentation>
 {
    \setbeamercovered{highly dynamic}
    
-    \usetheme{Malmoe}
-    \usefonttheme{serif}
+    \usetheme{default}
+    %\usefonttheme{serif}
     \setbeamertemplate{navigation symbols}{} 
 }
  
@@ -29,13 +29,25 @@
 \begin{document}
 
 
-\maketitle
-\tableofcontents
+%\maketitle
+%\tableofcontents
+%\section{bla}
 
-\section{bla}
 
-\begin{frame}{Test}
-  Any Questions?
+\begin{frame}{Map- und Reduce- Schritte}
+  Map
+
+  Distanz zwischen einem Subjekt s und einem Clusterzentrum c
+  $$ dist(c,s) = \sum_{i=1}^{n} | s_i \cdot 255 - c_i |^2 $$
+  
   \pause
+  Reduce
+  
+  n Subjekte im Cluster C werden gemittelt
+  $$ mean(C) = \left\lfloor \frac{255}{n} \sum_{\vec s \in C}  \vec s \right\rfloor $$
+  \pause
+  Clusterzentren sind Vektoren von Bytes
+  
 \end{frame}
+
 \end{document}
