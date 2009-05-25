@@ -16,8 +16,8 @@ public class ClusterDriver
 			pgd.driver(argv);
 			exitCode = 0;
 		} catch (Throwable t) //wtf?
-		{	
-			;//HACK: ignore
+		{
+		    t.printStackTrace();
 		} finally
 		{
 			System.exit(exitCode);

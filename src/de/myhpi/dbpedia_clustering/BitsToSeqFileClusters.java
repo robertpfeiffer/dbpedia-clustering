@@ -34,9 +34,8 @@ public class BitsToSeqFileClusters extends BitsToSeqFile{
         this.names = nameFile;
     }
 
-    protected StreamTokenizer openNameFile() throws Exception {
-	Reader r = new BufferedReader(new InputStreamReader(new FileInputStream(names)));
-        return new StreamTokenizer(r);
+    protected BufferedReader openNameFile() throws Exception {
+        return new BufferedReader(new InputStreamReader(new FileInputStream(names)));
     }
 
 
@@ -44,22 +43,24 @@ public class BitsToSeqFileClusters extends BitsToSeqFile{
     public void execute() throws Exception {
         DataInputStream input = null;
         SequenceFile.Writer output = null;
-	StreamTokenizer names = null;
+	BufferedReader names = null;
 	int size;
         try {
             input = this.openInputFile();
             output = this.openOutputFile();
 	    names = this.openNameFile();
-
-	    size = (int) java.lang.Math.ceil(input.readInt()/8.0);
+	    String name;
+	    int length_=input.readInt();
+	    size = (int) java.lang.Math.ceil(length_/8.0);
+	    System.out.println(length_);System.out.println(size);
 	    byte [] bytes = new byte[size * 8];
 	    for (byte [] bits = new byte [size];true; input.readFully(bits))
 	    {
-		names.nextToken();
+		name = names.readLine();
 		for (int i= 0;i<bytes.length;i++)
 		    bytes[i] += 255*(1 & (bits[i/8] >> i%8));
 		if(random.nextInt(denominator)<numerator){
-		    Text key = new Text(names.toString());
+		    Text key = new Text(name);
 		    BytesWritable value = new BytesWritable(bytes);
 		    output.append(key, value);
 		}
