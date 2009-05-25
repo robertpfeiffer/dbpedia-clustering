@@ -1,6 +1,6 @@
-/* TarToSeqFile.java - Convert tar files into Hadoop SequenceFiles.
- *
+/* 
  * Copyright (C) 2008 Stuart Sierra
+ * Copyright (C) 2009 Robert Pfeiffer
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you
  * may not use this file except in compliance with the License. You
@@ -15,8 +15,7 @@
 
 package de.myhpi.dbpedia_clustering;
 
-/* From hadoop-*-core.jar, http://hadoop.apache.org/
- * Developed with Hadoop 0.16.3. */
+
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.*;
 
@@ -29,7 +28,6 @@ import java.io.IOException;
 import java.io.DataInputStream;
 import java.io.StreamTokenizer;
 
-import java.util.Random;
 
 
 public class BitsToSeqFile {
@@ -100,71 +98,6 @@ public class BitsToSeqFile {
             me.execute();
         } catch (Exception e) {
             e.printStackTrace();
-        }
-    }
-}
-
-class BitsToSeqFileClusters extends BitsToSeqFile{
-
-    private Random random;
-    private int numerator;
-    private int denominator;
-    private File names;
-
-    
-
-    /** Sets up Configuration and LocalFileSystem instances for
-     * Hadoop.  Throws Exception if they fail.  Does not load any
-     * Hadoop XML configuration files, just sets the minimum
-     * configuration necessary to use the local file system.
-     */
-    public BitsToSeqFileClusters() throws Exception {
-        super();
-	this.random = new Random();
-    }
-
-    public void setProb(int numerator, int denominator){
-	this.numerator = numerator;
-	this.denominator = denominator;
-    }
-
-    public void setNameFilet(File inputFile) {
-        this.names = inputFile;
-    }
-
-    protected StreamTokenizer openNameFile() throws Exception {
-	Reader r = new BufferedReader(new InputStreamReader(new FileInputStream(inputFile)));
-        return new StreamTokenizer(r);
-    }
-
-
-    /** Performs the conversion. */
-    public void execute() throws Exception {
-        DataInputStream input = null;
-        SequenceFile.Writer output = null;
-	StreamTokenizer names = null;
-	int size;
-        try {
-            input = this.openInputFile();
-            output = this.openOutputFile();
-	    names = this.openNameFile();
-
-	    size = (int) java.lang.Math.ceil(input.readInt()/8.0);
-	    byte [] bytes = new byte[size * 8];
-	    for (byte [] bits = new byte [size];true; input.readFully(bits))
-	    {
-		names.nextToken();
-		for (int i= 0;i<bytes.length;i++)
-		    bytes[i] += 255*(1 & (bits[i/8] >> i%8));
-		if(random.nextInt(denominator)<numerator){
-		    Text key = new Text(names.toString());
-		    BytesWritable value = new BytesWritable(bytes);
-		    output.append(key, value);
-		}
-            }
-        } finally {
-            if (input != null) { input.close(); }
-            if (output != null) { output.close(); }
         }
     }
 }
