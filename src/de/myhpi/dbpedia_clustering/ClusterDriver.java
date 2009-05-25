@@ -13,6 +13,8 @@ public class ClusterDriver
 		{
 			pgd.addClass("wordcount", WordCount.class,
 				     "A map/reduce program that counts the words in the input files.");
+			pgd.addClass("k-means", WordCount.class,
+				     "Clustering of DBPedia Subjects");
 			pgd.driver(argv);
 			exitCode = 0;
 		} catch (Throwable t) //wtf?
