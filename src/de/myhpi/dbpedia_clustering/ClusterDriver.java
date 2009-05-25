@@ -1,9 +1,7 @@
 package de.myhpi.dbpedia_clustering;
-
-import de.myhpi.dbpedia_clustering.WordCount;
 import org.apache.hadoop.util.ProgramDriver;
 
-public class ClusterDriver 
+public class ClusterDriver
 {  
 	public static void main(String argv[])
 	{
@@ -13,7 +11,7 @@ public class ClusterDriver
 		{
 			pgd.addClass("wordcount", WordCount.class,
 				     "A map/reduce program that counts the words in the input files.");
-			pgd.addClass("k-means", WordCount.class,
+			pgd.addClass("k-means", K_Means.class,
 				     "Clustering of DBPedia Subjects");
 			pgd.driver(argv);
 			exitCode = 0;
