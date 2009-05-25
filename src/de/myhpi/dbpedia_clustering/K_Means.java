@@ -25,7 +25,7 @@ class DBMap extends MapReduceBase
 	private Map<Text,BytesWritable> centers;
 
 	public void configure(JobConf job) {
-	   
+
 		try{
 			localFiles = DistributedCache.getLocalCacheFiles(job);
 			centers = new TreeMap();
@@ -45,12 +45,12 @@ class DBMap extends MapReduceBase
 	}
 
 	public void map(Text key,
-			BytesWritable subject, 
-			OutputCollector<Text, BytesWritable> output, 
-			Reporter reporter) 
+		BytesWritable subject, 
+		OutputCollector<Text, BytesWritable> output, 
+		Reporter reporter) 
 		throws IOException
 	{
-		try{
+		try {
 			int distance;
 			int maxdistance = 256*length+1;
 			Map.Entry<Text,BytesWritable> current = null;
@@ -62,7 +62,7 @@ class DBMap extends MapReduceBase
 				byte [] center =entry.getValue().getBytes(); 
 				for (int i= 0;i<length;i++)
 					distance += Math.abs(center[i]-
-							     255*(1 & (bits[i/8] >> i%8)));
+					255*(1 & (bits[i/8] >> i%8)));
 				if (distance<maxdistance)
 					current=entry;
 			}
@@ -77,16 +77,16 @@ class DBReduce extends MapReduceBase
 { 
 	private int length;
 	public void reduce(Text key, 
-			   Iterator<BytesWritable> values, 
-			   OutputCollector<Text, BytesWritable> output, 
-			   Reporter reporter) 
+		Iterator<BytesWritable> values, 
+		OutputCollector<Text, BytesWritable> output, 
+		Reporter reporter) 
 		throws IOException
 	{
 		try{
 			int counts[] = new int[length];
 			int num_subjects = 0;
 			for(BytesWritable subject=values.next();values.hasNext();
-			    subject=values.next())
+			subject=values.next())
 			{
 				byte bits[]=subject.getBytes();
 				num_subjects++;
@@ -100,24 +100,24 @@ class DBReduce extends MapReduceBase
 			}
 			output.collect(key, new BytesWritable(byte_counts));
 		}
-	catch (Exception e) {}
+		catch (Exception e) {}
 	}
 }
-         
+
 public class K_Means {
 	public int run(String[] args) throws Exception {
-	
+
 		JobConf conf = new JobConf(K_Means.class);
 		conf.setJobName("k-means");
-	
+
 		DistributedCache.addCacheFile(new Path(args[0]).toUri(), conf);
-	
+
 		conf.setOutputKeyClass(Text.class);
 		conf.setOutputValueClass(BytesWritable.class);
-	
+
 		conf.setMapperClass(DBMap.class);
 		conf.setReducerClass(DBReduce.class);
-	
+
 		conf.setInputFormat(SequenceFileInputFormat.class);
 		conf.setOutputFormat(SequenceFileOutputFormat.class);
 
@@ -126,6 +126,6 @@ public class K_Means {
 
 		JobClient.runJob(conf);
 		return 0;
-	    	    
+
 	}
 }
