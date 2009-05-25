@@ -89,16 +89,15 @@ class DBReduce extends MapReduceBase
 	}
 
 	public void reduce(Text key, 
-			   Iterator<BytesWritable> values, 
-			   OutputCollector<Text, BytesWritable> output, 
-			   Reporter reporter) 
+		Iterator<BytesWritable> values, 
+		OutputCollector<Text, BytesWritable> output, 
+		Reporter reporter) 
 		throws IOException
 	{
 		try
 		{
 			int counts[] = new int[length];
 			int num_subjects = 0;
-			
 			for(BytesWritable subject=values.next();values.hasNext();
 			    subject=values.next())
 			{
@@ -120,7 +119,7 @@ class DBReduce extends MapReduceBase
 		}
 	}
 }
-         
+
 public class K_Means {
 	public static void main(String[] args) throws Exception
 	{

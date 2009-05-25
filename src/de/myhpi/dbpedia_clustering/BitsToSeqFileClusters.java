@@ -15,20 +15,20 @@ public class BitsToSeqFileClusters extends BitsToSeqFile{
     private int denominator;
     private File names;
 
-    /** Sets up Configuration and LocalFileSystem instances for
-     * Hadoop.  Throws Exception if they fail.  Does not load any
-     * Hadoop XML configuration files, just sets the minimum
-     * configuration necessary to use the local file system.
-     */
-    public BitsToSeqFileClusters() throws Exception {
-        super();
-	this.random = new Random();
-    }
+	/** Sets up Configuration and LocalFileSystem instances for
+	 * Hadoop.  Throws Exception if they fail.  Does not load any
+	 * Hadoop XML configuration files, just sets the minimum
+	 * configuration necessary to use the local file system.
+	 */
+	public BitsToSeqFileClusters() throws Exception {
+		super();
+		this.random = new Random();
+	}
 
-    public void setProb(int numerator, int denominator){
-	this.numerator = numerator;
-	this.denominator = denominator;
-    }
+	public void setProb(int numerator, int denominator){
+		this.numerator = numerator;
+		this.denominator = denominator;
+	}
 
     public void setNameFile(File nameFile) {
         this.names = nameFile;
@@ -71,17 +71,17 @@ public class BitsToSeqFileClusters extends BitsToSeqFile{
         }
     }
 
-    /** Runs the converter at the command line. */
-    public static void main(String[] args) {
-        try {
-            BitsToSeqFileClusters me = new BitsToSeqFileClusters();
-            me.setInput(new File(args[0]));
-            me.setOutput(new File(args[2]));
-   	    me.setNameFile(new File(args[1])); 
-	    me.setProb(1,1000);
-            me.execute();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
+	/** Runs the converter at the command line. */
+	public static void main(String[] args) {
+		try {
+			BitsToSeqFileClusters me = new BitsToSeqFileClusters();
+			me.setInput(new File(args[0]));
+			me.setOutput(new File(args[2]));
+			me.setNameFile(new File(args[1])); 
+			me.setProb(1,1000);
+			me.execute();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
 }

@@ -20,9 +20,9 @@ class Map extends MapReduceBase
 	private Text word = new Text();
 
 	public void map(LongWritable key,
-			Text value, 
-			OutputCollector<Text, IntWritable> output, 
-			Reporter reporter) 
+		Text value, 
+		OutputCollector<Text, IntWritable> output, 
+		Reporter reporter) 
 		throws IOException
 	{
 		String line = value.toString();
@@ -39,9 +39,9 @@ class Reduce extends MapReduceBase
 	implements Reducer<Text, IntWritable, Text, IntWritable>
 { 
 	public void reduce(Text key, 
-			   Iterator<IntWritable> values, 
-			   OutputCollector<Text, IntWritable> output, 
-			   Reporter reporter) 
+		Iterator<IntWritable> values, 
+		OutputCollector<Text, IntWritable> output, 
+		Reporter reporter) 
 		throws IOException
 	{
 		int sum = 0;
@@ -51,26 +51,26 @@ class Reduce extends MapReduceBase
 		output.collect(key, new IntWritable(sum));
 	}
 }
-         
+
 public class WordCount {
 	public static void main(String[] args) throws Exception {
 		JobConf conf = new JobConf(WordCount.class);
 		conf.setJobName("wordcount");
-         
+
 		conf.setOutputKeyClass(Text.class);
 		conf.setOutputValueClass(IntWritable.class);
-         
+
 		conf.setMapperClass(Map.class);
 		conf.setCombinerClass(Reduce.class);
 		conf.setReducerClass(Reduce.class);
-         
+
 		conf.setInputFormat(TextInputFormat.class);
 		conf.setOutputFormat(TextOutputFormat.class);
-         
+
 		FileInputFormat.setInputPaths(conf, new Path(args[0]));
 		FileOutputFormat.setOutputPath(conf, new Path(args[1]));
-         
+
 		JobClient.runJob(conf);
 	}
-         
+
 }
