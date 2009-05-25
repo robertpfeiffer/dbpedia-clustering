@@ -59,13 +59,13 @@ public class BitsToSeqFile {
     public void execute() throws Exception {
         DataInputStream input = null;
         SequenceFile.Writer output = null;
-	int size;
+        int size;
+        
         try {
             input = openInputFile();
             output = openOutputFile();
-	    size = (int) java.lang.Math.ceil(input.readInt()/8);
-	    for (byte [] currentEntry = new byte [size];true; input.readFully(currentEntry))
-	    {   
+            size = (int) java.lang.Math.ceil(input.readInt()/8);
+            for (byte [] currentEntry = new byte [size];true; input.readFully(currentEntry)) {
                 Text key = new Text("bla");
                 BytesWritable value = new BytesWritable(currentEntry);
                 output.append(key, value);
