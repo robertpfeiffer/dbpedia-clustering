@@ -38,9 +38,10 @@
   <target name="jar" 
 	  depends="compile">
     <jar destfile="${dir.dist}/${project.name}.jar" 
-	 basedir="${dir.classes}"/>
-    <manifest>
-        <attribute name="Main-Class" value="Main-Class: de.myhpi.dbpedia_clustering.ClusterDriver"/>
+	 basedir="${dir.classes}">
+      <manifest>
+	<attribute name="Main-Class" value="Main-Class: de.myhpi.dbpedia_clustering.ClusterDriver"/>
       </manifest>
+    </jar>
   </target>
 </project>
