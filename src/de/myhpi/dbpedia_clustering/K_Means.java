@@ -55,6 +55,8 @@ class DBMap extends MapReduceBase
 	{
 		try
 		{
+			boolean was_passiert=false;
+			System.out.println(key);
 			int distance;
 			int maxdistance = 256*length+1;
 			Map.Entry<Text,BytesWritable> current = null;
@@ -70,6 +72,9 @@ class DBMap extends MapReduceBase
 				if (distance<maxdistance)
 					current=entry;
 			}
+			assert(was_passiert);
+			System.out.println(current);
+			
 			output.collect(current.getKey(), current.getValue());
 		}
 		catch (Exception e)
@@ -123,9 +128,12 @@ class DBReduce extends MapReduceBase
 public class K_Means {
 	public static void main(String[] args) throws Exception
 	{
+		for(int i=0;i<args.length;i++)
+			System.out.println(args[i]);
 		JobConf conf = new JobConf(K_Means.class);
 		conf.setJobName("k-means");
 		conf.setInt("subject.length",42644); //TODO: Not Hardcode this
+
 		DistributedCache.addCacheFile(new Path(args[0]).toUri(), conf);
 
 		conf.setOutputKeyClass(Text.class);
