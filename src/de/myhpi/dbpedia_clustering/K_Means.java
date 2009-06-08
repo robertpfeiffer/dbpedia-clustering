@@ -57,20 +57,23 @@ class DBMap extends MapReduceBase
 		{
 			boolean was_passiert=false;
 			System.out.println(key);
-			int distance;
-			int maxdistance = 256*length+1;
+			int distance = Integer.MAX_VALUE;
 			Map.Entry<Text,BytesWritable> current = null;
 			byte bits[]=subject.getBytes();
-
+			
 			for(Map.Entry<Text,BytesWritable> entry:this.centers.entrySet())
 			{
-				distance = 0;
+				was_passiert=true;
+				int newdistance = 0;
 				byte [] center =entry.getValue().getBytes(); 
 				for (int i= 0;i<length;i++)
-					distance += Math.abs(center[i]-
+					newdistance += Math.abs(center[i]-
 							     255*(1 & (bits[i/8] >> i%8)));
-				if (distance<maxdistance)
-					current=entry;
+				if (newdistance<distance)
+				{
+					distance = newdistance;
+					current = entry;
+				}
 			}
 			assert(was_passiert);
 			System.out.println(current);
