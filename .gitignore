@@ -4,3 +4,4 @@ classes
 dist
 hadoop-0.19.1
 *~
+.DS_Store
