@@ -59,14 +59,15 @@ public class BitsToSeqFile {
 		DataInputStream input = null;
 		SequenceFile.Writer output = null;
 		int size;
-
+		int count = 0;
 		try {
 			input = openInputFile();
 			output = openOutputFile();
 			size = (int) java.lang.Math.ceil(input.readInt()/8);
-			for (byte [] currentEntry = new byte [size];true; input.readFully(currentEntry)) {
+			for (byte [] currentEntry = new byte [size];count < 1000; input.readFully(currentEntry)) {
 				Text key = new Text("bla");
 				BytesWritable value = new BytesWritable(currentEntry);
+				count +=1;
 				output.append(key, value);
 			}
 		} finally {

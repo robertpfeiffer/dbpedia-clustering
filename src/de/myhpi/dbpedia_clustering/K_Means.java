@@ -6,8 +6,9 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.StringTokenizer;
-import java.util.TreeMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
+import java.net.URI;
 
 import org.apache.hadoop.fs.*;
 import org.apache.hadoop.filecache.DistributedCache;
@@ -28,18 +29,23 @@ class DBMap extends MapReduceBase
 		{
 			this.length=job.getInt("subject.length",1);
 			localFiles = DistributedCache.getLocalCacheFiles(job);
-			centers = new TreeMap();
-			for(Path path:localFiles)
+			Path p = localFiles[0];
+			final FileSystem fs = FileSystem.getLocal(job);
+			final Path qualified = p.makeQualified(fs);
+
+			centers = new LinkedHashMap();
+			Text key = new Text();
+			BytesWritable value = new BytesWritable();
+			SequenceFile.Reader reader =
+				new SequenceFile.Reader(fs, qualified, job);
+
+			while (reader.next(key, value) == true)
 			{
-				Text key = new Text();
-				BytesWritable value = new BytesWritable();
-				SequenceFile.Reader reader =
-					new SequenceFile.Reader(FileSystem.get(job), path, job);
-				while (reader.next(key, value) == true) {
-					centers.put(key,value);
-				}
-				reader.close();
+				centers.put(key,value);
+				key = new Text();
+				value = new BytesWritable();
 			}
+			reader.close();
 		}
 		catch (IOException e)
 		{
@@ -56,17 +62,17 @@ class DBMap extends MapReduceBase
 		try
 		{
 			boolean was_passiert=false;
-			System.out.println(key);
 			int distance = Integer.MAX_VALUE;
 			Map.Entry<Text,BytesWritable> current = null;
 			byte bits[]=subject.getBytes();
 			
 			for(Map.Entry<Text,BytesWritable> entry:this.centers.entrySet())
 			{
-				was_passiert=true;
+
+				was_passiert = true;
 				int newdistance = 0;
-				byte [] center =entry.getValue().getBytes(); 
-				for (int i= 0;i<length;i++)
+				byte [] center = entry.getValue().getBytes(); 
+				for (int i = 0;i<length;i++)
 					newdistance += Math.abs(center[i]-
 							     255*(1 & (bits[i/8] >> i%8)));
 				if (newdistance<distance)
@@ -75,8 +81,6 @@ class DBMap extends MapReduceBase
 					current = entry;
 				}
 			}
-			assert(was_passiert);
-			System.out.println(current);
 			
 			output.collect(current.getKey(), current.getValue());
 		}
@@ -102,6 +106,7 @@ class DBReduce extends MapReduceBase
 		Reporter reporter) 
 		throws IOException
 	{
+	
 		try
 		{
 			int counts[] = new int[length];
@@ -131,14 +136,12 @@ class DBReduce extends MapReduceBase
 public class K_Means {
 	public static void main(String[] args) throws Exception
 	{
-		for(int i=0;i<args.length;i++)
-			System.out.println(args[i]);
 		JobConf conf = new JobConf(K_Means.class);
 		conf.setJobName("k-means");
 		conf.setInt("subject.length",42644); //TODO: Not Hardcode this
 
-		DistributedCache.addCacheFile(new Path(args[0]).toUri(), conf);
-
+		DistributedCache.addCacheFile(new URI(args[0]), conf);
+		
 		conf.setOutputKeyClass(Text.class);
 		conf.setOutputValueClass(BytesWritable.class);
 
@@ -146,7 +149,8 @@ public class K_Means {
 		conf.setReducerClass(DBReduce.class);
 
 		conf.setInputFormat(SequenceFileInputFormat.class);
-		conf.setOutputFormat(SequenceFileOutputFormat.class);
+		conf.setOutputFormat(TextOutputFormat.class);
+//conf.setOutputFormat(SequenceFileOutputFormat.class);
 
 		FileInputFormat.setInputPaths(conf, new Path(args[1]));
 		FileOutputFormat.setOutputPath(conf, new Path(args[2]));
