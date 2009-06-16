@@ -54,17 +54,25 @@ public class BitsToSeqFileClusters extends BitsToSeqFile{
 	    int length_=input.readInt();
 	    size = (int) java.lang.Math.ceil(length_/8.0);
 	    System.out.println(length_);System.out.println(size);
-	    byte [] bytes = new byte[size * 8];
+	    byte [] bytes = new byte[length_];
 	    for (byte [] bits = new byte [size];count < 10; input.readFully(bits))
 	    {
 		name = names.readLine();
-		for (int i= 0;i<bytes.length;i++)
-		    bytes[i] += 255*(1 & (bits[i/8] >> i%8));
-		if(random.nextInt(denominator)<numerator){
-		    count += 1;
-		    Text key = new Text(name);
-		    BytesWritable value = new BytesWritable(bytes);
-		    output.append(key, value);
+		if(random.nextInt(denominator)<numerator)
+		{
+			count += 1;
+			for (int i= 0;i<length_;i++)
+			{
+				bytes[i] = Byteconverter.bitToByte(Byteconverter.bitAt(bits,i));
+				if(bytes[i] == -1)
+				{
+					System.out.printf("%5x %5d %d \n",bits[i/8],bytes[i],i);
+				}
+			}
+			Text key = new Text(name);
+			BytesWritable value = new BytesWritable(bytes);
+			
+			output.append(key, value);
 		}
             }
         } finally {

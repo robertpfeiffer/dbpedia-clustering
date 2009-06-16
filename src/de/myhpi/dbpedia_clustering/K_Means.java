@@ -64,23 +64,36 @@ class DBMap extends MapReduceBase
 			int distance = Integer.MAX_VALUE;
 			Map.Entry<Text,BytesWritable> current = null;
 			byte bits[]=subject.getBytes();
-
-			System.out.println("+++++++");
-
+			byte bytes[]=new byte[length];
+			byte diff[]=new byte[length];
+			for (int i = 0;i<length;i++)
+				bytes[i]=Byteconverter.bitToByte(Byteconverter.bitAt(bits,i));
+			
+			System.out.println("++");
+			System.out.println(new BytesWritable(bytes));
+			
 			for(Map.Entry<Text,BytesWritable> entry:this.centers.entrySet())
 			{
 				int newdistance = 0;
-				byte [] center = entry.getValue().getBytes(); 
+				byte [] center = entry.getValue().getBytes();
+				
+				assert(length == center.length);
+				
 				for (int i = 0;i<length;i++)
-					newdistance += Math.abs(center[i]-
-							     255*(1 & (bits[i/8] >> i%8)));
+					diff[i]=(byte)Byteconverter.toSigned(Math.abs(Byteconverter.fromSigned(center[i])-Byteconverter.fromSigned(bytes[i])));
+				
+				for (int i = 0;i<length;i++)
+					newdistance += Math.abs(Byteconverter.fromSigned(center[i])-
+								255 *Byteconverter.bitAt(bits,i));
 				if (newdistance<distance)
 				{
 					distance = newdistance;
 					current = entry;
 				}
-				System.out.print(entry.getKey());
-				System.out.println(distance);
+				
+				System.out.println(new BytesWritable(center));
+				System.out.println(new BytesWritable(diff));
+				System.out.println("");
 
 			}
 			
@@ -112,6 +125,7 @@ class DBReduce extends MapReduceBase
 		try
 		{
 			int counts[] = new int[length];
+			byte byte_counts[] = new byte[length];
 			int num_subjects = 0;
 			for(BytesWritable subject=values.next();values.hasNext();
 			    subject=values.next())
@@ -119,12 +133,11 @@ class DBReduce extends MapReduceBase
 				byte bits[]=subject.getBytes();
 				num_subjects++;
 				for (int i= 0;i<length;i++)
-					counts[i] += 1 & (bits[i/8] >> i%8);
+					counts[i] += Byteconverter.bitAt(bits,i);
 			}
-			byte byte_counts[] = new byte[length];
 			for (int i= 0;i<length;i++)
 			{
-				byte_counts[i]=(byte)(255*counts[i]/num_subjects);
+				byte_counts[i]=Byteconverter.ratioToByte(counts[i],num_subjects);
 			}
 			output.collect(key, new BytesWritable(byte_counts));
 		}
