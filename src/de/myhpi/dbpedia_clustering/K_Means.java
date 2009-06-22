@@ -61,40 +61,27 @@ class DBMap extends MapReduceBase
 	{
 		try
 		{
-			int distance = Integer.MAX_VALUE;
+			Distance distance = new ByteBitDistance();
+			long minDistance = Long.MAX_VALUE;
 			Map.Entry<Text,BytesWritable> current = null;
-			byte bits[]=subject.getBytes();
-			byte bytes[]=new byte[length];
-			byte diff[]=new byte[length];
-			for (int i = 0;i<length;i++)
-				bytes[i]=Byteconverter.bitToByte(Byteconverter.bitAt(bits,i));
 			
 			System.out.println("++");
-			System.out.println(new BytesWritable(bytes));
 			
 			for(Map.Entry<Text,BytesWritable> entry:this.centers.entrySet())
 			{
-				int newdistance = 0;
+				long newDistance = 0;
 				byte [] center = entry.getValue().getBytes();
 				
 				assert(length == center.length);
 				
-				for (int i = 0;i<length;i++)
-					diff[i]=(byte)Byteconverter.toSigned(Math.abs(Byteconverter.fromSigned(center[i])-Byteconverter.fromSigned(bytes[i])));
-				
-				for (int i = 0;i<length;i++)
-					newdistance += Math.abs(Byteconverter.fromSigned(center[i])-
-								255 *Byteconverter.bitAt(bits,i));
-				if (newdistance<distance)
+				newDistance = distance.between(center, subject.getBytes());
+				if (newDistance < minDistance)
 				{
-					distance = newdistance;
+					minDistance = newDistance;
 					current = entry;
 				}
 				
-				System.out.println(new BytesWritable(center));
-				System.out.println(new BytesWritable(diff));
-				System.out.println("");
-
+				System.out.println(entry.getKey() + " distance: " + distance);
 			}
 			
 			output.collect(current.getKey(), current.getValue());
