@@ -8,13 +8,12 @@ import java.io.*;
 
 import java.util.Random;
 
-public class BitsToSeqFileClusters extends BitsToSeqFile{
-
-    private Random random;
-    private int numerator;
-    private int denominator;
-    private File names;
-
+public class BitsToSeqFileClusters extends BitsToSeqFile
+{
+	private Random random;
+	private int numerator;
+	private int denominator;
+	
 	/** Sets up Configuration and LocalFileSystem instances for
 	 * Hadoop.  Throws Exception if they fail.  Does not load any
 	 * Hadoop XML configuration files, just sets the minimum
@@ -30,57 +29,55 @@ public class BitsToSeqFileClusters extends BitsToSeqFile{
 		this.denominator = denominator;
 	}
 
-    public void setNameFile(File nameFile) {
-        this.names = nameFile;
-    }
-
-    protected BufferedReader openNameFile() throws Exception {
-        return new BufferedReader(new InputStreamReader(new FileInputStream(names)));
-    }
-
-
-    /** Performs the conversion. */
-    public void execute() throws Exception {
-        DataInputStream input = null;
-        SequenceFile.Writer output = null;
-	BufferedReader names = null;
-	int size;
-	int count = 0;
-        try {
-            input = this.openInputFile();
-            output = this.openOutputFile();
-	    names = this.openNameFile();
-	    String name;
-	    int length_=input.readInt();
-	    size = (int) java.lang.Math.ceil(length_/8.0);
-	    System.out.println(length_);System.out.println(size);
-	    byte [] bytes = new byte[length_];
-	    for (byte [] bits = new byte [size];count < 10; input.readFully(bits))
-	    {
-		name = names.readLine();
-		if(random.nextInt(denominator)<numerator)
-		{
-			count += 1;
-			for (int i= 0;i<length_;i++)
+	/** Performs the conversion. */
+	public void execute() throws Exception {
+		DataInputStream input = null;
+		SequenceFile.Writer output = null;
+		BufferedReader names = null;
+		int size,byte_size;
+		int count = 0;
+		String name;
+		try {
+			input = this.openInputFile();
+			output = this.openOutputFile();
+			names = this.openNameFile();
+			
+			size =input.readInt();
+			
+			byte_size=size/8;
+			if(size%8 != 0)
+				byte_size++;
+			
+			System.out.println(" "+size+" "+byte_size);
+			
+			System.out.println(" ++ ");
+			
+			for (byte [] bits = new byte [byte_size];count < 10; input.readFully(bits))
 			{
-				bytes[i] = Byteconverter.bitToByte(Byteconverter.bitAt(bits,i));
-				if(bytes[i] == -1)
+				name = names.readLine();
+				if(random.nextInt(denominator)<numerator)
 				{
-					System.out.printf("%5x %5d %d \n",bits[i/8],bytes[i],i);
+					count += 1;
+
+					byte [] bytes = new byte[size];
+					for (int i= 0;i<size;i++)
+					{
+						bytes[i] = Byteconverter.toSigned(
+							Byteconverter.bitToByte(Byteconverter.bitAt(bits,i)));
+					}
+					Text key = new Text(name);
+					BytesWritable value = new BytesWritable(bytes);
+									System.out.println(name);
+
+					output.append(key, value);
 				}
 			}
-			Text key = new Text(name);
-			BytesWritable value = new BytesWritable(bytes);
-			
-			output.append(key, value);
+		} finally {
+			if (input != null) { input.close(); }
+			if (output != null) { output.close(); }
 		}
-            }
-        } finally {
-            if (input != null) { input.close(); }
-            if (output != null) { output.close(); }
-        }
-    }
-
+	}
+	
 	/** Runs the converter at the command line. */
 	public static void main(String[] args) {
 		try {

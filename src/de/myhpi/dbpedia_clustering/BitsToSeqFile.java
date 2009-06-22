@@ -20,19 +20,17 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.*;
 import org.apache.hadoop.io.*;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStream;
-import java.io.IOException;
-import java.io.DataInputStream;
-import java.io.StreamTokenizer;
+import java.io.*;
 
 
 
-public class BitsToSeqFile {
 
+
+public class BitsToSeqFile
+{
 	private File inputFile;
-	private File outputFile;
+        private File outputFile;
+	private File namesFile;
 	private LocalSetup setup;
 
 	/** Sets up Configuration and LocalFileSystem instances for
@@ -54,20 +52,44 @@ public class BitsToSeqFile {
 		this.outputFile = outputFile;
 	}
 
+	public void setNameFile(File namesFile) {
+		this.namesFile = namesFile;
+	}
+
+	protected BufferedReader openNameFile() throws Exception {
+		return new BufferedReader(new InputStreamReader(new FileInputStream(namesFile)));
+	}
+
+
+
 	/** Performs the conversion. */
 	public void execute() throws Exception {
 		DataInputStream input = null;
 		SequenceFile.Writer output = null;
-		int size;
+		BufferedReader names = null;
+		int size,byte_size;
 		int count = 0;
+		String name;
 		try {
 			input = openInputFile();
 			output = openOutputFile();
-			size = (int) java.lang.Math.ceil(input.readInt()/8);
-			for (byte [] currentEntry = new byte [size];count < 1000; input.readFully(currentEntry)) {
-				Text key = new Text("bla");
-				BytesWritable value = new BytesWritable(currentEntry);
+			names = this.openNameFile();
+			
+			size =input.readInt();
+			
+			byte_size=size/8;
+			if(size%8 != 0)
+				byte_size++;
+			
+			System.out.println(" "+size+" "+byte_size);
+
+			for (byte [] currentEntry = new byte [size];count < 10000; input.readFully(currentEntry)) {
 				count +=1;
+
+				name = names.readLine();
+				Text key = new Text(name);
+				BytesWritable value = new BytesWritable(currentEntry);
+				System.out.println(name);
 				output.append(key, value);
 			}
 		} finally {
@@ -94,7 +116,8 @@ public class BitsToSeqFile {
 		try {
 			BitsToSeqFile me = new BitsToSeqFile();
 			me.setInput(new File(args[0]));
-			me.setOutput(new File(args[1]));
+			me.setOutput(new File(args[2]));
+			me.setNameFile(new File(args[1])); 
 			me.execute();
 		} catch (Exception e) {
 			e.printStackTrace();
