@@ -28,16 +28,16 @@ class DBMap extends MapReduceBase
 		try
 		{
 			this.length=job.getInt("subject.length",1);
-			localFiles = DistributedCache.getLocalCacheFiles(job);
+/*			localFiles = DistributedCache.getLocalCacheFiles(job);
 			Path p = localFiles[0];
 			final FileSystem fs = FileSystem.getLocal(job);
 			final Path qualified = p.makeQualified(fs);
-
+*/
 			centers = new LinkedHashMap();
 			Text key = new Text();
 			BytesWritable value = new BytesWritable();
 			SequenceFile.Reader reader =
-				new SequenceFile.Reader(fs, qualified, job);
+				new SequenceFile.Reader(FileSystem.get(job), new Path("centers.seq"), job);
 
 			while (reader.next(key, value) == true)
 			{
@@ -142,7 +142,7 @@ public class K_Means {
 		conf.setJobName("k-means");
 		conf.setInt("subject.length",42644); //TODO: Not Hardcode this
 
-		DistributedCache.addCacheFile(new URI(args[0]), conf);
+		// DistributedCache.addCacheFile(new URI(args[0]), conf);
 		
 		conf.setOutputKeyClass(Text.class);
 		conf.setOutputValueClass(BytesWritable.class);
@@ -152,7 +152,7 @@ public class K_Means {
 
 		conf.setInputFormat(SequenceFileInputFormat.class);
 		conf.setOutputFormat(TextOutputFormat.class);
-//conf.setOutputFormat(SequenceFileOutputFormat.class);
+		//conf.setOutputFormat(SequenceFileOutputFormat.class);
 
 		FileInputFormat.setInputPaths(conf, new Path(args[1]));
 		FileOutputFormat.setOutputPath(conf, new Path(args[2]));
