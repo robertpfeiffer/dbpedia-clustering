@@ -9,8 +9,11 @@ public class DummySeqFile
 {
 	private Random random;
 	private File outputFile;
-	private File namesFile;
 	private LocalSetup setup;
+	
+	public static final int SUBJECTS = 200;
+	public static final int ATTRIBUTES = 800;
+	public static final int GROUPS = 10;
 
 	/** Sets up Configuration and LocalFileSystem instances for
 	* Hadoop.  Throws Exception if they fail.  Does not load any
@@ -27,34 +30,27 @@ public class DummySeqFile
 		this.outputFile = outputFile;
 	}
 
-	public void setNameFile(File namesFile) {
-		this.namesFile = namesFile;
-	}
-
-	protected BufferedReader openNameFile() throws Exception {
-		return new BufferedReader(new InputStreamReader(new FileInputStream(namesFile)));
-	}
-
-
-
 	/** Performs the conversion. */
 	public void execute() throws Exception {
 		SequenceFile.Writer output = null;
-		BufferedReader names = null;
-		int size;
 		String name;
+		int group = 0;
+		
 		try {
 			output = openOutputFile();
-			names = this.openNameFile();
-			size = 20;
 			
-			for (int i = 0; i < size; i++) {
-				name = names.readLine();
-				byte[] bytes = new byte[200];
+			for (int i = 0; i < SUBJECTS; i++) {
+				name = String.valueOf(i+1);
+				byte[] bytes = new byte[ATTRIBUTES/8];
+				group = i / (SUBJECTS / GROUPS);
 				
 				for (int k = 0; k < bytes.length; k++)
 				{
-					bytes[k] = Byteconverter.toSigned(random.nextInt(256));
+					if (k / (bytes.length / GROUPS) == group) {
+						bytes[k] = (byte) 0;
+					} else {
+						bytes[k] = Byteconverter.toSigned(random.nextInt(256));
+					}
 				}
 				BytesWritable value = new BytesWritable(bytes);
 				
@@ -78,8 +74,7 @@ public class DummySeqFile
 	public static void main(String[] args) {
 		try {
 			DummySeqFile me = new DummySeqFile();
-			me.setOutput(new File(args[1]));
-			me.setNameFile(new File(args[0])); 
+			me.setOutput(new File(args[0]));
 			me.execute();
 		} catch (Exception e) {
 			e.printStackTrace();
