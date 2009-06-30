@@ -50,11 +50,11 @@ public class DummySeqFile
 			
 			for (int i = 0; i < size; i++) {
 				name = names.readLine();
-				byte[] bytes = new byte[size*10];
+				byte[] bytes = new byte[200];
 				
 				for (int k = 0; k < bytes.length; k++)
 				{
-					bytes[k] = (byte) random.nextInt(2);
+					bytes[k] = Byteconverter.toSigned(random.nextInt(256));
 				}
 				BytesWritable value = new BytesWritable(bytes);
 				

@@ -70,8 +70,6 @@ class DBMap extends MapReduceBase
 				long newDistance = 0;
 				byte [] center = entry.getValue().getBytes();
 
-				System.out.println(" "+length+" "+center.length+" "+subject.getBytes().length*8);
-
 				assert(length == center.length);
 				
 				newDistance = distance.between(center, subject.getBytes());
@@ -140,7 +138,7 @@ public class K_Means {
 	{
 		JobConf conf = new JobConf(K_Means.class);
 		conf.setJobName("k-means");
-		conf.setInt("subject.length",42644); //TODO: Not Hardcode this
+		conf.setInt("subject.length", 200); //TODO: Not Hardcode this
 
 		// DistributedCache.addCacheFile(new URI(args[0]), conf);
 		

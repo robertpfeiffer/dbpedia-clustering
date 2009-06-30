@@ -5,6 +5,7 @@ class Byteconverter{
 	{
 		return (bytes[index/8] >>> (index%8)) & 1;
 	}
+	
 	static int fromSigned (byte val)
 	{
 		if(val < 0)

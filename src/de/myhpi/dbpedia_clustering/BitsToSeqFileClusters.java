@@ -42,10 +42,10 @@ public class BitsToSeqFileClusters extends BitsToSeqFile
 			while (subjects.next(key, value)) {
 				if (count < 5) {
 					center = value.getBytes();
-					bytes = new byte[value.getLength()];
+					bytes = new byte[value.getLength()*8];
 					
 					for (int i = 0; i < bytes.length; i++) {
-						bytes[i] = Byteconverter.bitToByte(center[i]);
+						bytes[i] = Byteconverter.bitToByte(Byteconverter.bitAt(center, i));
 					}
 					
 					System.out.println(key + " => " + new BytesWritable(bytes));
