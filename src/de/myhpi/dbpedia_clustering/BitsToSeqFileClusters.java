@@ -1,18 +1,15 @@
 package de.myhpi.dbpedia_clustering;
 
-import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.*;
-
 import org.apache.hadoop.io.*;
-import java.io.*;
 
+import java.io.*;
 import java.util.Random;
 
 public class BitsToSeqFileClusters extends BitsToSeqFile
 {
 	private Random random;
-	private int numerator;
-	private int denominator;
+	private String subjectsFile;
 	
 	/** Sets up Configuration and LocalFileSystem instances for
 	 * Hadoop.  Throws Exception if they fail.  Does not load any
@@ -23,58 +20,46 @@ public class BitsToSeqFileClusters extends BitsToSeqFile
 		super();
 		this.random = new Random();
 	}
-
-	public void setProb(int numerator, int denominator){
-		this.numerator = numerator;
-		this.denominator = denominator;
+	
+	protected SequenceFile.Reader openSubjectsFile() throws Exception {
+		return new SequenceFile.Reader(setup.getLocalFileSystem(), new Path(this.subjectsFile), setup.getConf());
 	}
 
 	/** Performs the conversion. */
 	public void execute() throws Exception {
-		DataInputStream input = null;
+		SequenceFile.Reader subjects = null;
 		SequenceFile.Writer output = null;
-		BufferedReader names = null;
-		int size,byte_size;
+		Text key = new Text();
+		BytesWritable value = new BytesWritable();
 		int count = 0;
-		String name;
+		byte[] center;
+		byte[] bytes;
+		
 		try {
-			input = this.openInputFile();
+			subjects = this.openSubjectsFile();
 			output = this.openOutputFile();
-			names = this.openNameFile();
 			
-			size =input.readInt();
-			
-			byte_size=size/8;
-			if(size%8 != 0)
-				byte_size++;
-			
-			System.out.println(" "+size+" "+byte_size);
-			
-			System.out.println(" ++ ");
-			
-			for (byte [] bits = new byte [byte_size];count < 10; input.readFully(bits))
-			{
-				name = names.readLine();
-				if(random.nextInt(denominator)<numerator)
-				{
-					count += 1;
-
-					byte [] bytes = new byte[size];
-					for (int i= 0;i<size;i++)
-					{
-						bytes[i] = Byteconverter.toSigned(
-							Byteconverter.bitToByte(Byteconverter.bitAt(bits,i)));
+			while (subjects.next(key, value)) {
+				if (count < 5) {
+					center = value.getBytes();
+					bytes = new byte[value.getLength()];
+					
+					for (int i = 0; i < bytes.length; i++) {
+						bytes[i] = Byteconverter.bitToByte(center[i]);
 					}
-					Text key = new Text(name);
-					BytesWritable value = new BytesWritable(bytes);
-									System.out.println(name);
-
-					output.append(key, value);
+					
+					System.out.println(key + " => " + new BytesWritable(bytes));
+					output.append(key, new BytesWritable(bytes));
+				} else {
+					break;
 				}
+				key = new Text();
+				value = new BytesWritable();
+				count++;
 			}
 		} finally {
-			if (input != null) { input.close(); }
 			if (output != null) { output.close(); }
+			if (subjects != null) { subjects.close(); }
 		}
 	}
 	
@@ -82,10 +67,9 @@ public class BitsToSeqFileClusters extends BitsToSeqFile
 	public static void main(String[] args) {
 		try {
 			BitsToSeqFileClusters me = new BitsToSeqFileClusters();
-			me.setInput(new File(args[0]));
-			me.setOutput(new File(args[2]));
-			me.setNameFile(new File(args[1])); 
-			me.setProb(1,100);
+			me.subjectsFile = args[0];
+			me.setInput(new File(me.subjectsFile));
+			me.setOutput(new File(args[1]));
 			me.execute();
 		} catch (Exception e) {
 			e.printStackTrace();

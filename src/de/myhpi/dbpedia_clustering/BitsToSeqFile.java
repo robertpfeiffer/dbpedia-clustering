@@ -12,9 +12,7 @@
 * implied. See the License for the specific language governing
 * permissions and limitations under the License.
 */
-
-	package de.myhpi.dbpedia_clustering;
-
+package de.myhpi.dbpedia_clustering;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.*;
@@ -22,16 +20,12 @@ import org.apache.hadoop.io.*;
 
 import java.io.*;
 
-
-
-
-
 public class BitsToSeqFile
 {
 	private File inputFile;
-        private File outputFile;
+    private File outputFile;
 	private File namesFile;
-	private LocalSetup setup;
+	protected LocalSetup setup;
 
 	/** Sets up Configuration and LocalFileSystem instances for
 	* Hadoop.  Throws Exception if they fail.  Does not load any
