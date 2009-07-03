@@ -1,11 +1,18 @@
 package de.myhpi.dbpedia_clustering;
 
-class ByteBitDistance implements Distance<byte[], byte[]> {
+import org.apache.hadoop.io.BytesWritable;
+
+class ByteBitDistance implements Distance<BytesWritable, BytesWritable> {
 	
-	public long between(byte[] center, byte[] subject) {
+	public long between(BytesWritable center, BytesWritable subject) {
 		long distance = 0;
-		for (int i = 0;i<center.length;i++) {
-			distance += Math.abs(Byteconverter.fromSigned(center[i]) - Byteconverter.fromSigned(Byteconverter.bitToByte(Byteconverter.bitAt(subject, i))));
+		byte[] centerBytes = center.getBytes();
+		byte[] subjectBytes = subject.getBytes();
+		
+		// assert(center.getLength()/8 == subject.getLength());
+			
+		for (int i = 0; i < center.getLength(); i++) {
+			distance += Math.abs(Byteconverter.fromSigned(centerBytes[i]) - Byteconverter.fromSigned(Byteconverter.byteAt(subjectBytes, i)));
 		}
 		return distance;
 	}

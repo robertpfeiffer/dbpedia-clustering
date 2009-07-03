@@ -61,19 +61,17 @@ class DBMap extends MapReduceBase
 	{
 		try
 		{
-			Distance distance = new ByteBitDistance();
+			Distance distance = new JaccardDisctance();
 			long minDistance = Long.MAX_VALUE;
 			Text nearestCenter = null;
 			
 			for(Map.Entry<Text,BytesWritable> entry:this.centers.entrySet())
 			{
 				long newDistance = 0;
-				byte [] center = entry.getValue().getBytes();
-
-				assert(length == center.length);
+				BytesWritable center = entry.getValue();
 				
-				newDistance = distance.between(center, subject.getBytes());
-				System.out.println("distance "+newDistance+" to "+ entry.getKey());
+				newDistance = distance.between(center, subject);
+				System.out.println(key +" => "+ entry.getKey() + " distance: "+newDistance);
 
 				if (newDistance < minDistance)
 				{

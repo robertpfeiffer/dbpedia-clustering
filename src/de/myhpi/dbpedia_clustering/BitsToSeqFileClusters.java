@@ -46,6 +46,7 @@ public class BitsToSeqFileClusters extends BitsToSeqFile
 		SequenceFile.Writer output = null;
 		Text key = new Text();
 		BytesWritable value = new BytesWritable();
+		BytesWritable newValue = new BytesWritable();
 		int count = 0;
 		byte[] center;
 		byte[] bytes;
@@ -65,9 +66,11 @@ public class BitsToSeqFileClusters extends BitsToSeqFile
 					for (int k = 0; k < bytes.length; k++) {
 						bytes[k] = Byteconverter.bitToByte(Byteconverter.bitAt(center, k));
 					}
+					newValue = new BytesWritable(bytes);
+					newValue.setSize(bytes.length);
 					
-					System.out.println(key + " => " + new BytesWritable(bytes));
-					output.append(key, new BytesWritable(bytes));
+					System.out.println(key + " => " + newValue);
+					output.append(key, newValue);
 					count++;
 				}
 				if (count == this.clusterNumber) 
