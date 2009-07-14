@@ -42,7 +42,7 @@ public class BitsToSeqFile
 		this.setup = new LocalSetup();
 	}
 
-	/** Sets the input tar file. */
+	/** Sets the input file. */
 	public void setInput(File inputFile) {
 		this.inputFile = inputFile;
 	}
@@ -83,7 +83,7 @@ public class BitsToSeqFile
 			
 			System.out.println(" "+size+" "+byte_size);
 
-			for (byte [] currentEntry = new byte [size];count < 10000; input.readFully(currentEntry)) {
+			for (byte [] currentEntry = new byte [byte_size];count < 10000; input.readFully(currentEntry)) {
 				count +=1;
 
 				name = names.readLine();
