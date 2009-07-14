@@ -1,5 +1,4 @@
 package de.myhpi.dbpedia_clustering;
-
 class Byteconverter {
 
 	static int bitAt(byte[] bytes, int index) {

@@ -42,6 +42,7 @@ class DBMap extends MapReduceBase
 			while (reader.next(key, value) == true)
 			{
 				centers.put(key,value);
+				System.out.println(key +" => "+ value);
 				key = new Text();
 				value = new BytesWritable();
 			}
@@ -134,25 +135,49 @@ class DBReduce extends MapReduceBase
 public class K_Means {
 	public static void main(String[] args) throws Exception
 	{
+		
 		JobConf conf = new JobConf(K_Means.class);
 		conf.setJobName("k-means");
 		conf.setInt("subject.length", 200); //TODO: Not Hardcode this
-
 		// DistributedCache.addCacheFile(new URI(args[0]), conf);
 		
 		conf.setOutputKeyClass(Text.class);
 		conf.setOutputValueClass(BytesWritable.class);
-
+		
 		conf.setMapperClass(DBMap.class);
 		conf.setReducerClass(DBReduce.class);
-
+		
 		conf.setInputFormat(SequenceFileInputFormat.class);
-		conf.setOutputFormat(TextOutputFormat.class);
-		//conf.setOutputFormat(SequenceFileOutputFormat.class);
-
+		conf.setOutputFormat(SequenceFileOutputFormat.class);
+		
 		FileInputFormat.setInputPaths(conf, new Path(args[1]));
 		FileOutputFormat.setOutputPath(conf, new Path(args[2]));
-
+		
 		JobClient.runJob(conf);
+		
+		int a = 2;
+		/*do {
+			conf = new JobConf(K_Means.class);
+			conf.setJobName("k-means");
+			conf.setInt("subject.length", 200); //TODO: Not Hardcode this
+			DistributedCache.addCacheFile(new URI(args[a]), conf);
+
+			a ^= 1;
+
+			conf.setOutputKeyClass(Text.class);
+			conf.setOutputValueClass(BytesWritable.class);
+		
+			conf.setMapperClass(DBMap.class);
+			conf.setReducerClass(DBReduce.class);
+		
+			conf.setInputFormat(SequenceFileInputFormat.class);
+			conf.setOutputFormat(SequenceFileOutputFormat.class);
+		
+			FileInputFormat.setInputPaths(conf, new Path(args[1]));
+			FileOutputFormat.setOutputPath(conf, new Path(args[a]));
+
+			JobClient.runJob(conf);
+		} while(false);*/
+
 	}
 }
