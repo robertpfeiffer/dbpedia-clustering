@@ -26,19 +26,17 @@ public class KMeans {
 
 		protected void setup(Context context) {
 			try {
-				Configuration conf = context.getConfiguration();
-				this.length = conf.getInt("subject.length", 1);
-				/*
-				 * localFiles = DistributedCache.getLocalCacheFiles(job); Path p
-				 * = localFiles[0]; final FileSystem fs =
-				 * FileSystem.getLocal(job); final Path qualified =
-				 * p.makeQualified(fs);
-				 */
+			        Configuration conf = context.getConfiguration();
+				this.length = conf.getInt("subject.length", -1);
+				localFiles = DistributedCache.getLocalCacheFiles(job);
+				Path p = localFiles[0];
+				final FileSystem fs = FileSystem.getLocal(job);
+				final Path qualified = p.makeQualified(fs);
+
 				this.centers = new LinkedHashMap();
 				Text key = new Text();
 				BytesWritable value = new BytesWritable();
-				SequenceFile.Reader reader = new SequenceFile.Reader(FileSystem
-						.get(conf), new Path("centers.seq"), conf);
+				SequenceFile.Reader reader = new SequenceFile.Reader(fs, qualified, job);
 
 				while (reader.next(key, value) == true) {
 					this.centers.put(key, value);
@@ -126,10 +124,10 @@ public class KMeans {
 
 	public static void main(String[] args) throws Exception {
 		Configuration conf = new Configuration();
-		conf.setInt("subject.length", 200); // TODO: Not Hardcode this
+		conf.setInt("subject.length", Integer.parseInt(args[3])); // TODO: Not Hardcode this
 
-		if (args.length != 3) {
-			System.err.println("Usage: k-means <center> <subjects> <out>");
+		if (args.length != 4) {
+			System.err.println("Usage: k-means <center> <subjects> <out> length");
 			System.exit(2);
 		}
 		
