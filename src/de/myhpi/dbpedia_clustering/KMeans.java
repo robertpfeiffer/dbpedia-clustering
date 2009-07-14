@@ -27,7 +27,6 @@ public class KMeans {
 		protected void setup(Context context) {
 			try {
 				Configuration conf = context.getConfiguration();
-
 				this.length = conf.getInt("subject.length", 1);
 				/*
 				 * localFiles = DistributedCache.getLocalCacheFiles(job); Path p
@@ -65,8 +64,7 @@ public class KMeans {
 					BytesWritable center = entry.getValue();
 
 					newDistance = distance.between(center, subject);
-					// System.out.println(key + " => " + entry.getKey()
-					//		+ " distance: " + newDistance);
+					// System.out.println(key + " => " + entry.getKey() + " distance: " + newDistance);
 
 					if (newDistance < minDistance) {
 						minDistance = newDistance;
@@ -74,6 +72,7 @@ public class KMeans {
 					}
 				}
 
+				System.out.println(nearestCenter + " => " + subject);
 				context.write(nearestCenter, subject);
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -140,7 +139,6 @@ public class KMeans {
 		job.setJarByClass(KMeans.class);
 		// DistributedCache.addCacheFile(new URI(args[0]), conf);
 		job.setMapperClass(ClusterMapper.class);
-		job.setCombinerClass(CenterReducer.class);
 		job.setReducerClass(CenterReducer.class);
 		job.setInputFormatClass(SequenceFileInputFormat.class);
 		job.setOutputFormatClass(SequenceFileOutputFormat.class);
