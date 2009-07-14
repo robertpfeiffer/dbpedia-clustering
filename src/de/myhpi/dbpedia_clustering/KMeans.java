@@ -130,38 +130,49 @@ public class KMeans {
 			System.err.println("Usage: k-means <center> <subjects> <out> length");
 			System.exit(2);
 		}
-		
-		Path tempDir = new Path("k-means-temp");
 
-		Job job = new Job(conf, "k-means");
-		job.setJarByClass(KMeans.class);
-		// DistributedCache.addCacheFile(new URI(args[0]), conf);
-		job.setMapperClass(ClusterMapper.class);
-		job.setReducerClass(CenterReducer.class);
-		job.setInputFormatClass(SequenceFileInputFormat.class);
-		job.setOutputFormatClass(SequenceFileOutputFormat.class);
-		job.setOutputKeyClass(Text.class);
-		job.setOutputValueClass(BytesWritable.class);
-		FileInputFormat.setInputPaths(job, new Path(args[1]));
-		FileOutputFormat.setOutputPath(job, tempDir);
+		FileSystem hdfs = FileSystem.get(conf);
+
+		Path tempInput = new Path("k-means-temp-in");
+		Path tempOutput = new Path("k-means-temp-out");
+
+		Path centerPath = new Path(args[0]);
+		Path subjectPath = new Path(args[1]);
+		Path outPath = new Path(args[2]);
 		
-		// start k-means
-		job.waitForCompletion(true);
+		boolean isRenamed = hdfs.rename(centerPath, tempInput);
+
+		for(int i = 0; i<10; i++) {
+		    DistributedCache.addCacheFile(tempInput.toURI(), conf);
+		    
+		    Job job = new Job(conf, "k-means");
+		    job.setJarByClass(KMeans.class);
+		    job.setMapperClass(ClusterMapper.class);
+		    job.setReducerClass(CenterReducer.class);
+		    job.setInputFormatClass(SequenceFileInputFormat.class);
+		    job.setOutputFormatClass(SequenceFileOutputFormat.class);
+		    job.setOutputKeyClass(Text.class);
+		    job.setOutputValueClass(BytesWritable.class);
+		    FileInputFormat.setInputPaths(job, subjectPath);
+		    FileOutputFormat.setOutputPath(job, tempOutput);
 		
-		FileSystem.get(conf).copyFromLocalFile(tempDir.suffix("/part-r-00000"), new Path(args[0]));
-		FileSystem.get(conf).delete(tempDir, true);
-		
+		    job.waitForCompletion(true);
+		    DistributedCache.purgeCache(conf);
+
+		    hdfs.rename(tempOutput.suffix("/part-00000"),tempInput);
+		}
+		DistributedCache.addCacheFile(tempInput.toURI(), conf);		    
+
 		Job outputJob = new Job(conf, "k-means Output");
 		outputJob.setJarByClass(KMeans.class);
-		// DistributedCache.addCacheFile(new URI(args[0]), conf);
 		outputJob.setMapperClass(ClusterMapper.class);
 		outputJob.setReducerClass(OutputReducer.class);
 		outputJob.setInputFormatClass(SequenceFileInputFormat.class);
 		outputJob.setOutputFormatClass(TextOutputFormat.class);
 		outputJob.setOutputKeyClass(Text.class);
 		outputJob.setOutputValueClass(BytesWritable.class);
-		FileInputFormat.setInputPaths(outputJob, new Path(args[1]));
-		FileOutputFormat.setOutputPath(outputJob, new Path(args[2]));
+		FileInputFormat.setInputPaths(outputJob, subjectPAth);
+		FileOutputFormat.setOutputPath(outputJob, outPath);
 
 		outputJob.waitForCompletion(true);
 	}
