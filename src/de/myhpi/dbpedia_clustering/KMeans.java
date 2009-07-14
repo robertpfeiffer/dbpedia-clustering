@@ -54,13 +54,13 @@ public class KMeans {
 		public void map(Text key, BytesWritable subject, Context context)
 				throws IOException {
 			try {
-				Distance distance = new ByteBitDistance();
-				long minDistance = Long.MAX_VALUE;
+				Distance distance = new EuclideanDistance();
+				double minDistance = Long.MAX_VALUE;
 				Text nearestCenter = null;
 				
 				for (Map.Entry<Text, BytesWritable> entry : this.centers
 						.entrySet()) {
-					long newDistance = 0;
+					double newDistance = 0;
 					BytesWritable center = entry.getValue();
 
 					newDistance = distance.between(center, subject);
