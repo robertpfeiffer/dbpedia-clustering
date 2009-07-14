@@ -119,8 +119,8 @@ public class KMeans {
 
 		public void reduce(Text key, Iterator<BytesWritable> values,
 				Context context) throws IOException, InterruptedException {
-
-				context.write(key, new BytesWritable());
+		    for(BytesWritable value:values)
+			context.write(key, value);
 		}
 	}
 
