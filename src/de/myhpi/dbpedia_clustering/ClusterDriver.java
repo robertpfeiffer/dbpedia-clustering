@@ -9,10 +9,7 @@ public class ClusterDriver
 		ProgramDriver pgd = new ProgramDriver();
 		try
 		{
-			pgd.addClass("wordcount", WordCount.class,
-				     "A map/reduce program that counts the words in the input files.");
-			pgd.addClass("k-means", K_Means.class,
-				     "Clustering of DBPedia Subjects");
+			pgd.addClass("k-means", KMeans.class, "Clustering of DBPedia Subjects");
 			pgd.driver(argv);
 			exitCode = 0;
 		} catch (Throwable t) //wtf?

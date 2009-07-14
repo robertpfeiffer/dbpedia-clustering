@@ -47,9 +47,9 @@ public class DummySeqFile
 				for (int k = 0; k < bytes.length; k++)
 				{
 					if (k / (bytes.length / GROUPS) == group) {
-						bytes[k] = (byte) 0;
-					} else {
 						bytes[k] = Byteconverter.toSigned(random.nextInt(256));
+					} else {
+						bytes[k] = (byte) 0;
 					}
 				}
 				BytesWritable value = new BytesWritable(bytes);

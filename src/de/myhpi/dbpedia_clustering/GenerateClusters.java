@@ -6,7 +6,7 @@ import org.apache.hadoop.io.*;
 import java.io.*;
 import java.util.Random;
 
-public class BitsToSeqFileClusters extends BitsToSeqFile
+public class GenerateClusters extends BitsToSeqFile
 {
 	private Random random;
 	private String subjectsFile;
@@ -17,7 +17,7 @@ public class BitsToSeqFileClusters extends BitsToSeqFile
 	 * Hadoop XML configuration files, just sets the minimum
 	 * configuration necessary to use the local file system.
 	 */
-	public BitsToSeqFileClusters() throws Exception {
+	public GenerateClusters() throws Exception {
 		super();
 		this.random = new Random();
 	}
@@ -93,7 +93,7 @@ public class BitsToSeqFileClusters extends BitsToSeqFile
 	/** Runs the converter at the command line. */
 	public static void main(String[] args) {
 		try {
-			BitsToSeqFileClusters me = new BitsToSeqFileClusters();
+			GenerateClusters me = new GenerateClusters();
 			me.subjectsFile = args[0];
 			me.setInput(new File(me.subjectsFile));
 			me.setOutput(new File(args[1]));
