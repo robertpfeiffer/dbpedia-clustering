@@ -1,8 +1,6 @@
-server
-privat
-classes
-dist
-hadoop-0.19.1
+server/*
+classes/*
+dist/*
 *~
 .DS_Store
 .centers.seq.crc
@@ -16,3 +14,7 @@ hadoop-0.19.1
 out*/*
 clustering/*
 clustering/**/*
+server
+hadoop-0.20.0/*
+lib/*
+k-means-temp/*
