@@ -2,9 +2,9 @@ package de.myhpi.dbpedia_clustering;
 
 import org.apache.hadoop.io.BytesWritable;
 
-class ByteBitDistance implements Distance<BytesWritable, BytesWritable> {
+class EuclideanDistance implements Distance<BytesWritable, BytesWritable> {
 	
-	public long between(BytesWritable center, BytesWritable subject) {
+	public double between(BytesWritable center, BytesWritable subject) {
 		long distance = 0;
 		byte[] centerBytes = center.getBytes();
 		byte[] subjectBytes = subject.getBytes();
