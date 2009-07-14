@@ -15,6 +15,8 @@ import org.apache.hadoop.mapreduce.lib.input.SequenceFileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.mapreduce.lib.output.SequenceFileOutputFormat;
 import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
+import org.apache.hadoop.filecache.DistributedCache;
+
 
 public class KMeans {
 
@@ -28,15 +30,15 @@ public class KMeans {
 			try {
 			        Configuration conf = context.getConfiguration();
 				this.length = conf.getInt("subject.length", -1);
-				localFiles = DistributedCache.getLocalCacheFiles(job);
+				localFiles = DistributedCache.getLocalCacheFiles(conf);
 				Path p = localFiles[0];
-				final FileSystem fs = FileSystem.getLocal(job);
+				final FileSystem fs = FileSystem.getLocal(conf);
 				final Path qualified = p.makeQualified(fs);
 
 				this.centers = new LinkedHashMap();
 				Text key = new Text();
 				BytesWritable value = new BytesWritable();
-				SequenceFile.Reader reader = new SequenceFile.Reader(fs, qualified, job);
+				SequenceFile.Reader reader = new SequenceFile.Reader(fs, qualified, conf);
 
 				while (reader.next(key, value) == true) {
 					this.centers.put(key, value);
@@ -115,9 +117,9 @@ public class KMeans {
 	public static class OutputReducer extends
 			Reducer<Text, BytesWritable, Text, BytesWritable> {
 
-		public void reduce(Text key, Iterator<BytesWritable> values,
+		public void reduce(Text key, Iterable<BytesWritable> values,
 				Context context) throws IOException, InterruptedException {
-		    for(BytesWritable value:values)
+		    for(BytesWritable value : values)
 			context.write(key, value);
 		}
 	}
@@ -143,7 +145,7 @@ public class KMeans {
 		boolean isRenamed = hdfs.rename(centerPath, tempInput);
 
 		for(int i = 0; i<10; i++) {
-		    DistributedCache.addCacheFile(tempInput.toURI(), conf);
+		    DistributedCache.addCacheFile(tempInput.toUri(), conf);
 		    
 		    Job job = new Job(conf, "k-means");
 		    job.setJarByClass(KMeans.class);
@@ -161,7 +163,7 @@ public class KMeans {
 
 		    hdfs.rename(tempOutput.suffix("/part-00000"),tempInput);
 		}
-		DistributedCache.addCacheFile(tempInput.toURI(), conf);		    
+		DistributedCache.addCacheFile(tempInput.toUri(), conf);		    
 
 		Job outputJob = new Job(conf, "k-means Output");
 		outputJob.setJarByClass(KMeans.class);
@@ -171,7 +173,7 @@ public class KMeans {
 		outputJob.setOutputFormatClass(TextOutputFormat.class);
 		outputJob.setOutputKeyClass(Text.class);
 		outputJob.setOutputValueClass(BytesWritable.class);
-		FileInputFormat.setInputPaths(outputJob, subjectPAth);
+		FileInputFormat.setInputPaths(outputJob, subjectPath);
 		FileOutputFormat.setOutputPath(outputJob, outPath);
 
 		outputJob.waitForCompletion(true);
