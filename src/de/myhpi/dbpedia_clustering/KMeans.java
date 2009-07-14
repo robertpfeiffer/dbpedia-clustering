@@ -7,6 +7,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.filecache.DistributedCache;
 import org.apache.hadoop.fs.*;
 import org.apache.hadoop.io.*;
 import org.apache.hadoop.mapreduce.*;
@@ -21,13 +22,11 @@ public class KMeans {
 	public static class ClusterMapper extends
 			Mapper<Text, BytesWritable, Text, BytesWritable> {
 		private Path[] localFiles;
-		private int length;
 		private Map<Text, BytesWritable> centers;
 
 		protected void setup(Context context) {
 			try {
 				Configuration conf = context.getConfiguration();
-				this.length = conf.getInt("subject.length", 1);
 				/*
 				 * localFiles = DistributedCache.getLocalCacheFiles(job); Path p
 				 * = localFiles[0]; final FileSystem fs =
@@ -55,7 +54,7 @@ public class KMeans {
 				throws IOException {
 			try {
 				Distance distance = new EuclideanDistance();
-				double minDistance = Long.MAX_VALUE;
+				double minDistance = Double.MAX_VALUE;
 				Text nearestCenter = null;
 				
 				for (Map.Entry<Text, BytesWritable> entry : this.centers
@@ -64,7 +63,7 @@ public class KMeans {
 					BytesWritable center = entry.getValue();
 
 					newDistance = distance.between(center, subject);
-					// System.out.println(key + " => " + entry.getKey() + " distance: " + newDistance);
+					System.out.println(key + " => " + entry.getKey() + " distance: " + newDistance);
 
 					if (newDistance < minDistance) {
 						minDistance = newDistance;
@@ -72,7 +71,7 @@ public class KMeans {
 					}
 				}
 
-				System.out.println(nearestCenter + " => " + subject);
+				// System.out.println(nearestCenter + " => " + subject);
 				context.write(nearestCenter, subject);
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -89,15 +88,15 @@ public class KMeans {
 					.getInt("subject.length", 1);
 		}
 
-		public void reduce(Text key, Iterator<BytesWritable> values,
+		public void reduce(Text key, Iterable<BytesWritable> values,
 				Context context) throws IOException {
 
 			try {
 				int counts[] = new int[length];
 				byte byte_counts[] = new byte[length];
 				int num_subjects = 0;
-				for (BytesWritable subject = values.next(); values.hasNext(); subject = values
-						.next()) {
+				
+				for (BytesWritable subject : values) {
 					byte bits[] = subject.getBytes();
 					num_subjects++;
 					for (int i = 0; i < length; i++)
@@ -126,7 +125,7 @@ public class KMeans {
 
 	public static void main(String[] args) throws Exception {
 		Configuration conf = new Configuration();
-		conf.setInt("subject.length", 200); // TODO: Not Hardcode this
+		conf.setInt("subject.length", 800); // TODO: Not Hardcode this
 
 		if (args.length != 3) {
 			System.err.println("Usage: k-means <center> <subjects> <out>");

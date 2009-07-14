@@ -18,3 +18,5 @@ server
 hadoop-0.20.0/*
 lib/*
 k-means-temp/*
+centers.seq
+subjects.seq
