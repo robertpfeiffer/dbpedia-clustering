@@ -13,3 +13,6 @@ hadoop-0.19.1
 .project
 .settings/*
 .subjects.seq.crc
+out*/*
+clustering/*
+clustering/**/*
