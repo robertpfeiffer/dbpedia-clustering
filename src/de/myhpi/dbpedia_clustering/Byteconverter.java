@@ -8,6 +8,11 @@ class Byteconverter {
 	static byte byteAt(byte[] bytes, int index) {
 		return Byteconverter.bitToByte(Byteconverter.bitAt(bytes, index));
 	}
+	
+	
+	static int uByteAt(byte[] bytes, int index) {
+		return 255 * Byteconverter.bitAt(bytes, index);
+	}
 
 	static int fromSigned(byte val) {
 		if (val < 0)
