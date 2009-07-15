@@ -11,6 +11,7 @@ public class GenerateClusters extends BitsToSeqFile
 	private Random random;
 	private String subjectsFile;
 	private int clusterNumber = 5;
+	private int byte_size;
 	
 	/** Sets up Configuration and LocalFileSystem instances for
 	 * Hadoop.  Throws Exception if they fail.  Does not load any
@@ -55,26 +56,32 @@ public class GenerateClusters extends BitsToSeqFile
 		try {
 			subjects = this.openSubjectsFile();
 			output = this.openOutputFile();
+			
+			System.out.println("start counting subjects");
 			size = this.getSequenceFileSize();
+			System.out.println("number of subjects: "+size);
 			
 			i = 0;
 			while (subjects.next(key, value)) {
 				if (random.nextInt(size) < this.clusterNumber || (size-i == this.clusterNumber-count)) {
 					center = value.getBytes();
-					bytes = new byte[value.getLength()*8];
+					bytes = new byte[byte_size];
 					
 					for (int k = 0; k < bytes.length; k++) {
-						bytes[k] = Byteconverter.bitToByte(Byteconverter.bitAt(center, k));
+						bytes[k] = Byteconverter.byteAt(center, k);
 					}
 					newValue = new BytesWritable(bytes);
 					newValue.setSize(bytes.length);
 					
-					System.out.println(key + " => " + newValue);
 					output.append(key, newValue);
 					count++;
 				}
+				
 				if (count == this.clusterNumber) 
 					break;
+				
+				if (i % 100000 == 0)
+					System.out.println("processed subjects: "+i);
 				
 				key = new Text();
 				value = new BytesWritable();
@@ -90,6 +97,10 @@ public class GenerateClusters extends BitsToSeqFile
 		this.clusterNumber = Integer.parseInt(string);
 	}
 	
+	private void setByteSize(String string) {
+		this.byte_size = Integer.parseInt(string);
+	}
+	
 	/** Runs the converter at the command line. */
 	public static void main(String[] args) {
 		try {
@@ -97,8 +108,9 @@ public class GenerateClusters extends BitsToSeqFile
 			me.subjectsFile = args[0];
 			me.setInput(new File(me.subjectsFile));
 			me.setOutput(new File(args[1]));
-			if (args.length == 3) {
-				me.setClusterNumber(args[2]);
+			me.setByteSize(args[2]);
+			if (args.length == 4) {
+				me.setClusterNumber(args[3]);
 			}
 			me.execute();
 		} catch (Exception e) {

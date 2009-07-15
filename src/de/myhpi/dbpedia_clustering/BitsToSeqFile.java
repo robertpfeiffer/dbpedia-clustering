@@ -63,29 +63,34 @@ public class BitsToSeqFile
 		BufferedReader names = null;
 		int size,byte_size;
 		int count = 0;
-		String name;
+		String name = null;
 		try {
 			input = openInputFile();
 			output = openOutputFile();
 			names = this.openNameFile();
 			
-			size =input.readInt();
-			
+			size = input.readInt();
+
 			byte_size=size/8;
 			if(size%8 != 0)
 				byte_size++;
 			
-			System.out.println(" "+size+" "+byte_size);
-
-			for (byte [] currentEntry = new byte [byte_size];count < 10000; input.readFully(currentEntry)) {
+			byte [] currentEntry = new byte [byte_size];
+			while ((input.read(currentEntry)) != -1) {
 				count +=1;
-
+				
 				name = names.readLine();
 				Text key = new Text(name);
 				BytesWritable value = new BytesWritable(currentEntry);
-				System.out.println(name);
 				output.append(key, value);
+				
+				if (count % 10000 == 0) {
+					System.out.println("processed entries: "+count);
+				}
 			}
+			System.out.println(name);
+			System.out.println("Number of subjects: "+count);
+			System.out.println("Number of attributes: "+size);
 		} finally {
 			if (input != null) { input.close(); }
 			if (output != null) { output.close(); }
