@@ -5,7 +5,7 @@ import org.apache.hadoop.io.*;
 import java.io.*;
 import java.util.Random;
 
-public class DummySeqFile
+public class DummySubjects
 {
 	private Random random;
 	private File outputFile;
@@ -20,7 +20,7 @@ public class DummySeqFile
 	* Hadoop XML configuration files, just sets the minimum
 	* configuration necessary to use the local file system.
 	*/
-	public DummySeqFile() throws Exception {
+	public DummySubjects() throws Exception {
 		this.setup = new LocalSetup();
 		this.random = new Random();
 	}
@@ -73,7 +73,7 @@ public class DummySeqFile
 	/** Runs the converter at the command line. */
 	public static void main(String[] args) {
 		try {
-			DummySeqFile me = new DummySeqFile();
+			DummySubjects me = new DummySubjects();
 			me.setOutput(new File(args[0]));
 			me.execute();
 		} catch (Exception e) {
