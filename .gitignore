@@ -20,3 +20,7 @@ lib/*
 k-means-temp/*
 centers.seq
 subjects.seq
+centers.orig.seq
+config.xml
+infobox_en.csv.sort11.pivot_part_1
+infobox_en.csv.sort11.pivot_part_2
