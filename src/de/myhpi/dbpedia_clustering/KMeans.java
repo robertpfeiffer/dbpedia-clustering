@@ -7,6 +7,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.filecache.DistributedCache;
 import org.apache.hadoop.fs.*;
 import org.apache.hadoop.io.*;
 import org.apache.hadoop.mapreduce.*;
@@ -25,8 +26,7 @@ public class KMeans {
 
 		protected void setup(Context context) {
 			try {
-			        Configuration conf = context.getConfiguration();
-				this.length = conf.getInt("subject.length", -1);
+				Configuration conf = context.getConfiguration();
 				localFiles = DistributedCache.getLocalCacheFiles(conf);
 				Path p = localFiles[0];
 				final FileSystem fs = FileSystem.getLocal(conf);
@@ -121,16 +121,14 @@ public class KMeans {
 		}
 	}
 
-public static class OutputMapper extends
+	public static class OutputMapper extends
 			Mapper<Text, BytesWritable, Text, Text> {
 		private Path[] localFiles;
-		private int length;
 		private Map<Text, BytesWritable> centers;
 
 		protected void setup(Context context) {
 			try {
-			        Configuration conf = context.getConfiguration();
-				this.length = conf.getInt("subject.length", -1);
+				Configuration conf = context.getConfiguration();
 				localFiles = DistributedCache.getLocalCacheFiles(conf);
 				Path p = localFiles[0];
 				final FileSystem fs = FileSystem.getLocal(conf);
@@ -173,7 +171,7 @@ public static class OutputMapper extends
 					}
 				}
 
-				System.out.println(nearestCenter + " => " + subject);
+				// System.out.println(nearestCenter + " => " + subject);
 				context.write(nearestCenter, key);
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -199,7 +197,7 @@ public static class OutputMapper extends
 		Path subjectPath = new Path(args[1]);
 		Path outPath = new Path(args[2]);
 		
-		boolean isRenamed = hdfs.rename(centerPath, tempInput);
+		hdfs.rename(centerPath, tempInput);
 
 		for(int i = 0; i<10; i++) {
 		    DistributedCache.addCacheFile(tempInput.toUri(), conf);
