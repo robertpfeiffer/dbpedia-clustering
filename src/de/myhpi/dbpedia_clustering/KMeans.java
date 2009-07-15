@@ -55,7 +55,7 @@ public class KMeans {
 				throws IOException {
 			try {
 				Distance distance = new EuclideanDistance();
-				double minDistance = Long.MAX_VALUE;
+				double minDistance = Double.MAX_VALUE;
 				Text nearestCenter = null;
 				
 				for (Map.Entry<Text, BytesWritable> entry : this.centers
@@ -115,23 +115,83 @@ public class KMeans {
 	}
 
 	public static class OutputReducer extends
-			Reducer<Text, BytesWritable, Text, BytesWritable> {
+			Reducer<Text, Text, Text, Text> {
 
-		public void reduce(Text key, Iterable<BytesWritable> values,
+		public void reduce(Text key, Iterable<Text> values,
 				Context context) throws IOException, InterruptedException {
-		    for(BytesWritable value : values)
+		    for(Text value : values)
 			context.write(key, value);
 		}
 	}
 
-	public static void main(String[] args) throws Exception {
-		Configuration conf = new Configuration();
-		conf.setInt("subject.length", Integer.parseInt(args[3])); // TODO: Not Hardcode this
+public static class OutputMapper extends
+			Mapper<Text, BytesWritable, Text, Text> {
+		private Path[] localFiles;
+		private int length;
+		private Map<Text, BytesWritable> centers;
 
+		protected void setup(Context context) {
+			try {
+			        Configuration conf = context.getConfiguration();
+				this.length = conf.getInt("subject.length", -1);
+				localFiles = DistributedCache.getLocalCacheFiles(conf);
+				Path p = localFiles[0];
+				final FileSystem fs = FileSystem.getLocal(conf);
+				final Path qualified = p.makeQualified(fs);
+
+				this.centers = new LinkedHashMap();
+				Text key = new Text();
+				BytesWritable value = new BytesWritable();
+				SequenceFile.Reader reader = new SequenceFile.Reader(fs, qualified, conf);
+
+				while (reader.next(key, value) == true) {
+					this.centers.put(key, value);
+					key = new Text();
+					value = new BytesWritable();
+				}
+				reader.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+
+		public void map(Text key, BytesWritable subject, Context context)
+				throws IOException {
+			try {
+				Distance distance = new EuclideanDistance();
+				double minDistance = Double.MAX_VALUE;
+				Text nearestCenter = null;
+				
+				for (Map.Entry<Text, BytesWritable> entry : this.centers
+						.entrySet()) {
+					double newDistance = 0;
+					BytesWritable center = entry.getValue();
+
+					newDistance = distance.between(center, subject);
+					// System.out.println(key + " => " + entry.getKey() + " distance: " + newDistance);
+
+					if (newDistance < minDistance) {
+						minDistance = newDistance;
+						nearestCenter = entry.getKey();
+					}
+				}
+
+				System.out.println(nearestCenter + " => " + subject);
+				context.write(nearestCenter, key);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+	}
+
+	public static void main(String[] args) throws Exception {
 		if (args.length != 4) {
 			System.err.println("Usage: k-means <center> <subjects> <out> length");
 			System.exit(2);
 		}
+
+		Configuration conf = new Configuration();
+		conf.setInt("subject.length", Integer.parseInt(args[3]));
 
 		FileSystem hdfs = FileSystem.get(conf);
 
@@ -160,22 +220,27 @@ public class KMeans {
 		
 		    job.waitForCompletion(true);
 		    DistributedCache.purgeCache(conf);
+		    hdfs.delete(tempInput, true);
+		    hdfs.rename(
+			hdfs.globStatus(
+				  tempOutput.suffix("/part-*"))[0].getPath(),tempInput);
+		    hdfs.delete(tempOutput, true);
 
-		    hdfs.rename(tempOutput.suffix("/part-00000"),tempInput);
 		}
-		DistributedCache.addCacheFile(tempInput.toUri(), conf);		    
-
+		DistributedCache.addCacheFile(tempInput.toUri(), conf);
 		Job outputJob = new Job(conf, "k-means Output");
 		outputJob.setJarByClass(KMeans.class);
-		outputJob.setMapperClass(ClusterMapper.class);
+		outputJob.setMapperClass(OutputMapper.class);
 		outputJob.setReducerClass(OutputReducer.class);
 		outputJob.setInputFormatClass(SequenceFileInputFormat.class);
 		outputJob.setOutputFormatClass(TextOutputFormat.class);
 		outputJob.setOutputKeyClass(Text.class);
-		outputJob.setOutputValueClass(BytesWritable.class);
+		outputJob.setOutputValueClass(Text.class);
 		FileInputFormat.setInputPaths(outputJob, subjectPath);
 		FileOutputFormat.setOutputPath(outputJob, outPath);
 
 		outputJob.waitForCompletion(true);
+		hdfs.delete(tempInput, true);
+				    
 	}
 }
