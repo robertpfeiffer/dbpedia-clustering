@@ -21,9 +21,6 @@ public class JaccardDistance implements Distance<BytesWritable, BytesWritable> {
 		    i_card+=a;
 		}
 	    }
-	    System.out.println(">>");
-	    System.out.println(i_card);
-	    System.out.println(u_card);
 	    if(u_card==0)
 		return 0.0;
 	    return 1.0 - (1.0*i_card)/u_card;
