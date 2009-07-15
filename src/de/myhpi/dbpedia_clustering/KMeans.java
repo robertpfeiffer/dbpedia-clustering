@@ -23,6 +23,8 @@ public class KMeans {
 			Mapper<Text, BytesWritable, Text, BytesWritable> {
 		private Path[] localFiles;
 		private Map<Text, BytesWritable> centers;
+		private Distance distance;
+
 
 		protected void setup(Context context) {
 			try {
