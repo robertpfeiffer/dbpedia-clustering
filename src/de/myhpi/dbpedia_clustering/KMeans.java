@@ -2,7 +2,6 @@ package de.myhpi.dbpedia_clustering;
 
 import java.io.IOException;
 
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -122,16 +121,6 @@ public class KMeans {
 		}
 	}
 
-	public static class OutputReducer extends
-			Reducer<Text, Text, Text, Text> {
-
-		public void reduce(Text key, Iterable<Text> values,
-				Context context) throws IOException, InterruptedException {
-		    for(Text value : values)
-			context.write(key, value);
-		}
-	}
-
 	public static class OutputMapper extends
 			Mapper<Text, BytesWritable, Text, Text> {
 		private Path[] localFiles;
@@ -198,6 +187,16 @@ public class KMeans {
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
+		}
+	}
+	
+	public static class OutputReducer extends
+			Reducer<Text, Text, Text, Text> {
+
+		public void reduce(Text key, Iterable<Text> values,
+				Context context) throws IOException, InterruptedException {
+			for(Text value : values)
+		    	context.write(key, value);
 		}
 	}
 
