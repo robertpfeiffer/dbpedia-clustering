@@ -189,13 +189,15 @@ public class KMeans {
 
 	public static void main(String[] args) throws Exception {
 		if (args.length != 4) {
-			System.err.println("Usage: k-means <center> <subjects> <out> length");
+			System.err.println("Usage: k-means <center> <subjects> <out>");
 			System.exit(2);
 		}
 
 		Configuration conf = new Configuration();
-		conf.setInt("subject.length", Integer.parseInt(args[3]));
+		conf.setInt("subject.length", -1);
 		conf.setBoolean("run.local", false);
+
+		conf.addResource(new Path("config.xml"));
 
 		FileSystem hdfs = FileSystem.get(conf);
 
@@ -209,8 +211,9 @@ public class KMeans {
 		hdfs.rename(centerPath, tempInput);
 
 		for(int i = 0; i<10; i++) {
-		    DistributedCache.addCacheFile(tempInput.toUri(), conf);
-		    
+		    if (!conf.getBoolean("run.local",false)) {
+			     DistributedCache.addCacheFile(tempInput.toUri(), conf);
+		    }
 		    Job job = new Job(conf, "k-means");
 		    job.setJarByClass(KMeans.class);
 		    job.setMapperClass(ClusterMapper.class);
@@ -223,7 +226,9 @@ public class KMeans {
 		    FileOutputFormat.setOutputPath(job, tempOutput);
 		
 		    job.waitForCompletion(true);
-		    DistributedCache.purgeCache(conf);
+		    if (!conf.getBoolean("run.local",false)) {
+			    DistributedCache.purgeCache(conf);
+		    }
 		    hdfs.delete(tempInput, true);
 		    hdfs.rename(
 			hdfs.globStatus(
@@ -231,7 +236,9 @@ public class KMeans {
 		    hdfs.delete(tempOutput, true);
 
 		}
-		DistributedCache.addCacheFile(tempInput.toUri(), conf);
+		if (!conf.getBoolean("run.local",false)) {
+			DistributedCache.addCacheFile(tempInput.toUri(), conf);
+		}
 		Job outputJob = new Job(conf, "k-means Output");
 		outputJob.setJarByClass(KMeans.class);
 		outputJob.setMapperClass(OutputMapper.class);
@@ -245,6 +252,6 @@ public class KMeans {
 
 		outputJob.waitForCompletion(true);
 		hdfs.delete(tempInput, true);
-				    
+
 	}
 }
