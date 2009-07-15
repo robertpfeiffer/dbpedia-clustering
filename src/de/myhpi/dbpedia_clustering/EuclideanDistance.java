@@ -12,11 +12,9 @@ class EuclideanDistance implements Distance<BytesWritable, BytesWritable> {
 		// assert(center.getLength()/8 == subject.getLength());
 
 		for (int i = 0; i < center.getLength(); i++) {
-			distance += Math.abs(Math.pow(Byteconverter
-					.fromSigned(centerBytes[i]), 2)
-					- Math.pow(Byteconverter.fromSigned(Byteconverter.byteAt(
-							subjectBytes, i)), 2));
+			distance += Math.pow(Byteconverter.fromSigned(centerBytes[i])
+			    - Byteconverter.fromSigned(Byteconverter.byteAt(subjectBytes,i)),2);
 		}
-		return distance;
+		return Math.sqrt(distance);
 	}
 }

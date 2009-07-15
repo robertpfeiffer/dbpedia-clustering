@@ -47,6 +47,12 @@ public class KMeans {
 					value = new BytesWritable();
 				}
 				reader.close();
+
+				if (conf.get("distance.calculation").equals("Jaccard")) {
+					distance = new JaccardDistance();
+				} else {
+					distance = new EuclideanDistance();
+				}
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
@@ -55,7 +61,6 @@ public class KMeans {
 		public void map(Text key, BytesWritable subject, Context context)
 				throws IOException {
 			try {
-				Distance distance = new JaccardDistance();
 				double minDistance = Double.MAX_VALUE;
 				Text nearestCenter = null;
 				
@@ -129,6 +134,7 @@ public class KMeans {
 			Mapper<Text, BytesWritable, Text, Text> {
 		private Path[] localFiles;
 		private Map<Text, BytesWritable> centers;
+		private Distance distance;
 
 		protected void setup(Context context) {
 			try {
@@ -153,6 +159,12 @@ public class KMeans {
 					value = new BytesWritable();
 				}
 				reader.close();
+
+				if (conf.get("distance.calculation").equals("Jaccard")) {
+					distance = new JaccardDistance();
+				} else {
+					distance = new EuclideanDistance();
+				}
 			} catch (IOException e) {
 				e.printStackTrace();
 			}

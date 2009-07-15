@@ -13,4 +13,18 @@
      <value>800</value>
     <description>number of attributes</description>
    </property>
- </configuration>
+
+   <property>
+     <name>iterations</name>
+     <value>10</value>
+    <description></description>
+   </property>
+
+   <property>
+     <name>distance.calculation</name>
+     <value>Jaccard</value>
+    <description></description>
+   </property> 
+
+
+</configuration>
