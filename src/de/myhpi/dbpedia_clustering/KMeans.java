@@ -27,8 +27,12 @@ public class KMeans {
 		protected void setup(Context context) {
 			try {
 				Configuration conf = context.getConfiguration();
-				localFiles = DistributedCache.getLocalCacheFiles(conf);
-				Path p = localFiles[0];
+				Path p;
+				if (conf.getBoolean("run.local",false)) {
+					p = new Path("k-means-temp-in");
+				} else {
+					p = DistributedCache.getLocalCacheFiles(conf)[0];
+				}
 				final FileSystem fs = FileSystem.getLocal(conf);
 				final Path qualified = p.makeQualified(fs);
 
@@ -83,7 +87,7 @@ public class KMeans {
 
 		protected void setup(Context context) {
 			this.length = context.getConfiguration()
-					.getInt("subject.length", 1);
+					.getInt("subject.length", -1);
 		}
 
 		public void reduce(Text key, Iterable<BytesWritable> values,
@@ -129,8 +133,12 @@ public class KMeans {
 		protected void setup(Context context) {
 			try {
 				Configuration conf = context.getConfiguration();
-				localFiles = DistributedCache.getLocalCacheFiles(conf);
-				Path p = localFiles[0];
+				Path p;
+				if (conf.getBoolean("run.local",false)) {
+					p = new Path("k-means-temp-in");
+				} else {
+					p = DistributedCache.getLocalCacheFiles(conf)[0];
+				}
 				final FileSystem fs = FileSystem.getLocal(conf);
 				final Path qualified = p.makeQualified(fs);
 
@@ -187,6 +195,7 @@ public class KMeans {
 
 		Configuration conf = new Configuration();
 		conf.setInt("subject.length", Integer.parseInt(args[3]));
+		conf.setBoolean("run.local", false);
 
 		FileSystem hdfs = FileSystem.get(conf);
 
