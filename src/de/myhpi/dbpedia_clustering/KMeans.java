@@ -71,7 +71,6 @@ public class KMeans {
 					BytesWritable center = entry.getValue();
 
 					newDistance = distance.between(center, subject);
-					System.out.println(key + " => " + entry.getKey() + " distance: " + newDistance);
 
 					if (newDistance < minDistance) {
 						minDistance = newDistance;
@@ -79,7 +78,6 @@ public class KMeans {
 					}
 				}
 
-				// System.out.println(nearestCenter + " => " + subject);
 				context.write(nearestCenter, subject);
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -174,7 +172,6 @@ public class KMeans {
 					BytesWritable center = entry.getValue();
 
 					newDistance = distance.between(center, subject);
-					// System.out.println(key + " => " + entry.getKey() + " distance: " + newDistance);
 
 					if (newDistance < minDistance) {
 						minDistance = newDistance;
@@ -182,7 +179,6 @@ public class KMeans {
 					}
 				}
 
-				// System.out.println(nearestCenter + " => " + subject);
 				context.write(nearestCenter, key);
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -234,6 +230,7 @@ public class KMeans {
 		    job.setOutputKeyClass(Text.class);
 		    job.setOutputValueClass(BytesWritable.class);
 		    FileInputFormat.setInputPaths(job, subjectPath);
+		    FileInputFormat.setMaxInputSplitSize(job, 1000000);
 		    FileOutputFormat.setOutputPath(job, tempOutput);
 		
 		    job.waitForCompletion(true);

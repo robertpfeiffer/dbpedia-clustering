@@ -75,6 +75,7 @@ public class GenerateClusters extends BitsToSeqFile
 					
 					output.append(key, newValue);
 					count++;
+					System.out.println("cluster taken at " +i+ " : "+key);
 				}
 				
 				if (count == this.clusterNumber) 
@@ -87,6 +88,7 @@ public class GenerateClusters extends BitsToSeqFile
 				value = new BytesWritable();
 				i++;
 			}
+			System.out.println("finished");
 		} finally {
 			if (output != null) { output.close(); }
 			if (subjects != null) { subjects.close(); }
