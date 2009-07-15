@@ -7,7 +7,6 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.filecache.DistributedCache;
 import org.apache.hadoop.fs.*;
 import org.apache.hadoop.io.*;
 import org.apache.hadoop.mapreduce.*;
@@ -26,18 +25,17 @@ public class KMeans {
 
 		protected void setup(Context context) {
 			try {
-				Configuration conf = context.getConfiguration();
-				/*
-				 * localFiles = DistributedCache.getLocalCacheFiles(job); Path p
-				 * = localFiles[0]; final FileSystem fs =
-				 * FileSystem.getLocal(job); final Path qualified =
-				 * p.makeQualified(fs);
-				 */
+			        Configuration conf = context.getConfiguration();
+				this.length = conf.getInt("subject.length", -1);
+				localFiles = DistributedCache.getLocalCacheFiles(conf);
+				Path p = localFiles[0];
+				final FileSystem fs = FileSystem.getLocal(conf);
+				final Path qualified = p.makeQualified(fs);
+
 				this.centers = new LinkedHashMap();
 				Text key = new Text();
 				BytesWritable value = new BytesWritable();
-				SequenceFile.Reader reader = new SequenceFile.Reader(FileSystem
-						.get(conf), new Path("centers.seq"), conf);
+				SequenceFile.Reader reader = new SequenceFile.Reader(fs, qualified, conf);
 
 				while (reader.next(key, value) == true) {
 					this.centers.put(key, value);
@@ -114,56 +112,132 @@ public class KMeans {
 	}
 
 	public static class OutputReducer extends
-			Reducer<Text, BytesWritable, Text, BytesWritable> {
+			Reducer<Text, Text, Text, Text> {
 
-		public void reduce(Text key, Iterator<BytesWritable> values,
+		public void reduce(Text key, Iterable<Text> values,
 				Context context) throws IOException, InterruptedException {
+		    for(Text value : values)
+			context.write(key, value);
+		}
+	}
 
-				context.write(key, new BytesWritable());
+public static class OutputMapper extends
+			Mapper<Text, BytesWritable, Text, Text> {
+		private Path[] localFiles;
+		private int length;
+		private Map<Text, BytesWritable> centers;
+
+		protected void setup(Context context) {
+			try {
+			        Configuration conf = context.getConfiguration();
+				this.length = conf.getInt("subject.length", -1);
+				localFiles = DistributedCache.getLocalCacheFiles(conf);
+				Path p = localFiles[0];
+				final FileSystem fs = FileSystem.getLocal(conf);
+				final Path qualified = p.makeQualified(fs);
+
+				this.centers = new LinkedHashMap();
+				Text key = new Text();
+				BytesWritable value = new BytesWritable();
+				SequenceFile.Reader reader = new SequenceFile.Reader(fs, qualified, conf);
+
+				while (reader.next(key, value) == true) {
+					this.centers.put(key, value);
+					key = new Text();
+					value = new BytesWritable();
+				}
+				reader.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+
+		public void map(Text key, BytesWritable subject, Context context)
+				throws IOException {
+			try {
+				Distance distance = new EuclideanDistance();
+				double minDistance = Double.MAX_VALUE;
+				Text nearestCenter = null;
+				
+				for (Map.Entry<Text, BytesWritable> entry : this.centers
+						.entrySet()) {
+					double newDistance = 0;
+					BytesWritable center = entry.getValue();
+
+					newDistance = distance.between(center, subject);
+					// System.out.println(key + " => " + entry.getKey() + " distance: " + newDistance);
+
+					if (newDistance < minDistance) {
+						minDistance = newDistance;
+						nearestCenter = entry.getKey();
+					}
+				}
+
+				System.out.println(nearestCenter + " => " + subject);
+				context.write(nearestCenter, key);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 		}
 	}
 
 	public static void main(String[] args) throws Exception {
-		Configuration conf = new Configuration();
-		conf.setInt("subject.length", 800); // TODO: Not Hardcode this
-
-		if (args.length != 3) {
-			System.err.println("Usage: k-means <center> <subjects> <out>");
+		if (args.length != 4) {
+			System.err.println("Usage: k-means <center> <subjects> <out> length");
 			System.exit(2);
 		}
-		
-		Path tempDir = new Path("k-means-temp");
 
-		Job job = new Job(conf, "k-means");
-		job.setJarByClass(KMeans.class);
-		// DistributedCache.addCacheFile(new URI(args[0]), conf);
-		job.setMapperClass(ClusterMapper.class);
-		job.setReducerClass(CenterReducer.class);
-		job.setInputFormatClass(SequenceFileInputFormat.class);
-		job.setOutputFormatClass(SequenceFileOutputFormat.class);
-		job.setOutputKeyClass(Text.class);
-		job.setOutputValueClass(BytesWritable.class);
-		FileInputFormat.setInputPaths(job, new Path(args[1]));
-		FileOutputFormat.setOutputPath(job, tempDir);
+		Configuration conf = new Configuration();
+		conf.setInt("subject.length", Integer.parseInt(args[3]));
+
+		FileSystem hdfs = FileSystem.get(conf);
+
+		Path tempInput = new Path("k-means-temp-in");
+		Path tempOutput = new Path("k-means-temp-out");
+
+		Path centerPath = new Path(args[0]);
+		Path subjectPath = new Path(args[1]);
+		Path outPath = new Path(args[2]);
 		
-		// start k-means
-		job.waitForCompletion(true);
+		boolean isRenamed = hdfs.rename(centerPath, tempInput);
+
+		for(int i = 0; i<10; i++) {
+		    DistributedCache.addCacheFile(tempInput.toUri(), conf);
+		    
+		    Job job = new Job(conf, "k-means");
+		    job.setJarByClass(KMeans.class);
+		    job.setMapperClass(ClusterMapper.class);
+		    job.setReducerClass(CenterReducer.class);
+		    job.setInputFormatClass(SequenceFileInputFormat.class);
+		    job.setOutputFormatClass(SequenceFileOutputFormat.class);
+		    job.setOutputKeyClass(Text.class);
+		    job.setOutputValueClass(BytesWritable.class);
+		    FileInputFormat.setInputPaths(job, subjectPath);
+		    FileOutputFormat.setOutputPath(job, tempOutput);
 		
-		FileSystem.get(conf).copyFromLocalFile(tempDir.suffix("/part-r-00000"), new Path(args[0]));
-		FileSystem.get(conf).delete(tempDir, true);
-		
+		    job.waitForCompletion(true);
+		    DistributedCache.purgeCache(conf);
+		    hdfs.delete(tempInput, true);
+		    hdfs.rename(
+			hdfs.globStatus(
+				  tempOutput.suffix("/part-*"))[0].getPath(),tempInput);
+		    hdfs.delete(tempOutput, true);
+
+		}
+		DistributedCache.addCacheFile(tempInput.toUri(), conf);
 		Job outputJob = new Job(conf, "k-means Output");
 		outputJob.setJarByClass(KMeans.class);
-		// DistributedCache.addCacheFile(new URI(args[0]), conf);
-		outputJob.setMapperClass(ClusterMapper.class);
+		outputJob.setMapperClass(OutputMapper.class);
 		outputJob.setReducerClass(OutputReducer.class);
 		outputJob.setInputFormatClass(SequenceFileInputFormat.class);
 		outputJob.setOutputFormatClass(TextOutputFormat.class);
 		outputJob.setOutputKeyClass(Text.class);
-		outputJob.setOutputValueClass(BytesWritable.class);
-		FileInputFormat.setInputPaths(outputJob, new Path(args[1]));
-		FileOutputFormat.setOutputPath(outputJob, new Path(args[2]));
+		outputJob.setOutputValueClass(Text.class);
+		FileInputFormat.setInputPaths(outputJob, subjectPath);
+		FileOutputFormat.setOutputPath(outputJob, outPath);
 
 		outputJob.waitForCompletion(true);
+		hdfs.delete(tempInput, true);
+				    
 	}
 }
