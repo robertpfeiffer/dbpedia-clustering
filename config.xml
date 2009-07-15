@@ -1,14 +1,16 @@
- <configuration>
+<?xml version="1.0"?>
+<?xml-stylesheet type="text/xsl" href="configuration.xsl"?>
+<configuration>
  
    <property>
      <name>run.local</name>
-     <value>false</value>
+     <value>true</value>
      <description>Don't use distributed Cache</description>
    </property>
 
    <property>
      <name>subject.length</name>
-     <value>42644</value>
+     <value>800</value>
     <description>number of attributes</description>
    </property>
  </configuration>

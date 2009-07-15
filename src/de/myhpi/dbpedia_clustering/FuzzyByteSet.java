@@ -35,10 +35,10 @@ class FuzzyByteSet {
 	return new BytesWritable(result);
     }
 
-     public static long cardinality(BytesWritable aB) {
+     public static double cardinality(BytesWritable aB) {
 	 int length=aB.getLength();
 	 byte[] a = aB.getBytes();
-	 long result = 0;
+	 double result = 0;
 	 for (int i=0; i<length;i++)
 	    result+=Byteconverter.fromSigned(a[i]);
 	 return result;

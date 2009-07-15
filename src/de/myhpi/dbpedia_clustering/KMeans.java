@@ -55,7 +55,7 @@ public class KMeans {
 		public void map(Text key, BytesWritable subject, Context context)
 				throws IOException {
 			try {
-				Distance distance = new EuclideanDistance();
+				Distance distance = new JaccardDistance();
 				double minDistance = Double.MAX_VALUE;
 				Text nearestCenter = null;
 				
@@ -161,7 +161,7 @@ public class KMeans {
 		public void map(Text key, BytesWritable subject, Context context)
 				throws IOException {
 			try {
-				Distance distance = new EuclideanDistance();
+				Distance distance = new JaccardDistance();
 				double minDistance = Double.MAX_VALUE;
 				Text nearestCenter = null;
 				
@@ -188,14 +188,12 @@ public class KMeans {
 	}
 
 	public static void main(String[] args) throws Exception {
-		if (args.length != 4) {
+		if (args.length != 3) {
 			System.err.println("Usage: k-means <center> <subjects> <out>");
-			System.exit(2);
+			System.exit(-1);
 		}
 
 		Configuration conf = new Configuration();
-		conf.setInt("subject.length", -1);
-		conf.setBoolean("run.local", false);
 
 		conf.addResource(new Path("config.xml"));
 
@@ -210,7 +208,7 @@ public class KMeans {
 		
 		hdfs.rename(centerPath, tempInput);
 
-		for(int i = 0; i<10; i++) {
+		for(int i = 0; i<conf.getInt("iterations",1); i++) {
 		    if (!conf.getBoolean("run.local",false)) {
 			     DistributedCache.addCacheFile(tempInput.toUri(), conf);
 		    }
