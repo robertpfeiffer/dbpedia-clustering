@@ -12,7 +12,6 @@ public class GenerateClusters {
 	private int byte_size;
 	
 	public GenerateClusters() throws Exception {
-		super();
 		this.random = new Random();
 		this.handler = new SequenceFileHandler();
 	}

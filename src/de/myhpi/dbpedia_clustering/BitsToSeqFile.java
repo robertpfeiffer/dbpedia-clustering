@@ -31,8 +31,8 @@ public class BitsToSeqFile
 	}
 
 	/** Sets the input file. */
-	public void setInput(File input) {
-		this.inputFile = input;
+	public void setInput(File inputFile) {
+		this.inputFile = inputFile;
 	}
 
 	/** Sets the output SequenceFile. */
@@ -100,7 +100,7 @@ public class BitsToSeqFile
 	public static void main(String[] args) {
 		try {
 			BitsToSeqFile me = new BitsToSeqFile();
-			me.setInput(args[0]);
+			me.setInput(new File(args[0]));
 			me.setOutput(args[2]);
 			me.setNameFile(new File(args[1])); 
 			me.execute();
