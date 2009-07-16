@@ -14,7 +14,6 @@
 */
 package de.myhpi.dbpedia_clustering;
 
-import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.*;
 import org.apache.hadoop.io.*;
 
@@ -23,27 +22,22 @@ import java.io.*;
 public class BitsToSeqFile
 {
 	private File inputFile;
-    private File outputFile;
+    private String outputName;
 	private File namesFile;
 	protected LocalSetup setup;
 
-	/** Sets up Configuration and LocalFileSystem instances for
-	* Hadoop.  Throws Exception if they fail.  Does not load any
-	* Hadoop XML configuration files, just sets the minimum
-	* configuration necessary to use the local file system.
-	*/
 	public BitsToSeqFile() throws Exception {
 		this.setup = new LocalSetup();
 	}
 
 	/** Sets the input file. */
-	public void setInput(File inputFile) {
-		this.inputFile = inputFile;
+	public void setInput(File input) {
+		this.inputFile = input;
 	}
 
 	/** Sets the output SequenceFile. */
-	public void setOutput(File outputFile) {
-		this.outputFile = outputFile;
+	public void setOutput(String output) {
+		this.outputName = output;
 	}
 
 	public void setNameFile(File namesFile) {
@@ -66,7 +60,7 @@ public class BitsToSeqFile
 		String name = null;
 		try {
 			input = openInputFile();
-			output = openOutputFile();
+			output = new SequenceFileHandler().openWriter(this.outputName);
 			names = this.openNameFile();
 			
 			size = input.readInt();
@@ -102,20 +96,12 @@ public class BitsToSeqFile
 		return new DataInputStream(fileStream);
 	}
 
-	protected SequenceFile.Writer openOutputFile() throws Exception {
-		Path outputPath = new Path(outputFile.getAbsolutePath());
-		return SequenceFile.createWriter(setup.getLocalFileSystem(), setup.getConf(),
-			outputPath,
-			Text.class, BytesWritable.class,
-			SequenceFile.CompressionType.BLOCK);
-	}
-
 	/** Runs the converter at the command line. */
 	public static void main(String[] args) {
 		try {
 			BitsToSeqFile me = new BitsToSeqFile();
-			me.setInput(new File(args[0]));
-			me.setOutput(new File(args[2]));
+			me.setInput(args[0]);
+			me.setOutput(args[2]);
 			me.setNameFile(new File(args[1])); 
 			me.execute();
 		} catch (Exception e) {

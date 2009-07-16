@@ -1,44 +1,28 @@
 package de.myhpi.dbpedia_clustering;
 
-import org.apache.hadoop.fs.*;
 import org.apache.hadoop.io.*;
-
-import java.io.*;
 import java.util.Random;
 
-public class GenerateClusters extends BitsToSeqFile
-{
+public class GenerateClusters {
 	private Random random;
-	private String subjectsFile;
+	private String inputFile;
+	private String outputFile;
+	private SequenceFileHandler handler;
 	private int clusterNumber = 5;
 	private int byte_size;
 	
-	/** Sets up Configuration and LocalFileSystem instances for
-	 * Hadoop.  Throws Exception if they fail.  Does not load any
-	 * Hadoop XML configuration files, just sets the minimum
-	 * configuration necessary to use the local file system.
-	 */
 	public GenerateClusters() throws Exception {
 		super();
 		this.random = new Random();
+		this.handler = new SequenceFileHandler();
 	}
 	
-	protected SequenceFile.Reader openSubjectsFile() throws Exception {
-		return new SequenceFile.Reader(setup.getLocalFileSystem(), new Path(this.subjectsFile), setup.getConf());
+	private void setOutput(String string) {
+		this.outputFile = string;
 	}
-	
-	protected int getSequenceFileSize() throws Exception {
-		int count = 0;
-		Text key = new Text();
-		BytesWritable value = new BytesWritable();
-		SequenceFile.Reader file = this.openSubjectsFile();
-		
-		while (file.next(key, value) == true) {
-			count++;
-		}
-		
-		file.close();
-		return count;
+
+	private void setInput(String string) {
+		this.inputFile = string;
 	}
 
 	/** Performs the conversion. */
@@ -54,12 +38,9 @@ public class GenerateClusters extends BitsToSeqFile
 		int size, i;
 		
 		try {
-			subjects = this.openSubjectsFile();
-			output = this.openOutputFile();
-			
-			System.out.println("start counting subjects");
-			size = this.getSequenceFileSize();
-			System.out.println("number of subjects: "+size);
+			subjects = handler.openReader(this.inputFile);
+			output = handler.openWriter(this.outputFile);
+			size = handler.getReaderSize(this.inputFile);
 			
 			i = 0;
 			while (subjects.next(key, value)) {
@@ -107,9 +88,8 @@ public class GenerateClusters extends BitsToSeqFile
 	public static void main(String[] args) {
 		try {
 			GenerateClusters me = new GenerateClusters();
-			me.subjectsFile = args[0];
-			me.setInput(new File(me.subjectsFile));
-			me.setOutput(new File(args[1]));
+			me.setInput(args[0]);
+			me.setOutput(args[1]);
 			me.setByteSize(args[2]);
 			if (args.length == 4) {
 				me.setClusterNumber(args[3]);
