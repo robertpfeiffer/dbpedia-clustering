@@ -24,7 +24,13 @@
      <name>distance.calculation</name>
      <value>Jaccard</value>
     <description></description>
-   </property> 
+   </property>
+
+   <property>
+     <name>kmeans.split.size</name>
+     <value>1000000</value>
+    <description>1 MB</description>
+   </property>
 
 
 </configuration>

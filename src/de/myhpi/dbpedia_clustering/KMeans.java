@@ -221,7 +221,7 @@ public class KMeans {
 		    if (!conf.getBoolean("run.local",false)) {
 			     DistributedCache.addCacheFile(tempInput.toUri(), conf);
 		    }
-		    Job job = new Job(conf, "k-means");
+		    Job job = new Job(conf, "k-means iteration "+(i+1));
 		    job.setJarByClass(KMeans.class);
 		    job.setMapperClass(ClusterMapper.class);
 		    job.setReducerClass(CenterReducer.class);
@@ -230,7 +230,7 @@ public class KMeans {
 		    job.setOutputKeyClass(Text.class);
 		    job.setOutputValueClass(BytesWritable.class);
 		    FileInputFormat.setInputPaths(job, subjectPath);
-		    FileInputFormat.setMaxInputSplitSize(job, 1000000);
+		    FileInputFormat.setMaxInputSplitSize(job, conf.getInt("kmeans.split.size", 1000000));
 		    FileOutputFormat.setOutputPath(job, tempOutput);
 		
 		    job.waitForCompletion(true);
@@ -256,6 +256,7 @@ public class KMeans {
 		outputJob.setOutputKeyClass(Text.class);
 		outputJob.setOutputValueClass(Text.class);
 		FileInputFormat.setInputPaths(outputJob, subjectPath);
+		FileInputFormat.setMaxInputSplitSize(outputJob, conf.getInt("kmeans.split.size", 1000000));
 		FileOutputFormat.setOutputPath(outputJob, outPath);
 
 		outputJob.waitForCompletion(true);
