@@ -22,25 +22,30 @@ public class KMeans {
 			Mapper<Text, BytesWritable, Text, BytesWritable> {
 		private Path[] localFiles;
 		private Map<Text, BytesWritable> centers;
-		private Distance distance;
-
+		private Distance<BytesWritable, BytesWritable> distance;
 
 		protected void setup(Context context) {
 			try {
 				Configuration conf = context.getConfiguration();
+				if (conf.get("kmeans.distance.calculation").equals("Jaccard")) {
+					distance = new JaccardDistance();
+				} else {
+					distance = new EuclideanDistance();
+				}
+				
 				Path p;
-				if (conf.getBoolean("run.local",false)) {
+				if (conf.getBoolean("kmeans.run.local",false)) {
 					p = new Path("k-means-temp-in");
 				} else {
 					p = DistributedCache.getLocalCacheFiles(conf)[0];
 				}
 				final FileSystem fs = FileSystem.getLocal(conf);
 				final Path qualified = p.makeQualified(fs);
-
+				SequenceFile.Reader reader = new SequenceFile.Reader(fs, qualified, conf);
+				
 				this.centers = new LinkedHashMap();
 				Text key = new Text();
 				BytesWritable value = new BytesWritable();
-				SequenceFile.Reader reader = new SequenceFile.Reader(fs, qualified, conf);
 
 				while (reader.next(key, value) == true) {
 					this.centers.put(key, value);
@@ -48,12 +53,6 @@ public class KMeans {
 					value = new BytesWritable();
 				}
 				reader.close();
-
-				if (conf.get("distance.calculation").equals("Jaccard")) {
-					distance = new JaccardDistance();
-				} else {
-					distance = new EuclideanDistance();
-				}
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
@@ -91,7 +90,7 @@ public class KMeans {
 
 		protected void setup(Context context) {
 			this.length = context.getConfiguration()
-					.getInt("subject.length", -1);
+					.getInt("kmeans.subject.length", -1);
 		}
 
 		public void reduce(Text key, Iterable<BytesWritable> values,
@@ -123,24 +122,30 @@ public class KMeans {
 			Mapper<Text, BytesWritable, Text, Text> {
 		private Path[] localFiles;
 		private Map<Text, BytesWritable> centers;
-		private Distance distance;
+		private Distance<BytesWritable, BytesWritable> distance;
 
 		protected void setup(Context context) {
 			try {
 				Configuration conf = context.getConfiguration();
+				if (conf.get("kmeans.distance.calculation").equals("Jaccard")) {
+					distance = new JaccardDistance();
+				} else {
+					distance = new EuclideanDistance();
+				}
+				
 				Path p;
-				if (conf.getBoolean("run.local",false)) {
+				if (conf.getBoolean("kmeans.run.local",false)) {
 					p = new Path("k-means-temp-in");
 				} else {
 					p = DistributedCache.getLocalCacheFiles(conf)[0];
 				}
 				final FileSystem fs = FileSystem.getLocal(conf);
 				final Path qualified = p.makeQualified(fs);
-
+				SequenceFile.Reader reader = new SequenceFile.Reader(fs, qualified, conf);
+				
 				this.centers = new LinkedHashMap();
 				Text key = new Text();
 				BytesWritable value = new BytesWritable();
-				SequenceFile.Reader reader = new SequenceFile.Reader(fs, qualified, conf);
 
 				while (reader.next(key, value) == true) {
 					this.centers.put(key, value);
@@ -148,12 +153,6 @@ public class KMeans {
 					value = new BytesWritable();
 				}
 				reader.close();
-
-				if (conf.get("distance.calculation").equals("Jaccard")) {
-					distance = new JaccardDistance();
-				} else {
-					distance = new EuclideanDistance();
-				}
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
@@ -162,7 +161,6 @@ public class KMeans {
 		public void map(Text key, BytesWritable subject, Context context)
 				throws IOException {
 			try {
-				Distance distance = new JaccardDistance();
 				double minDistance = Double.MAX_VALUE;
 				Text nearestCenter = null;
 				
@@ -195,6 +193,47 @@ public class KMeans {
 		    	context.write(key, value);
 		}
 	}
+	
+	public static boolean breakCondition(Configuration conf, Path oldCentersPath, Path newCentersPath) throws IOException {
+		Distance distance;
+		SequenceFile.Reader oldCentersReader;
+		SequenceFile.Reader newCentersReader;
+		LinkedHashMap newCenters = new LinkedHashMap();
+		Text key = new Text();
+		BytesWritable value = new BytesWritable();
+		final FileSystem fs = FileSystem.getLocal(conf);
+		double dissimilarity = 0.0;
+		
+		if (conf.get("kmeans.distance.calculation").equals("Jaccard")) {
+			distance = new JaccardDistance();
+		} else {
+			distance = new EuclideanDistance();
+		}
+		
+		// old centers
+		oldCentersReader = new SequenceFile.Reader(fs, oldCentersPath.makeQualified(fs), conf);
+		
+		// new centers
+		newCentersReader = new SequenceFile.Reader(fs, newCentersPath.makeQualified(fs), conf);
+		while (newCentersReader.next(key, value) == true) {
+			newCenters.put(key, value);
+			key = new Text();
+			value = new BytesWritable();
+		}
+		newCentersReader.close();
+		
+		// calculate sum of dissimilarity
+		while (oldCentersReader.next(key, value) == true) {
+			dissimilarity += distance.index(value, newCenters.get(key));
+		}
+		oldCentersReader.close();
+
+		// calculate average dissimilarity
+		dissimilarity = dissimilarity / newCenters.size();
+		
+		System.out.println("Dissimilarity: " + dissimilarity + " < " + conf.getFloat("kmeans.breakcondition.dissimilarity", (float) 0.05));
+		return dissimilarity < conf.getFloat("kmeans.breakcondition.dissimilarity", (float) 0.05);
+	}
 
 	public static void main(String[] args) throws Exception {
 		if (args.length != 3) {
@@ -202,26 +241,28 @@ public class KMeans {
 			System.exit(-1);
 		}
 
+		// load config
 		Configuration conf = new Configuration();
-
 		conf.addResource(new Path("config.xml"));
 
+		// prepare temp directories
 		FileSystem hdfs = FileSystem.get(conf);
-
 		Path tempInput = new Path("k-means-temp-in");
 		Path tempOutput = new Path("k-means-temp-out");
-
 		Path centerPath = new Path(args[0]);
 		Path subjectPath = new Path(args[1]);
 		Path outPath = new Path(args[2]);
-		
+		Path tempOutputFile;
 		hdfs.rename(centerPath, tempInput);
 
-		for(int i = 0; i<conf.getInt("iterations",1); i++) {
-		    if (!conf.getBoolean("run.local",false)) {
+		// map/reduce Job
+		int iteration = 1;
+		boolean done = false;
+		do {
+		    if (!conf.getBoolean("kmeans.run.local",false)) {
 			     DistributedCache.addCacheFile(tempInput.toUri(), conf);
 		    }
-		    Job job = new Job(conf, "k-means iteration "+(i+1));
+		    Job job = new Job(conf, "k-means iteration " + iteration);
 		    job.setJarByClass(KMeans.class);
 		    job.setMapperClass(ClusterMapper.class);
 		    job.setReducerClass(CenterReducer.class);
@@ -234,19 +275,31 @@ public class KMeans {
 		    FileOutputFormat.setOutputPath(job, tempOutput);
 		
 		    job.waitForCompletion(true);
-		    if (!conf.getBoolean("run.local",false)) {
+		    if (!conf.getBoolean("kmeans.run.local",false)) {
 			    DistributedCache.purgeCache(conf);
 		    }
+		    
+		    // get the path to the outputfile
+		    tempOutputFile = hdfs.globStatus(tempOutput.suffix("/part-*"))[0].getPath();
+		    
+		    // break condition
+		    if ((conf.get("kmeans.breakcondition").equals("dissimilarity") && breakCondition(conf, tempInput, tempOutputFile))
+		    	|| iteration >= conf.getInt("kmeans.breakcondition.iterations",1)) {
+		    	done = true;
+		    }
+		    
 		    hdfs.delete(tempInput, true);
-		    hdfs.rename(
-			hdfs.globStatus(
-				  tempOutput.suffix("/part-*"))[0].getPath(),tempInput);
+		    hdfs.rename(tempOutputFile,tempInput);
 		    hdfs.delete(tempOutput, true);
-
-		}
-		if (!conf.getBoolean("run.local",false)) {
+		    
+		    iteration++;
+		} while (!done);
+		
+		if (!conf.getBoolean("kmeans.run.local",false)) {
 			DistributedCache.addCacheFile(tempInput.toUri(), conf);
 		}
+		
+		// output Job
 		Job outputJob = new Job(conf, "k-means Output");
 		outputJob.setJarByClass(KMeans.class);
 		outputJob.setMapperClass(OutputMapper.class);
@@ -261,6 +314,5 @@ public class KMeans {
 
 		outputJob.waitForCompletion(true);
 		hdfs.delete(tempInput, true);
-
 	}
 }

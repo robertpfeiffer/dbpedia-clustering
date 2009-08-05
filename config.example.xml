@@ -1,36 +1,47 @@
 <?xml version="1.0"?>
 <?xml-stylesheet type="text/xsl" href="configuration.xsl"?>
 <configuration>
- 
-   <property>
-     <name>run.local</name>
-     <value>true</value>
-     <description>Don't use distributed Cache</description>
-   </property>
 
-   <property>
-     <name>subject.length</name>
-     <value>800</value>
-    <description>number of attributes</description>
-   </property>
+        <property>
+                <name>kmeans.run.local</name>
+                <value>true</value>
+                <description>Don't use distributed Cache</description>
+        </property>
 
-   <property>
-     <name>iterations</name>
-     <value>10</value>
-    <description></description>
-   </property>
+        <property>
+                <name>kmeans.subject.length</name>
+                <value>800</value>
+                <description>number of attributes</description>
+        </property>
 
-   <property>
-     <name>distance.calculation</name>
-     <value>Jaccard</value>
-    <description></description>
-   </property>
+        <property>
+                <name>kmeans.distance.calculation</name>
+                <value>Jaccard</value>
+                <description>Jaccard or Euclidean</description>
+        </property>
 
-   <property>
-     <name>kmeans.split.size</name>
-     <value>1000000</value>
-    <description>1 MB</description>
-   </property>
+        <property>
+                <name>kmeans.split.size</name>
+                <value>1000000</value>
+                <description>1 MB</description>
+        </property>
 
+        <property>
+                <name>kmeans.breakcondition</name>
+                <value>iterations</value>
+                <description>iterations or dissimilarity</description>
+        </property>
+
+        <property>
+                <name>kmeans.breakcondition.iterations</name>
+                <value>10</value>
+                <description>number of iterations</description>
+        </property>
+
+        <property>
+                <name>kmeans.breakcondition.dissimilarity</name>
+                <value>0.05</value>
+                <description>value of dissimilarity</description>
+        </property>
 
 </configuration>

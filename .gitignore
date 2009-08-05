@@ -10,7 +10,7 @@ dist/*
 .names.txt.crc
 .project
 .settings/*
-.subjects.seq.crc
+.*.crc
 out*/*
 clustering/*
 clustering/**/*
