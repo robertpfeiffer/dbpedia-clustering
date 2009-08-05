@@ -194,15 +194,15 @@ public class KMeans {
 		}
 	}
 	
-	public static boolean breakCondition(Configuration conf, Path oldCentersPath, Path newCentersPath) throws IOException {
+	public static boolean breakCondition(Configuration conf, Path oldCentersPath, Path newCentersPath) throws Exception {
 		Distance distance;
 		SequenceFile.Reader oldCentersReader;
 		SequenceFile.Reader newCentersReader;
 		LinkedHashMap newCenters = new LinkedHashMap();
 		Text key = new Text();
 		BytesWritable value = new BytesWritable();
-		final FileSystem fs = FileSystem.getLocal(conf);
 		double dissimilarity = 0.0;
+		FileSystem hdfs = FileSystem.get(conf);
 		
 		if (conf.get("kmeans.distance.calculation").equals("Jaccard")) {
 			distance = new JaccardDistance();
@@ -210,11 +210,8 @@ public class KMeans {
 			distance = new EuclideanDistance();
 		}
 		
-		// old centers
-		oldCentersReader = new SequenceFile.Reader(fs, oldCentersPath.makeQualified(fs), conf);
-		
 		// new centers
-		newCentersReader = new SequenceFile.Reader(fs, newCentersPath.makeQualified(fs), conf);
+		newCentersReader = new SequenceFile.Reader(hdfs, newCentersPath.makeQualified(hdfs), conf);
 		while (newCentersReader.next(key, value) == true) {
 			newCenters.put(key, value);
 			key = new Text();
@@ -223,6 +220,7 @@ public class KMeans {
 		newCentersReader.close();
 		
 		// calculate sum of dissimilarity
+		oldCentersReader = new SequenceFile.Reader(hdfs, oldCentersPath.makeQualified(hdfs), conf);
 		while (oldCentersReader.next(key, value) == true) {
 			dissimilarity += distance.index(value, newCenters.get(key));
 		}
@@ -254,7 +252,7 @@ public class KMeans {
 		Path outPath = new Path(args[2]);
 		Path tempOutputFile;
 		hdfs.rename(centerPath, tempInput);
-
+		
 		// map/reduce Job
 		int iteration = 1;
 		boolean done = false;
@@ -275,9 +273,6 @@ public class KMeans {
 		    FileOutputFormat.setOutputPath(job, tempOutput);
 		
 		    job.waitForCompletion(true);
-		    if (!conf.getBoolean("kmeans.run.local",false)) {
-			    DistributedCache.purgeCache(conf);
-		    }
 		    
 		    // get the path to the outputfile
 		    tempOutputFile = hdfs.globStatus(tempOutput.suffix("/part-*"))[0].getPath();
@@ -288,6 +283,9 @@ public class KMeans {
 		    	done = true;
 		    }
 		    
+		    if (!conf.getBoolean("kmeans.run.local",false)) {
+			    DistributedCache.purgeCache(conf);
+		    }
 		    hdfs.delete(tempInput, true);
 		    hdfs.rename(tempOutputFile,tempInput);
 		    hdfs.delete(tempOutput, true);
