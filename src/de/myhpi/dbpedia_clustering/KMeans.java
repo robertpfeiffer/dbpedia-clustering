@@ -2,6 +2,7 @@ package de.myhpi.dbpedia_clustering;
 
 import java.io.IOException;
 
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -196,11 +197,13 @@ public class KMeans {
 	
 	public static boolean breakCondition(Configuration conf, Path oldCentersPath, Path newCentersPath) throws Exception {
 		Distance distance;
-		SequenceFile.Reader oldCentersReader;
-		SequenceFile.Reader newCentersReader;
-		HashMap oldCenters = new HashMap(100); //TODO
+		int dropped, num_centers = 0;
+		SequenceFile.Reader oldCentersReader, newCentersReader;
+		HashMap<Text,BytesWritable> oldCenters = new HashMap<Text,BytesWritable>(100); //TODO
+
 		Text key = new Text();
 		BytesWritable value = new BytesWritable();
+
 		double dissimilarity = 0.0;
 		FileSystem hdfs = FileSystem.get(conf);
 		
@@ -220,17 +223,40 @@ public class KMeans {
 		}
 		
 		// calculate sum of dissimilarity
+		Path path_dropped = new Path("temp-dropped");
+		SequenceFile.Writer writer = SequenceFile.createWriter(hdfs, conf, path_dropped, Text.class, BytesWritable.class, SequenceFile.CompressionType.BLOCK);
 
 		while (newCentersReader.next(key, value) == true) {
 			dissimilarity += distance.between_center_center(value, oldCenters.get(key));
+			num_centers++;
+			writer.append(key,value);
 		}
 
 		newCentersReader.close();
 		oldCentersReader.close();
 
+		dropped = oldCenters.size()-num_centers;
+
 		// calculate average dissimilarity
+		dissimilarity += dropped;
 		dissimilarity /= oldCenters.size();
-		
+		int length = conf.getInt("kmeans.subject.length", -1);
+
+		while (dropped > 0) {
+			newCentersReader = new SequenceFile.Reader(hdfs, newCentersPath.makeQualified(hdfs), conf);
+			while (newCentersReader.next(key, value) == true  && dropped > 0) {
+				byte[] v = value.getBytes();
+				for (int i = 0; i<length; i++)
+					if(v[i]!=0)v[i]+=1;
+				writer.append(new Text(key.toString()+"|"+dissimilarity+"|"+dropped),new BytesWritable(v));
+				dropped--;
+			}
+			newCentersReader.close();
+		}
+		writer.close();
+		hdfs.delete(newCentersPath, true);
+		hdfs.rename(path_dropped, newCentersPath);
+
 		System.out.println("Dissimilarity: " + dissimilarity + " < " + conf.getFloat("kmeans.breakcondition.dissimilarity", (float) 0.05));
 		return dissimilarity < conf.getFloat("kmeans.breakcondition.dissimilarity", (float) 0.05);
 	}
@@ -275,20 +301,21 @@ public class KMeans {
 		    FileOutputFormat.setOutputPath(job, tempOutput);
 
 		    job.waitForCompletion(true);
+		    if (!conf.getBoolean("kmeans.run.local",false)) {
+			    DistributedCache.purgeCache(conf);
+		    }
 		    
 		    // get the path to the outputfile
 		    tempOutputFile = hdfs.globStatus(tempOutput.suffix("/part-*"))[0].getPath();
 
 		    // break condition
+			boolean bc = breakCondition(conf, tempInput, tempOutputFile);
 		    if (conf.get("kmeans.breakcondition").equals("dissimilarity")) {
-				done = breakCondition(conf, tempInput, tempOutputFile);
+				done = bc;
 			} else {
 		    	done = iteration >= conf.getInt("kmeans.breakcondition.iterations",1);
 		    }
-		    
-		    if (!conf.getBoolean("kmeans.run.local",false)) {
-			    DistributedCache.purgeCache(conf);
-		    }
+
 		    hdfs.delete(tempInput, true);
 		    hdfs.rename(tempOutputFile,tempInput);
 		    hdfs.delete(tempOutput, true);
