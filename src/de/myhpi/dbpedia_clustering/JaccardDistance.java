@@ -4,7 +4,8 @@ import org.apache.hadoop.io.BytesWritable;
 
 public class JaccardDistance implements Distance<BytesWritable, BytesWritable> {
 
-	public double between(BytesWritable center, BytesWritable subject) {
+	public double between_center_subject(BytesWritable center,
+										 BytesWritable subject) {
 		byte[] subjectBits = subject.getBytes();
 		byte[] centerBytes = center.getBytes();
 		long i_card, u_card;
@@ -24,12 +25,13 @@ public class JaccardDistance implements Distance<BytesWritable, BytesWritable> {
 			}
 		}
 
-		if (u_card == 0 || u_card == i_card)
+		if (u_card == 0)
 			return 0.0;
 		return 1.0 - ((double) i_card) / u_card;
 	}
 
-	public double index(BytesWritable center1, BytesWritable center2) {
+	public double between_center_center(BytesWritable center1,
+										BytesWritable center2) {
 		byte[] center1Bytes = center1.getBytes();
 		byte[] center2Bytes = center2.getBytes();
 		long i_card, u_card;
@@ -49,8 +51,8 @@ public class JaccardDistance implements Distance<BytesWritable, BytesWritable> {
 			}
 		}
 
-		if (u_card == 0 || u_card == i_card)
+		if (u_card == 0)
 			return 0.0;
-		return ((double) i_card) / u_card;
+		return 1.0 - ((double) i_card) / u_card;
 	}
 }

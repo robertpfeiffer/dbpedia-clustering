@@ -69,7 +69,7 @@ public class KMeans {
 					double newDistance = 0;
 					BytesWritable center = entry.getValue();
 
-					newDistance = distance.between(center, subject);
+					newDistance = distance.between_center_subject(center, subject);
 
 					if (newDistance < minDistance) {
 						minDistance = newDistance;
@@ -169,7 +169,7 @@ public class KMeans {
 					double newDistance = 0;
 					BytesWritable center = entry.getValue();
 
-					newDistance = distance.between(center, subject);
+					newDistance = distance.between_center_subject(center, subject);
 
 					if (newDistance < minDistance) {
 						minDistance = newDistance;
@@ -198,7 +198,7 @@ public class KMeans {
 		Distance distance;
 		SequenceFile.Reader oldCentersReader;
 		SequenceFile.Reader newCentersReader;
-		LinkedHashMap newCenters = new LinkedHashMap();
+		HashMap oldCenters = new HashMap(100); //TODO
 		Text key = new Text();
 		BytesWritable value = new BytesWritable();
 		double dissimilarity = 0.0;
@@ -212,22 +212,24 @@ public class KMeans {
 		
 		// new centers
 		newCentersReader = new SequenceFile.Reader(hdfs, newCentersPath.makeQualified(hdfs), conf);
-		while (newCentersReader.next(key, value) == true) {
-			newCenters.put(key, value);
+		oldCentersReader = new SequenceFile.Reader(hdfs, oldCentersPath.makeQualified(hdfs), conf);
+		while (oldCentersReader.next(key, value) == true) {
+			oldCenters.put(key, value);
 			key = new Text();
 			value = new BytesWritable();
 		}
-		newCentersReader.close();
 		
 		// calculate sum of dissimilarity
-		oldCentersReader = new SequenceFile.Reader(hdfs, oldCentersPath.makeQualified(hdfs), conf);
-		while (oldCentersReader.next(key, value) == true) {
-			dissimilarity += distance.index(value, newCenters.get(key));
+
+		while (newCentersReader.next(key, value) == true) {
+			dissimilarity += distance.between_center_center(value, oldCenters.get(key));
 		}
+
+		newCentersReader.close();
 		oldCentersReader.close();
 
 		// calculate average dissimilarity
-		dissimilarity = dissimilarity / newCenters.size();
+		dissimilarity /= oldCenters.size();
 		
 		System.out.println("Dissimilarity: " + dissimilarity + " < " + conf.getFloat("kmeans.breakcondition.dissimilarity", (float) 0.05));
 		return dissimilarity < conf.getFloat("kmeans.breakcondition.dissimilarity", (float) 0.05);
@@ -271,16 +273,17 @@ public class KMeans {
 		    FileInputFormat.setInputPaths(job, subjectPath);
 		    FileInputFormat.setMaxInputSplitSize(job, conf.getInt("kmeans.split.size", 1000000));
 		    FileOutputFormat.setOutputPath(job, tempOutput);
-		
+
 		    job.waitForCompletion(true);
 		    
 		    // get the path to the outputfile
 		    tempOutputFile = hdfs.globStatus(tempOutput.suffix("/part-*"))[0].getPath();
-		    
+
 		    // break condition
-		    if ((conf.get("kmeans.breakcondition").equals("dissimilarity") && breakCondition(conf, tempInput, tempOutputFile))
-		    	|| iteration >= conf.getInt("kmeans.breakcondition.iterations",1)) {
-		    	done = true;
+		    if (conf.get("kmeans.breakcondition").equals("dissimilarity")) {
+				done = breakCondition(conf, tempInput, tempOutputFile);
+			} else {
+		    	done = iteration >= conf.getInt("kmeans.breakcondition.iterations",1);
 		    }
 		    
 		    if (!conf.getBoolean("kmeans.run.local",false)) {
