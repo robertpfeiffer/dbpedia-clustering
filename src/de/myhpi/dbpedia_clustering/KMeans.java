@@ -237,6 +237,8 @@ public class KMeans {
 
 		dropped = oldCenters.size()-num_centers;
 
+
+		System.out.println("Dropped: " + dropped);
 		// calculate average dissimilarity
 		dissimilarity += dropped;
 		dissimilarity /= oldCenters.size();

@@ -1,0 +1,64 @@
+%&program=xelatex
+%&encoding=UTF-8 Unicode
+\documentclass[a4paper,12pt]{article}
+
+\usepackage[ngerman]{babel}
+\usepackage{fontspec}
+
+\title{DBPedia-Clustering mit dem K-Means-Algorithmus}
+
+\author{Robert Pfeiffer \and Tobias Schmidt}
+\setromanfont[Mapping=tex-text,Alternate=1,Ligatures={Common,Diphthong}]{Palatino} 
+%%Die Schrift aus den DBS-Übungsblättern
+
+\begin{document}
+\maketitle
+\section{Einleitung}
+Problemstellung hier wiederholen
+
+Clustering erklären
+
+DBPedia erklären
+
+\section{Der K-means-Algorithmus}Clusterzentren auswählensubjekte dem nächsten zentrum zuordnendaraus neue cluster bildenden mittelwert der cluster berechnendaraus clusterzentren bilden
+wiederholen
+konvergenz
+\subsection{freie Parameter}anzahl der cluster
+vorauswahl der cluster (zufällig)
+
+abstandsfunktion (jaccard/euklid)
+
+mittelwertsfunktion (arithmetisches mittel)
+
+datenstruktur für zentren (8-bit festkomma-array)
+
+datenstruktur für abstand (float)
+
+anzahl der iterationen/abbruchbedingung
+
+eingabeformat (matrix oder listen)
+
+% implementierungsdetails ab hier
+\section{Abstandsmaße}
+\subsection{euklidischer abstand}
+\subsection{Der Jaccard-Abstand}
+\subsection{Fuzzy-Mengen}
+
+\section{Verteilung auf hadoop}
+\subsection{Karthesisches Produkt}
+-langsam
+
+-viel I/O
+
+-mehr zyklen
+
+-inputformat
+
+\subsection{Caching von Zentren}
+-machen wir
+
+\section{Eingabeformat}
+
+\section{Performance/Laufzeitkomplexität}
+
+\end{document}
