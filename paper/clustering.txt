@@ -1,0 +1,55 @@
+Clustering
+----------
+
+Abstract
+    - TODO
+
+1. Introduction
+    - Was ist Map/Reduce, was ist Hadoop
+    - Für welche Aufgaben eignet sich dieser Ansatz
+2. Clustering
+    - Wozu
+    - Welche Daten haben wir
+    - K-Means
+    - Jaccard
+3. Implementierung
+  3.1 k-means
+    - 2 Phasen. Welche Daten werden von Mapper an Reducer und umgekehrt übergeben
+    - Vorteile / Nachteile gegenüber anderen Ansätzen
+    - <überarbeitete Grafik ?>
+  3.2 Distributed Cache
+    - Problem: Verteilung der Centroids
+    - Lösung mittels Distributed Cache
+    - Vorteile: in Hadoop, synchrone Datenhaltung, wenig Overhead für die restlichen berechnungen
+    - Nachteile: bricht das Map/Reduce Konzept
+    - andere Möglichkeit: kartesisches Produkt
+  3.3 Sequence Files
+    - Problem: Daten sind große Matrizen
+    - Vorteile:
+        - Hadoop Format, dadurch gibt es bereits ein Interface und Hadoop kann den Input splitten
+        - komprimiert
+    - Nachteile:
+        - kodiertes Format, daher für Menschen nicht lesbar
+        - keine Information über die Gesamtgröße
+  3.4 Festkommazahlen
+    - Centroids werden durch Vektor über Festkommazahlen mit der Größe eines Bytes dargestellt
+    - Vorteile: klein Datengröße
+    - Nachteile: evt. zu grobe Abstufungen, man muss immer an die Umrechnung denken, unflexibel, schlecht austauschbar
+4. Evaluierung
+  4.1 Eingabegröße
+    - <Grafik>
+    - linear
+  4.2 Center
+    - <Grafik>
+    - linear
+  4.3 Abbruchbedingung
+    - <Grafik>
+    - halbiert sich ungefähr
+5. Fazit
+    - TODO
+6. Quellen
+
+Abstract, 1. und 2. => max. 2 Seiten
+3.                  => 2-3 Seiten
+4.                  => 2 Seiten
+5. und 6.           => 1 Seite
