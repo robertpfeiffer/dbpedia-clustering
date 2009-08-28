@@ -1,0 +1,75 @@
+\documentclass[a4paper]{llncs}
+\usepackage{llncsdoc}
+
+%% Deutsche Anpassungen %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\usepackage[ngerman]{babel}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+
+% Paket für Graphiken
+\usepackage[pdftex]{graphicx}
+
+%\Paket für Hyperlinks
+\usepackage{hyperref}
+
+\title{Clustering of DBPedia Subjects}
+\author{Robert Pfeiffer, Tobias Schmidt}
+\institute{Hasso-Plattner-Institut für Softwaresystemtechnik, Potsdam}
+\begin{document}
+\maketitle
+\begin{abstract}
+TODO
+\end{abstract}
+
+\section{Einleitung}
+- Was ist Map/Reduce, was ist Hadoop\\
+- Für welche Aufgaben eignet sich dieser Ansatz
+
+\section{Clustering}
+
+\section{Implementierung}
+
+\subsection{k-means Algorithmus}
+- 2 Phasen. Welche Daten werden von Mapper an Reducer und umgekehrt übergeben\\
+- Vorteile / Nachteile gegenüber anderen Ansätzen\\
+- <überarbeitete Grafik ?>
+
+\subsection{Distributed Cache}
+- Problem: Verteilung der Centroids\\
+- Lösung mittels Distributed Cache\\
+- Vorteile: in Hadoop, synchrone Datenhaltung, wenig Overhead für die restlichen berechnungen\\
+- Nachteile: bricht das Map/Reduce Konzept\\
+- andere Möglichkeit: kartesisches Produkt
+
+\subsection{Sequence Files}
+- Problem: Daten sind große Matrizen\\
+- Vorteile:\\
+    - Hadoop Format, dadurch gibt es bereits ein Interface und Hadoop kann den Input splitten\\
+    - komprimiert\\
+- Nachteile:\\
+    - kodiertes Format, daher für Menschen nicht lesbar\\
+    - keine Information über die Gesamtgröße
+
+\subsection{Festkommazahlen}
+- Centroids werden durch Vektor über Festkommazahlen mit der Größe eines Bytes dargestellt\\
+- Vorteile: klein Datengröße\\
+- Nachteile: evt. zu grobe Abstufungen, man muss immer an die Umrechnung denken, unflexibel, schlecht austauschbar
+
+\section{Evaluierung}
+Eingabegröße
+Anzahl der Cluster
+Abbruch
+
+\section{Fazit}
+TODO
+
+\begin{thebibliography}{--------}
+
+\bibitem[KI2008]{KI2008}
+	Toby Segaran.
+  {\em Kollektive Intelligenz}.
+   O'Reilly, 2008
+   
+\end{thebibliography}
+
+\end{document}
