@@ -24,3 +24,8 @@ centers.orig.seq
 config.xml
 infobox_en.csv.sort11.pivot_part_1
 infobox_en.csv.sort11.pivot_part_2
+evaluation/*
+paper/clustering.aux
+paper/clustering.log
+paper/clustering.out
+paper/clustering.pdf
