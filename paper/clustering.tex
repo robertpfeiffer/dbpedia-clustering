@@ -13,19 +13,24 @@
 \usepackage{hyperref}
 
 \title{Clustering of DBPedia Subjects}
+\subtitle{Seminar Map/Reduce Algorithms on Hadoop}
 \author{Robert Pfeiffer, Tobias Schmidt}
-\institute{Hasso-Plattner-Institut für Softwaresystemtechnik, Potsdam}
+\institute{Fachgebiet Informationssysteme\\Hasso-Plattner-Institut für Softwaresystemtechnik\\Prof.-Dr.-Helmert-Str. 2-3\\14482 Potsdam, Deutschland\\August 2009}
 \begin{document}
 \maketitle
 \begin{abstract}
-TODO
+TODO\\
+wenn alles fertig ist\\
+werden es mal 3 Zeilen?
 \end{abstract}
 
 \section{Einleitung}
-- Was ist Map/Reduce, was ist Hadoop\\
-- Für welche Aufgaben eignet sich dieser Ansatz
+Mit der fortschreitenden Entwicklung der Computertechnik steigt auch zu bearbeitende Datenvolumen stetig an. Damit auch auf immer größeren Datenmengen weiterhin effizient Berechnungen ausgeführt werden können, wurde von Google Inc. ein Framework namens MapReduce entwickelt. Mit diesem Programmrahmen ist es möglich, Berechnungen auf mehere Rechner und CPUs zu verteilen und parallel ablaufen zu lassen.\\
+Der MapReduce Ansatz beinhaltet allgemein zwei Schritte: den Map- und den Reduce-Schritt. Während des Map-Schrittes wird ein Problem in mehrere Teilprobleme zerlegt, die idialerweise parallel und unabhängig voneinander ausgeführt werden. Anschließend werden die Ergebnisse der Teilprobleme im Reduce-Schritt zu einem Gesamtergebnis zusammengesetzt.\\
+Im Seminar \emph{Map/Reduce Algorithms on Hadoop}\footnote{\url{http://www.hpi.uni-potsdam.de/naumann/lehre/ss_09/mapreduce_algorithms_on_hadoop.html}} haben wir uns mit dem, in Java implementierem, MapReduce-Framework \emph{Hadoop}\footnote{\url{http://hadoop.apache.org/}} auseinandergesetzt und einen Algorithmus implementiert, der eine Menge von \emph{DBPedia}-Einträge anhand ihrer Ähnlichkeit gruppiert. Die \emph{DBPedia}\footnote{\url{http://dbpedia.org/}} ist eine Datenbank, die Informationen aus der Online-Enzyklopädie \emph{Wikipedia}\footnote{\url{http://www.wikipedia.org/}} extrahiert, aufbereitet und strukturiert zur freien Verfügung stellt. Einträge der \emph{DBPedia} entsprechen damit weitesgehend Artikeln der \emph{Wikipedia}.
 
 \section{Clustering}
+Algorithmen beziehungsweise Verfahren die eine Menge von Objekten zu Gruppen zusammenfasst, bezeichnet man als Clusteranalyseverfahren. Es gibt eine ganze Reihe von unterschiedlichen Ansätzen zur Analyse, die alle unterschiedliche Vor- und Nachteile haben. Wir haben uns für den \emph{k-Means-Algorithmus}\footnote{\url{http://de.wikipedia.org/wiki/K-Means-Algorithmus}} entschieden. \emph{k-Means} zeichnet sich durch seine Geschwindigkeit aus, liefert jedoch nicht zwingend die optimale Lösung.\\
 
 \section{Implementierung}
 
@@ -66,9 +71,9 @@ TODO
 \begin{thebibliography}{--------}
 
 \bibitem[KI2008]{KI2008}
-	Toby Segaran.
+  Toby Segaran.
   {\em Kollektive Intelligenz}.
-   O'Reilly, 2008
+  O'Reilly, 2008
    
 \end{thebibliography}
 
