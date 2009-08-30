@@ -45,8 +45,16 @@ Mit der fortschreitenden Entwicklung der Computertechnik steigt auch das zu bear
 
 Im Seminar \emph{Map/Reduce Algorithms on Hadoop}\footnote{\url{http://www.hpi.uni-potsdam.de/naumann/lehre/ss_09/mapreduce_algorithms_on_hadoop.html}} haben wir uns mit dem, in Java implementierem, MapReduce-Framework \emph{Hadoop}\footnote{\url{http://hadoop.apache.org/}} auseinandergesetzt und einen Algorithmus implementiert, der eine Menge von Objekten anhand ihrer Ähnlichkeit gruppiert.
 
+\section{Grundlagen}
+
 \subsection{MapReduce}
-Der MapReduce Ansatz beinhaltet allgemein zwei Schritte: den Map- und den Reduce-Schritt. Während des Map-Schrittes wird ein Problem in mehrere Teilprobleme zerlegt, die idealerweise parallel und unabhängig voneinander ausgeführt werden. Anschließend werden die Ergebnisse der Teilprobleme im Reduce-Schritt wieder zu einem Gesamtergebnis zusammengesetzt.
+MapReduce ist ein Programmiermodell, welches erstmals 2004 vorgestellt wurde \cite{DG04}.
+Der MapReduce Ansatz beinhaltet allgemein zwei Funktionen: die Map- und die Reduce-Funktion. In der Map-Funktion wird ein Problem in mehrere Teilprobleme zerlegt, die idealerweise parallel und unabhängig voneinander ausgeführt werden. Anschließend werden die Ergebnisse der Teilprobleme in der Reduce-Funktion wieder zu einem Gesamtergebnis zusammengesetzt.
+
+Die Map-Funktion erwartet als Eingabe Schlüssel-Wert-Paare und gibt neue Schlüssel-Wert-Paare als Ergebnis aus. Die Reduce-Funktion erhält als Eingabe einen Schlüssel und alle dazugehörigen Werte. Diese Werte werden je nach vorgegebener Berechnung zusammengeführt und dem Schlüssel zugeordnet. Die Reduce gibt anschließend wiederum Schlüssel-Wert-Paare aus.
+
+\subsection{Hadoop TODO}
+Das Hadoop Framework übernimmt die Zerteilung der Eingabedatei und generiert aus den einzelnen Teilen sogenannte Maptasks. Die einzelnen Rechner im Hadoop-Cluster bearbeiten anschließend diese Maptasks. Für jedes Schlüssel-Wert-Paar wird die Map-Funktion aufgerufen.
 
 \subsection{Die Daten}
 Die Datenmenge, die uns zur Verfügung gestellt wurde, sind Objekte aus der \emph{DBPedia}\footnote{\url{http://dbpedia.org/}}. Das \emph{DBPedia}-Projekt extrahiert Informationen aus der Online-Enzyklopädie \emph{Wikipedia}\footnote{\url{http://www.wikipedia.org/}}, bereitet diese auf und stellt diese strukturiert zur freien Verfügung. Einträge der \emph{DBPedia} entsprechen damit weitesgehend Artikeln der \emph{Wikipedia}.
@@ -89,7 +97,11 @@ Das erste Problem bei der Implementierung des k-Means Algorithmus stellte die Ge
 - andere Möglichkeit: kartesisches Produkt
 
 \subsection{Berechnung der Cluster}
-Nach dem die Clusterzentren mittels des Distributed Cache auf den einzelnen Nodes verteilt wurden, beginnt die eigentliche Berechnung. Das Hadoop Framework übernimmt die Zerteilung der Eingabedatei und generiert aus den einzelnen Teilen sogenannte Maptasks. 
+Nach dem die Clusterzentren mittels des Distributed Cache auf den einzelnen Nodes verteilt wurden, beginnt die eigentliche Berechnung. Der iterative Teil des k-Means-Algorithmus lässt sich relativ leicht auf das MapReduce-Schema abbilden. Für jedes Subjekt wird eine Map-Funktion aufgerufen. Diese berechnet den Abstand des Subjektes zu jedem Clusterzentrum, welche mittels Distributed Cache zur Verfügung stehen. Das Resultat ist ein Schlüssel-Wert-Paar, bestehend aus dem Schlüssel des nächsten Centers und dem Vektor des Subjektes.
+
+Die Reduce-Phase beginnt, sobald für jedes Subjekt das nächste Clusterzentrum berechnet wurde. ...
+
+\subsection{Abbruch der Iteration}
 
 \section{Evaluierung}
 Eingabegröße
@@ -99,12 +111,17 @@ Abbruch
 \section{Fazit}
 TODO
 
-\begin{thebibliography}{--------}
+\begin{thebibliography}{------------}
 
 \bibitem[KI2008]{KI2008}
-  Toby Segaran.
+  Segaran, Toby.
   {\em Kollektive Intelligenz}.
   O'Reilly, 2008
+
+\bibitem[DG04]{DG04}
+  Dean, Jeffrey; Ghemawat, Sanjay.\\
+  {\em MapReduce: Simplified Data Processing on Large Clusters}.\\
+  San Francisco, CA, 2004
    
 \end{thebibliography}
 
