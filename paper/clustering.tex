@@ -79,7 +79,9 @@ Als Hauptquelle für Informationen in der DBPedia sind die Infoboxen zu nennen, 
 Die Daten werden als RDF-Tripel der Form $(Ressource, Attribut, Wert)$ in der DBPedia gehalten. Dabei sind die Attribute in eine Ontologie eingeordnet.
 Ein Beispiel für ein solches Tripel ist $(Berlin, populationTotal, 3429300)$.
 
-Die Eingabedaten für das Clustering-Verfahren bestehen für jede Ressource aus der Menge der für sie verfügbaren Attribute. Es gibt insgesamt ca. 44000 mögliche Attribute in der DBPedia. Da alle Ressourcen aus der Ontologie stammen, kann man davon ausgehen, dass gleiche Attribute die gleiche Semantik haben. Dadurch lassen sich aus dem Ergebnis des Clustering-Verfahrens nach diesen Attributen möglicherweise semantische Rückschlüsse ziehen.
+Die Eingabedaten für das Clustering-Verfahren bestehen für jede Ressource aus der Menge der für sie verfügbaren Attribute. 
+Es gibt insgesamt ca. 44000 mögliche Attribute in der DBPedia. Da alle Ressourcen aus der Ontologie stammen, kann man davon ausgehen, dass gleiche Attribute die gleiche Semantik haben.
+Dadurch lassen sich aus dem Ergebnis des Clustering-Verfahrens nach diesen Attributen möglicherweise semantische Rückschlüsse ziehen.
 
 \subsection{Clustering}
 Algorithmen, beziehungsweise Verfahren, die eine Menge von Objekten zu Gruppen (Cluster) mit jeweils ähnlichen Eigenschaften zusammenfassen, bezeichnet man als Clusteranalyseverfahren.
@@ -106,15 +108,18 @@ $$J_{\delta}(A,B) = 1 - J(A,B) = { { |A \cup B| - |A \cap B| } \over |A \cup B| 
 
 \subsection{Fuzzy-Mengen}
 
-Da die Clusterzentren gemittelte Werte enthalte, können sie nicht wie die Subjekte als einfache Mengen dargestellt werden. Stattdessen werden Fuzzy-Mengen benutzt. Bei Fuzzy-Mengen kann ein Element zu einem gewissen Grad zwischen 0 und 1 enthalten sein. Dies wird durch die Funktion $\mu : M \times E \rightarrow [0,1] $ beschrieben. Dabei bedeutet $m(A,e) = 0$ soviel wie $ e \not\in A $ und $m(A,e) = 1$ entspricht $ e \in A $ aus der normalen Mengenlehre.
+Da die Clusterzentren gemittelte Werte enthalte, können sie nicht wie die Subjekte als einfache Mengen dargestellt werden.
+Stattdessen werden Fuzzy-Mengen benutzt. Bei Fuzzy-Mengen kann ein Element zu einem gewissen Grad zwischen 0 und 1 enthalten sein.
+Dies wird durch die Funktion $\mu : M \times E \rightarrow [0,1] $ beschrieben. Dabei bedeutet $m(A,e) = 0$ soviel wie $ e \not\in A $ und $m(A,e) = 1$ entspricht $ e \in A $ aus der normalen Mengenlehre.
 
 Die Identitäten für Schnitt- Vereinungsmengen in der Mengenlehre \begin{align*}e \in (A \cap B) = (e \in A) \wedge (e \in B)
 	\\ e \in (A \cup B) = (e \in A) \vee (e \in B) \end{align*} lauten für Fuzzy-Mengen  \begin{align*}\mu(e, A \cap B) = min(\mu(e, A), \mu(e, B))\\ \mu(e, A \cup B) = max(\mu(e, A), \mu(e, B))  \end{align*}.
 
-Damit lässt sich der Jaccard-Index
+Damit lässt sich der Jaccard-Index numerisch auf folgende Weise berechnen.
+
+$P$ sei die Menge aller möglichen Attribute.
 
 $$J_{\delta}(A,B) = \sum_{p \in P}\frac{max\bigl(\mu(p, A)\mu(p, B)\bigr) - min\bigl(\mu(p, A),\mu(p, B))\bigr)}{max\bigl(\mu(p, A),\mu(p, B))\bigr)}$$
-
 
 \section{Implementation}
 
@@ -126,7 +131,7 @@ $$J_{\delta}(A,B) = \sum_{p \in P}\frac{max\bigl(\mu(p, A)\mu(p, B)\bigr) - min\
 - Nachteile:\\
     - kodiertes Format, daher für Menschen nicht lesbar\\
     - keine Information über die Gesamtgröße
-    
+Die Eingabedateien enthalten die Subjekte in einem Binärformat. Dabei wird jedes Subjekt durch ein Array von Bits repräsentiert, wobei die Stelle im Array immer ein Attribut repräsentiert. Wenn an einer Stelle ein 1-Bit steht, dann hat die Ressource das Attribut
 \subsection{Sequence Files}
 
 
