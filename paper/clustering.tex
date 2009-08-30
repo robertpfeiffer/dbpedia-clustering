@@ -10,6 +10,9 @@
 %\usepackage{fontspec}
 %\setromanfont[Mapping=tex-text,Alternate=1,Ligatures={Common,Diphthong}]{Palatino} 
 
+% Mateh
+\usepackage{amsmath}
+
 % Paket für Graphiken
 \usepackage[pdftex]{graphicx}
 
@@ -168,11 +171,10 @@ Die Reduce-Funktion gibt anschließend ein Schlüssel-Wert-Paar mit dem Schlüss
 
 \subsection{Abbruch der Iteration}
 Da der \emph{k-Means}-Algorithmus erst nach mehreren, im Vorfeld nicht genau bestimmbaren, Iterationen das gewünschte Ergebnis liefert,
-muss der in \ref{sec:BerechnungDerCluster} beschriebene Prozess mehrmals ausgeführt werden. Allerdings genügt es nicht, 
-nur den Job, der die beschriebenen Map- und Reduce-Funktionen enthält, erneut anzustoßen. Zuvor muss die Ausgabe der Reduce-Funktion, 
-welche die neu berechneten Clusterzentren enthält, in den \emph{Distributed Cache} verschoben werden, 
-um in der nächsten Iteration nicht mit den selben Daten erneut zu rechnen.
-
+muss der in \ref{sec:BerechnungDerCluster} beschriebene Prozess mehrmals ausgeführt werden.
+% Allerdings genügt es nicht, nur den Job, der die beschriebenen Map- und Reduce-Funktionen enthält, erneut anzustoßen. Zuvor muss die Ausgabe der Reduce-Funktion, 
+% welche die neu berechneten Clusterzentren enthält, in den \emph{Distributed Cache} verschoben werden, 
+% um in der nächsten Iteration nicht mit den selben Daten erneut zu rechnen.
 Nach der Definition von \emph{k-Means} wird dieser Zyklus beendet, sobald keine bzw. nur noch sehr wenige Subjekte einem anderen Cluster zugeordnet wurden.
 Dies stellte sich bei unserer Implementation als Problem heraus, da aus Platz- und Geschwindigkeitsgründen keine Informationen über die Zuordnung von Subjekten zu Clustern gespeichert werden. Diese Informationen stehen nur zu Beginn des Reduce-Schrittes zur Verfügung, nicht aber nach Abschluss des Jobs.
 Da das Mitführen der Zuordnungen sowie das dauerhafte Speichern sowohl die, zwischen den einzelnen Knoten zu übertragenen, Datenmengen stark erhöht,
