@@ -48,7 +48,7 @@ werden es mal 3 Zeilen?
 \end{abstract}
 
 \section{Einleitung}
-Mit der fortschreitenden Entwicklung der Computertechnik steigt auch das zu bearbeitende Datenvolumen stetig an. Damit auf immer größeren Datenmengen weiterhin effizient Berechnungen ausgeführt werden können, wurde von Google\footnote{\url{http://www.google.com/}} ein Framework namens MapReduce entwickelt. Mit diesem Programmrahmen ist es möglich, Berechnungen auf mehere Rechner zu verteilen und parallel ablaufen zu lassen.
+Mit der fortschreitenden Entwicklung der Computertechnik steigt auch das zu bearbeitende Datenvolumen stetig an. Damit auf immer größeren Datenmengen weiterhin effizient Berechnungen ausgeführt werden können, wurde von Google\footnote{\url{http://www.google.com/}} ein Berechnungsmodell namens MapReduce entwickelt. Mit diesem Programmrahmen ist es möglich, Berechnungen auf mehere Rechner zu verteilen und parallel ablaufen zu lassen.
 
 Im Seminar \emph{Map/Reduce Algorithms on Hadoop}\footnote{\url{http://www.hpi.uni-potsdam.de/naumann/lehre/ss_09/mapreduce_algorithms_on_hadoop.html}} haben wir uns mit dem, in Java implementierem, MapReduce-Framework \emph{Hadoop}\footnote{\url{http://hadoop.apache.org/}} auseinandergesetzt und einen Algorithmus implementiert, der eine Menge von Objekten anhand ihrer Ähnlichkeit gruppiert.
 
@@ -114,11 +114,10 @@ Dies wird durch die Funktion $\mu : M \times E \rightarrow [0,1] $ beschrieben. 
 Die Identitäten für Schnitt- Vereinungsmengen in der Mengenlehre \begin{align*}e \in (A \cap B) = (e \in A) \wedge (e \in B)
 	\\ e \in (A \cup B) = (e \in A) \vee (e \in B) \end{align*} lauten für Fuzzy-Mengen  \begin{align*}\mu(e, A \cap B) = min(\mu(e, A), \mu(e, B))\\ \mu(e, A \cup B) = max(\mu(e, A), \mu(e, B))  \end{align*}.
 
-Damit lässt sich der Jaccard-Index numerisch auf folgende Weise berechnen.
+Damit lässt sich der Jaccard-Index numerisch auf folgende Weise berechnen:
 
 $P$ sei die Menge aller möglichen Attribute.
-
-$$J_{\delta}(A,B) = \sum_{p \in P}\frac{max\bigl(\mu(p, A)\mu(p, B)\bigr) - min\bigl(\mu(p, A),\mu(p, B))\bigr)}{max\bigl(\mu(p, A),\mu(p, B))\bigr)}$$
+$$J_{\delta}(A,B) = \frac{\sum_{p \in P}max\bigl(\mu(p, A)\mu(p, B)\bigr) - min\bigl(\mu(p, A),\mu(p, B))\bigr)}{\sum_{p \in P}max\bigl(\mu(p, A),\mu(p, B))\bigr)}$$
 
 \section{Implementation}
 
@@ -130,7 +129,8 @@ $$J_{\delta}(A,B) = \sum_{p \in P}\frac{max\bigl(\mu(p, A)\mu(p, B)\bigr) - min\
 - Nachteile:\\
     - kodiertes Format, daher für Menschen nicht lesbar\\
     - keine Information über die Gesamtgröße
-Die Eingabedateien enthalten die Subjekte in einem Binärformat. Dabei wird jedes Subjekt durch ein Array von Bits repräsentiert, wobei die Stelle im Array immer ein Attribut repräsentiert. Wenn an einer Stelle ein 1-Bit steht, dann hat die Ressource das Attribut
+Die Eingabedateien enthalten die Subjekte in einem Binärformat. Dabei wird jedes Subjekt durch ein Array von Bits repräsentiert, wobei die Stelle im Array immer ein Attribut repräsentiert. Wenn an einer Stelle ein 1-Bit steht, dann hat die Ressource das Attribut.
+
 \subsection{Sequence Files}
 
 
