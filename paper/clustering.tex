@@ -68,10 +68,14 @@ Für jedes Schlüssel-Wert-Paar wird die Map-Funktion aufgerufen.
 
 \subsection{Die Daten}
 Die Datenmenge, die uns zur Verfügung gestellt wurde, sind Ressourcen aus der \emph{DBPedia}\footnote{\url{http://dbpedia.org/}}.
-Das \emph{DBPedia}-Projekt extrahiert Informationen aus der Online-Enzyklopädie \emph{Wikipedia}\footnote{\url{http://www.wikipedia.org/}}, bereitet diese auf und stellt diese strukturiert zur freien Verfügung.
+Das \emph{DBPedia}-Projekt extrahiert Informationen aus der Online-Enzyklopädie \emph{Wikipedia}\footnote{\url{http://www.wikipedia.org/}}, bereitet diese auf und stellt diese strukturiert zur freien Verfügung. % Wirklich wiki zitieren? Christoph weiss was k-means ist
 Einträge der \emph{DBPedia} entsprechen damit weitesgehend Artikeln der \emph{Wikipedia}.
 
 Als Hauptquelle für Informationen in der DBPedia sind die Infoboxen zu nennen, die in vielen Artikeln wie z.B. \emph{Europa}\footnote{\url{http://de.wikipedia.org/wiki/Europa}} auf der rechten Seite existieren.
+
+Die Daten werden als RDF-Tripel der Form $(Ressource, Attribut, Wert)$ in der DBPedia gehalten. Dabei sind die Attribute in eine Ontologie eingeordnet.
+
+Die Eingabedaten für das Clustering-Verfahren bestehen für jede Ressource aus der Menge der für sie verfügbaren Attribute. Es gibt insgesamt ca. 44000 mögliche Attribute in der DBPedia. Da alle Ressourcen aus der Ontologie stammen, kann man davon ausgehen, dass gleiche Attribute die gleiche Semantik haben. Dadurch lassen sich aus dem Ergebnis des Clustering-Verfahrens nach diesen Attributen möglicherweise semantische Rückschlüsse ziehen.
 
 \subsection{Clustering}
 Algorithmen, beziehungsweise Verfahren, die eine Menge von Objekten zu Gruppen (Cluster) mit jeweils ähnlichen Eigenschaften zusammenfassen, bezeichnet man als Clusteranalyseverfahren.
@@ -92,12 +96,20 @@ Nachdem alle Objekte einem Cluster zugeordnet worden sind, wird das neue Cluster
 Dieser Vorgang wird solange wiederholt, bis nach einer Iteration kein Objekt mehr einem anderen Clusterzentrum zugeordnet wird. Alternativ kann auch eine prozentuale Schranke festgelegt werden (zum Beispiel: wiederhole bis weniger als 2\% der Objekte einem anderen Cluster zugeordnet werden).
 
 \subsection{Jaccard-Distanz}
+Die Jaccard-Distanz ist ein Abstandsmaß, dass die Ähnlichkeit zwischen Mengen angibt. Dabei wird 
 
 $$J_{\delta}(A,B) = 1 - J(A,B) = { { |A \cup B| - |A \cap B| } \over |A \cup B| }$$
 
 \subsection{Fuzzy-Mengen}
-$$\mbox{Attribute}  P$$
-$$J_{\delta}(A,B) = 1 - J(A,B) = \sum_{p \in P}\frac{max(p \in A,p \in B) - min(p \in A,p \in B)}{max(p \in A,p \in B)}$$
+
+Da die Clusterzentren gemittelte Werte enthalte, können sie nicht wie die Subjekte als einfache Mengen dargestellt werden. Stattdessen werden Fuzzy-Mengen benutzt. Bei Fuzzy-Mengen kann ein Element zu einem gewissen Grad zwischen 0 und 1 enthalten sein. Dies wird durch die Funktion $\mu : M \times E \rightarrow [0,1] $ beschrieben. Dabei bedeutet $m(A,e) = 0$ soviel wie $ e \not\in A $ und $m(A,e) = 1$ entspricht $ e \in A $ aus der normalen Mengenlehre.
+
+Die Identitäten für Schnitt- Vereinungsmengen in der Mengenlehre \begin{align*}e \in (A \cap B) = (e \in A) \wedge (e \in B)
+	\\ e \in (A \cup B) = (e \in A) \vee (e \in B) \end{align*} lauten für Fuzzy-Mengen  \begin{align*}\mu(e, A \cap B) = min(\mu(e, A), \mu(e, B))\\ \mu(e, A \cup B) = max(\mu(e, A), \mu(e, B))  \end{align*}.
+
+Damit lässt sich der Jaccard-Index
+
+$$J_{\delta}(A,B) = \sum_{p \in P}\frac{max\bigl(\mu(p, A)\mu(p, B)\bigr) - min\bigl(\mu(p, A),\mu(p, B))\bigr)}{max\bigl(\mu(p, A),\mu(p, B))\bigr)}$$
 
 
 \section{Implementation}
@@ -110,6 +122,9 @@ $$J_{\delta}(A,B) = 1 - J(A,B) = \sum_{p \in P}\frac{max(p \in A,p \in B) - min(
 - Nachteile:\\
     - kodiertes Format, daher für Menschen nicht lesbar\\
     - keine Information über die Gesamtgröße
+    
+\subsection{Sequence Files}
+
 
 \subsection{Generierung der Clusterzentren}
 Das erste Problem bei der Implementierung des k-Means Algorithmus stellte die Generierung der initialen Clusterzentren dar. Im Hadoop-Framework werden eine Map- und eine Reduce-Funktion zu einem Job zusammengefasst und es ist möglich, in einem Programm mehrere Jobs hintereinander auszuführen. Dadurch bestand eine Möglichkeit darin, mittels eines Jobs die Zentren zu generieren und mit Hilfe eines zweiten Jobtyps den iterativen Teil des Algorithmus auszuführen. Die zweite von uns erarbeitete Idee war, die Clusterzentren vor dem Starten des Hadoop-Programmes seperat zu generieren und als weiteren Eingabeparameter mitzuliefern. Wir haben uns für das zweite Verfahren entschieden, da es zum einen zu diesem Zeitpunkt für uns leichter zu implementieren war und zum anderen durch die einmalige Generierung einen Geschwindigkeitsvorteil darstellte. Für eine finale Version des Programms wäre es jedoch von Vorteil, wenn der Benutzer nicht selbst die Clusterzentren generieren müsste.
