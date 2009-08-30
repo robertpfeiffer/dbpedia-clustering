@@ -119,7 +119,8 @@ Anstatt das kartesische Produkt von Clusterzentren und Subjekten zu bilden und a
 
 Parameter können nicht direkt an die Mapper übergeben werden, da die Job-Konfiguarion nicht die Mapper kennt, sondern nur deren Klassennamen. Die Mapper werden erst auf den Knoten erzeugt. Um den Mappern zusätzliche Parameter zu übergeben, werden deshalb zusätzliche Einträge in der Configuration sowie der \emph{Distributed Cache} verwendet. Der \emph{Distributed Cache} bietet die Möglichkeit, größere Datenmengen an die Knoten zu übermitteln, bevor der eigentliche MapReduce-Zyklus beginnt. Dazu werden die Dateien, die zum \emph{Distributed Cache} hinzugefügt wurden, vom HDFS in das lokale Dateisystem auf den Knoten kopiert. Im Gegensatz zum HDFS stellt der \emph{Distributed Cache} sicher, dass jeder Knoten alle Dateien vollständig erhält, bevor ein Map-Reduce-Zyklus beginnt.
 
-Die Knoten können jederzeit auf die lokalen Dateien lesend zugreifen. In unserer Implementierung werden die Clusterzentren zu vor der Erzeugung der Mapper auf den Knoten ausgelesen und anschließend im Hauptspeicher gehalten.
+Die Knoten können jederzeit auf die lokalen Dateien lesend zugreifen. In unserer Implementierung werden die Clusterzentren vor der Erzeugung der Mapper auf den Knoten ausgelesen und anschließend im Hauptspeicher gehalten.
+% "mit der Erzeugung" statt "vor der Erzeugung" ?
 
 \subsection{Berechnung der Cluster}
 Nachdem die Clusterzentren mittels des \emph{Distributed Cache} auf den einzelnen Nodes verteilt wurden, beginnt die eigentliche Berechnung.
@@ -129,11 +130,15 @@ Diese berechnet den Abstand des Subjektes zu jedem Clusterzentrum, welche mittel
 Für die Abstandsberechnung haben wir ein Interface \emph{Distance} eingeführt, welches unter anderem die Funktion \emph{between} bereitstellt.
 Diese Funktion erwartet als Eingabe zwei Vektoren gleicher Länge und gibt eine reele Zahl zurück, welche den Abstand zwischen den beiden Vektoren repräsentiert.
 Wir haben mit dem \emph{Euklidischen Abstandsmaß} und der \emph{Jaccard Distance} zwei verschiedene Implementationen des Interfaces erstellt.
-Welche Implementation verwendet wird, ist dem Benutzer überlassen, der dies in der Konfigurationsdatei einstellen kann.
+Dem Anwender ist es selbst überlassen, welche Implementation er verwenden möchte, da er dies mittels der Konfigurationsdatei einstellen kann.
 
-Das Resultat der Map-Funktion ist ein Schlüssel-Wert-Paar, bestehend aus dem Schlüssel des nächsten Centers und dem Vektor des Subjektes.
+Das Resultat der Map-Funktion ist ein Schlüssel-Wert-Paar, bestehend aus dem Schlüssel des nächsten Clusterzentrums und dem Vektor des Subjektes.
 
-Die Reduce-Phase beginnt, sobald für jedes Subjekt das nächste Clusterzentrum berechnet wurde. ...
+Die Reduce-Phase beginnt, sobald für jedes Subjekt das nächste Clusterzentrum berechnet wurde.
+Für jeden eindeutigen Schlüssel wird die Reduce-Funktion genau einmal gerufen. Als Wert wird eine Liste aller Vektoren übergeben, 
+die diesem Clusterzentrum (sprich diesem Schlüssel) zugeordnet wurden. Um den neuen Schwerpunkt des Clusterzentrums zu berechnen,
+wird erst die Summe aller Vektoren gebildet und diese anschließend durch die Anzahl der Vektoren dividiert.
+Die Reduce-Funktion gibt anschließend ein Schlüssel-Wert-Paar mit dem Schlüssel des Clusters und dem neuen Schwerpunkt als Vektor zurück.
 
 \subsection{Abbruch der Iteration}
 
