@@ -84,14 +84,22 @@ Dieser Vorgang wird solange wiederholt, bis nach einer Iteration kein Objekt meh
 Das erste Problem bei der Implementierung des k-Means Algorithmus stellte die Generierung der initialen Clusterzentren dar. Im Hadoop Framework werden eine Map- und eine Reduce-Funktion zu einem Job zusammengefasst und es ist möglich, in einem Programm mehrere Jobs hintereinander auszuführen. Dadurch bestand eine Möglichkeit darin, mittels eines Jobs die Zentren zu generieren und mit Hilfe eines zweiten Jobtyps den iterativen Teil des Algorithmus auszuführen. Die zweite von uns erarbeitete Idee war, die Clusterzentren vor dem Starten des Hadoop-Programmes seperat zu generieren und als weiteren Eingabeparameter mitzuliefern. Wir haben uns für das zweite Verfahren entschieden, da es zum einen zu diesem Zeitpunkt für uns leichter zu implementieren war und zum anderen durch die einmalige Generierung einen Geschwindigkeitsvorteil darstellte. Für ein finale Version des Programms wäre es jedoch von Vorteil, wenn der Benutzer nicht selbst die Clusterzentren generieren müsste.
 
 \subsection{Distributed Cache}
-- Problem: Verteilung der Centroids\\
-- Lösung mittels Distributed Cache\\
-- Vorteile: in Hadoop, synchrone Datenhaltung, wenig Overhead für die restlichen berechnungen\\
-- Nachteile: bricht das Map/Reduce Konzept\\
-- andere Möglichkeit: kartesisches Produkt
+%- Problem: Verteilung der Centroids\\
+%- Lösung mittels Distributed Cache\\
+%- Vorteile: in Hadoop, synchrone Datenhaltung, wenig Overhead für die restlichen berechnungen\\
+%- Nachteile: bricht das Map/Reduce Konzept\\
+%- andere Möglichkeit: kartesisches Produkt
+
+Um die Cluster in einer Iteration des K-Means-Algorithmus neu zu bestimmen, muss der Abstand jedes Subjektes von jedem Zentrum berechnet werden. Die Eingabedaten müssen für die Verarbeitung mit Map-Reduce so aufgeteilt werden, dass dies möglich ist.
+
+Anstatt das kartesische Produkt von Clusterzentren und Subjekten zu bilden und anschließend zu verteilen, wird eine Liste von Zentren den Mappern zu Beginn jeder Iteration als Parameter übergeben. Da die Anzahl der Cluster, und demzufolge auch die der Clusterzentren, viel kleiner als die Anzahl der Subjekte ist, bewirkt dieses Vorgehen einen sehr geringen Kommuniakationsaufwand. Da im Map-Schritt alle Zentren bekannt sind, kann das nächste Zentrum, und damit die Clusterzugehörigkeit jedes Subjektes, bereits im Map-Schritt bestimmt werden. 
+
+Parameter können nicht direkt an die Mapper übergeben werden, da die Job-Konfiguarion nicht die Mapper kennt, sondern nur deren Klassennamen. Die Mapper werden erst auf den Knoten erzeugt. Um den Mappern zusätzliche Parameter zu übergeben, werden deshalb zusätzliche Einträge in der Configuration sowie der \em{Distributed Cache} verwendet. Der \em{Distributed Cache} bietet die Möglichkeit, größere Datenmengen an die Knoten zu übermitteln, bevor der eigentliche MapReduce-Zyklus beginnt. Dazu werden die Dateien, die zum \em{Distributed Cache} hinzugefügt wurden, vom HDFS in das lokale Dateisystem auf den Knoten kopiert. Im Gegensatz zum HDFS stellt der \em{Distributed Cache} sicher, dass jeder Knoten alle Dateien vollständig erhält, bevor ein Map-Reduce-Zyklus beginnt.
+
+Die Knoten können jederzeit auf die Dateien aus dem \em{Distributed Cache} lesend zugreifen. In unserer Implementierung werden die Clusterzentren zu vor der Erzeugung der Mapper auf den Knoten ausgelesen und anschließend im Hauptspeicher gehalten.
 
 \subsection{Berechnung der Cluster}
-Nach dem die Clusterzentren mittels des Distributed Cache auf den einzelnen Nodes verteilt wurden, beginnt die eigentliche Berechnung. Das Hadoop Framework übernimmt die Zerteilung der Eingabedatei und generiert aus den einzelnen Teilen sogenannte Maptasks. 
+Nach dem die Clusterzentren mittels des \em{Distributed Cache} auf den einzelnen Nodes verteilt wurden, beginnt die eigentliche Berechnung. Das Hadoop Framework übernimmt die Zerteilung der Eingabedatei und generiert aus den einzelnen Teilen sogenannte Maptasks. 
 
 \section{Evaluierung}
 Eingabegröße
