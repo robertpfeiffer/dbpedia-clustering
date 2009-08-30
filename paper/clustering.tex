@@ -51,29 +51,40 @@ Im Seminar \emph{Map/Reduce Algorithms on Hadoop}\footnote{\url{http://www.hpi.u
 
 \subsection{MapReduce}
 MapReduce ist ein Programmiermodell, welches erstmals 2004 vorgestellt wurde \cite{DG04}.
-Der MapReduce Ansatz beinhaltet allgemein zwei Funktionen: die Map- und die Reduce-Funktion. In der Map-Funktion wird ein Problem in mehrere Teilprobleme zerlegt, die idealerweise parallel und unabhängig voneinander ausgeführt werden. Anschließend werden die Ergebnisse der Teilprobleme in der Reduce-Funktion wieder zu einem Gesamtergebnis zusammengesetzt.
+Der MapReduce Ansatz beinhaltet allgemein zwei Funktionen: die Map- und die Reduce-Funktion. In der Map-Funktion wird ein Problem in mehrere Teilprobleme zerlegt, die idealerweise parallel und unabhängig voneinander ausgeführt werden.
+Anschließend werden die Ergebnisse der Teilprobleme in der Reduce-Funktion wieder zu einem Gesamtergebnis zusammengesetzt.
 
-Die Map-Funktion erwartet als Eingabe Schlüssel-Wert-Paare und gibt neue Schlüssel-Wert-Paare als Ergebnis aus. Die Reduce-Funktion erhält als Eingabe einen Schlüssel und alle dazugehörigen Werte. Diese Werte werden je nach vorgegebener Berechnung zusammengeführt und dem Schlüssel zugeordnet. Die Reduce gibt anschließend wiederum Schlüssel-Wert-Paare aus.
+Die Map-Funktion erwartet als Eingabe Schlüssel-Wert-Paare und gibt neue Schlüssel-Wert-Paare als Ergebnis aus.
+Die Reduce-Funktion erhält als Eingabe einen Schlüssel und alle dazugehörigen Werte.
+Diese Werte werden je nach vorgegebener Berechnung zusammengeführt und dem Schlüssel zugeordnet.
+Die Reduce gibt anschließend wiederum Schlüssel-Wert-Paare aus.
 
 \subsection{Hadoop TODO}
-Das Hadoop Framework übernimmt die Zerteilung der Eingabedatei und generiert aus den einzelnen Teilen sogenannte Maptasks. Die einzelnen Rechner im Hadoop-Cluster bearbeiten anschließend diese Maptasks. Für jedes Schlüssel-Wert-Paar wird die Map-Funktion aufgerufen.
+Das Hadoop Framework übernimmt die Zerteilung der Eingabedatei und generiert aus den einzelnen Teilen sogenannte Maptasks.
+Die einzelnen Rechner im Hadoop-Cluster bearbeiten anschließend diese Maptasks.
+Für jedes Schlüssel-Wert-Paar wird die Map-Funktion aufgerufen.
 
 \subsection{Die Daten}
-Die Datenmenge, die uns zur Verfügung gestellt wurde, sind Objekte aus der \emph{DBPedia}\footnote{\url{http://dbpedia.org/}}. Das \emph{DBPedia}-Projekt extrahiert Informationen aus der Online-Enzyklopädie \emph{Wikipedia}\footnote{\url{http://www.wikipedia.org/}}, bereitet diese auf und stellt diese strukturiert zur freien Verfügung. Einträge der \emph{DBPedia} entsprechen damit weitesgehend Artikeln der \emph{Wikipedia}.
+Die Datenmenge, die uns zur Verfügung gestellt wurde, sind Objekte aus der \emph{DBPedia}\footnote{\url{http://dbpedia.org/}}.
+Das \emph{DBPedia}-Projekt extrahiert Informationen aus der Online-Enzyklopädie \emph{Wikipedia}\footnote{\url{http://www.wikipedia.org/}}, bereitet diese auf und stellt diese strukturiert zur freien Verfügung.
+Einträge der \emph{DBPedia} entsprechen damit weitesgehend Artikeln der \emph{Wikipedia}.
 
 Als Beispiel für Informationen in der DBPedia sind die Infoboxen zu nennen, die in vielen Artikeln wie z.B. \emph{Europa}\footnote{\url{http://de.wikipedia.org/wiki/Europa}} auf der rechten Seite existieren.
 
 \subsection{Clustering}
-Algorithmen beziehungsweise Verfahren, die eine Menge von Objekten zu Gruppen (Cluster) mit jeweils ähnlichen Eigenschaften zusammenfassen, bezeichnet man als Clusteranalyseverfahren. Es gibt eine ganze Reihe von unterschiedlichen Ansätzen zur Analyse, die alle unterschiedliche Vor- und Nachteile haben. Grundsätzlich unterscheidet man zwischen partitionierenden und hierarischen Analyseverfahren.
+Algorithmen, beziehungsweise Verfahren, die eine Menge von Objekten zu Gruppen (Cluster) mit jeweils ähnlichen Eigenschaften zusammenfassen, bezeichnet man als Clusteranalyseverfahren.
+Es gibt eine ganze Reihe von unterschiedlichen Ansätzen zur Analyse, die alle unterschiedliche Vor- und Nachteile haben.
+Grundsätzlich unterscheidet man zwischen partitionierenden und hierarischen Analyseverfahren.
 
-Für viele Clusterverfahren wird ein Abstandsmaß benötigt. Dieses gibt für zwei Objekte einen Wert zurück, der angibt, wie weit die beiden Objekte voneinander entfernt sind. Kleinere Werte beschreiben üblicherweise geringere Abstände. Es gibt verschiedene Abstandsmaße, die für unterschiedlichen Daten unterschiedlich gute Ergebnisse liefern. Als Beispiele sind das \emph{Euklidische Abstandsmaß} und die \emph{Jaccard-Distance} zu nennen.
+Für viele Clusterverfahren wird ein Abstandsmaß benötigt. Dieses gibt für zwei Objekte einen Wert zurück, der angibt, wie weit die beiden Objekte voneinander entfernt sind. Kleinere Werte beschreiben üblicherweise geringere Abstände. Es gibt verschiedene Abstandsmaße, die für unterschiedlichen Daten unterschiedlich gute Ergebnisse liefern. Als Beispiele sind das \emph{Euklidische Abstandsmaß} und die \emph{Jaccard-Distanz} zu nennen.
 
 \subsection{k-Means}
 Wir haben uns für das partitionierende Clusteranalyseverfahren \emph{k-Means}\footnote{\url{http://de.wikipedia.org/wiki/K-Means-Algorithmus}} entschieden. \emph{k-Means} zeichnet sich durch seine hohe Geschwindigkeit aus, liefert jedoch nicht zwingend die optimale Lösung. Desweiteren muss man bei \emph{k-Means} die Anzahl der gewünschten Cluster im Vorfeld vorgeben.
 
-Zu Beginn des Algorithmus wählt man zufällig die gewünschte Anzahl von Clustern aus der Objektmenge aus. Diese Objekte bilden die initialen Clusterzentren. Aus der zufälligen Auswahl der Clusterzentren ergibt sich die Konsequenz, dass bei verschiedenen Programmdurchläufen mit gleichen Eingabedateien, unterschiedliche Cluster berechnet werden können. Nach der Wahl der Clusterzentren, beginnt der iterative Teil des Algorithmus.
+Zu Beginn des Algorithmus wählt man zufällig die gewünschte Anzahl von Clustern aus der Objektmenge aus. Diese Objekte bilden die initialen Clusterzentren. Aus der zufälligen Auswahl der Clusterzentren ergibt sich die Konsequenz, dass bei verschiedenen Programmdurchläufen mit gleichen Eingabedateien unterschiedliche Cluster berechnet werden können. Nach der Wahl der Clusterzentren beginnt der iterative Teil des Algorithmus.
 
-Für jedes Objekt wird mit Hilfe des Abstandsmaßes der Abstand zu jedem Clusterzentrum berechnet. Anschließend wird das Objekt demjenigen Cluster zugerordnet, zu dessem Clusterzentrum es den geringsten Abstand aufweist. Nach dem alle Objekte einem Cluster zugeordnet worden sind, wird das neue Clusterzentrum bestimmt, in dem der Schwerpunkt aller dem Cluster zugeordneten Objekte berechnet wird.
+Für jedes Objekt wird mit Hilfe des Abstandsmaßes der Abstand zu jedem Clusterzentrum berechnet. Anschließend wird das Objekt demjenigen Cluster zugerordnet, zu dessen Clusterzentrum es den geringsten Abstand aufweist.
+Nachdem alle Objekte einem Cluster zugeordnet worden sind, wird das neue Clusterzentrum bestimmt, indem der Schwerpunkt aller dem Cluster zugeordneten Objekte berechnet wird.
 
 Dieser Vorgang wird solange wiederholt, bis nach einer Iteration kein Objekt mehr einem anderen Clusterzentrum zugeordnet wird. Alternativ kann auch eine prozentuale Schranke festgelegt werden (zum Beispiel: wiederhole bis weniger als 2\% der Objekte einem anderen Cluster zugeordnet werden).
 
@@ -89,17 +100,27 @@ Dieser Vorgang wird solange wiederholt, bis nach einer Iteration kein Objekt meh
     - keine Information über die Gesamtgröße
 
 \subsection{Generierung der Clusterzentren}
-Das erste Problem bei der Implementierung des k-Means Algorithmus stellte die Generierung der initialen Clusterzentren dar. Im Hadoop Framework werden eine Map- und eine Reduce-Funktion zu einem Job zusammengefasst und es ist möglich, in einem Programm mehrere Jobs hintereinander auszuführen. Dadurch bestand eine Möglichkeit darin, mittels eines Jobs die Zentren zu generieren und mit Hilfe eines zweiten Jobtyps den iterativen Teil des Algorithmus auszuführen. Die zweite von uns erarbeitete Idee war, die Clusterzentren vor dem Starten des Hadoop-Programmes seperat zu generieren und als weiteren Eingabeparameter mitzuliefern. Wir haben uns für das zweite Verfahren entschieden, da es zum einen zu diesem Zeitpunkt für uns leichter zu implementieren war und zum anderen durch die einmalige Generierung einen Geschwindigkeitsvorteil darstellte. Für ein finale Version des Programms wäre es jedoch von Vorteil, wenn der Benutzer nicht selbst die Clusterzentren generieren müsste.
+Das erste Problem bei der Implementierung des k-Means Algorithmus stellte die Generierung der initialen Clusterzentren dar. Im Hadoop-Framework werden eine Map- und eine Reduce-Funktion zu einem Job zusammengefasst und es ist möglich, in einem Programm mehrere Jobs hintereinander auszuführen. Dadurch bestand eine Möglichkeit darin, mittels eines Jobs die Zentren zu generieren und mit Hilfe eines zweiten Jobtyps den iterativen Teil des Algorithmus auszuführen. Die zweite von uns erarbeitete Idee war, die Clusterzentren vor dem Starten des Hadoop-Programmes seperat zu generieren und als weiteren Eingabeparameter mitzuliefern. Wir haben uns für das zweite Verfahren entschieden, da es zum einen zu diesem Zeitpunkt für uns leichter zu implementieren war und zum anderen durch die einmalige Generierung einen Geschwindigkeitsvorteil darstellte. Für eine finale Version des Programms wäre es jedoch von Vorteil, wenn der Benutzer nicht selbst die Clusterzentren generieren müsste.
+
+% hat auch Vorteile beim evaluieren
 
 \subsection{Distributed Cache}
-- Problem: Verteilung der Centroids\\
-- Lösung mittels Distributed Cache\\
-- Vorteile: in Hadoop, synchrone Datenhaltung, wenig Overhead für die restlichen berechnungen\\
-- Nachteile: bricht das Map/Reduce Konzept\\
-- andere Möglichkeit: kartesisches Produkt
+%- Problem: Verteilung der Centroids\\
+%- Lösung mittels Distributed Cache\\
+%- Vorteile: in Hadoop, synchrone Datenhaltung, wenig Overhead für die restlichen berechnungen\\
+%- Nachteile: bricht das Map/Reduce Konzept\\
+%- andere Möglichkeit: kartesisches Produkt
+
+Um die Cluster in einer Iteration des K-Means-Algorithmus neu zu bestimmen, muss der Abstand jedes Subjektes von jedem Zentrum berechnet werden. Die Eingabedaten müssen für die Verarbeitung mit Map-Reduce so aufgeteilt werden, dass dies möglich ist.
+
+Anstatt das kartesische Produkt von Clusterzentren und Subjekten zu bilden und anschließend zu verteilen, wird eine Liste von Zentren den Mappern zu Beginn jeder Iteration als Parameter übergeben. Da die Anzahl der Cluster, und demzufolge auch die der Clusterzentren, viel kleiner als die Anzahl der Subjekte ist, bewirkt dieses Vorgehen einen sehr geringen Kommuniakationsaufwand. Da im Map-Schritt alle Zentren bekannt sind, kann das nächste Zentrum, und damit die Clusterzugehörigkeit jedes Subjektes, bereits im Map-Schritt bestimmt werden. 
+
+Parameter können nicht direkt an die Mapper übergeben werden, da die Job-Konfiguarion nicht die Mapper kennt, sondern nur deren Klassennamen. Die Mapper werden erst auf den Knoten erzeugt. Um den Mappern zusätzliche Parameter zu übergeben, werden deshalb zusätzliche Einträge in der Configuration sowie der \em{Distributed Cache} verwendet. Der \em{Distributed Cache} bietet die Möglichkeit, größere Datenmengen an die Knoten zu übermitteln, bevor der eigentliche MapReduce-Zyklus beginnt. Dazu werden die Dateien, die zum \em{Distributed Cache} hinzugefügt wurden, vom HDFS in das lokale Dateisystem auf den Knoten kopiert. Im Gegensatz zum HDFS stellt der \em{Distributed Cache} sicher, dass jeder Knoten alle Dateien vollständig erhält, bevor ein Map-Reduce-Zyklus beginnt.
+
+Die Knoten können jederzeit auf die Dateien aus dem \em{Distributed Cache} lesend zugreifen. In unserer Implementierung werden die Clusterzentren zu vor der Erzeugung der Mapper auf den Knoten ausgelesen und anschließend im Hauptspeicher gehalten.
 
 \subsection{Berechnung der Cluster}
-Nach dem die Clusterzentren mittels des Distributed Cache auf den einzelnen Nodes verteilt wurden, beginnt die eigentliche Berechnung.
+Nach dem die Clusterzentren mittels des \em{Distributed Cache} auf den einzelnen Nodes verteilt wurden, beginnt die eigentliche Berechnung.
 Der iterative Teil des k-Means-Algorithmus lässt sich relativ leicht auf das MapReduce-Schema abbilden. Für jedes Subjekt wird eine Map-Funktion aufgerufen. 
 Diese berechnet den Abstand des Subjektes zu jedem Clusterzentrum, welche mittels Distributed Cache zur Verfügung stehen.
 
