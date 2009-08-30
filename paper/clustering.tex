@@ -81,7 +81,8 @@ Grundsätzlich unterscheidet man zwischen partitionierenden und hierarischen Ana
 Für viele Clusterverfahren wird ein Abstandsmaß benötigt. Dieses gibt für zwei Objekte einen Wert zurück, der angibt, wie weit die beiden Objekte voneinander entfernt sind. Kleinere Werte beschreiben üblicherweise geringere Abstände. Es gibt verschiedene Abstandsmaße, die für unterschiedlichen Daten unterschiedlich gute Ergebnisse liefern. Als Beispiele sind das \emph{Euklidische Abstandsmaß} und die \emph{Jaccard-Distanz} zu nennen.
 
 \subsection{k-Means}
-Wir haben uns für das partitionierende Clusteranalyseverfahren \emph{k-Means}\footnote{\url{http://de.wikipedia.org/wiki/K-Means-Algorithmus}} entschieden. \emph{k-Means} zeichnet sich durch seine hohe Geschwindigkeit aus, liefert jedoch nicht zwingend die optimale Lösung. Desweiteren muss man bei \emph{k-Means} die Anzahl der gewünschten Cluster im Vorfeld vorgeben.
+Wir haben das partitionierende Clusteranalyseverfahren \emph{k-Means}\footnote{\url{http://de.wikipedia.org/wiki/K-Means-Algorithmus}} angewendet.
+\emph{k-Means} zeichnet sich durch seine hohe Geschwindigkeit aus, liefert jedoch nicht zwingend die optimale Lösung. Desweiteren muss man bei \emph{k-Means} die Anzahl der gewünschten Cluster im Vorfeld vorgeben.
 
 Zu Beginn des Algorithmus wählt man zufällig die gewünschte Anzahl von Clustern aus der Objektmenge aus. Diese Objekte bilden die initialen Clusterzentren. Aus der zufälligen Auswahl der Clusterzentren ergibt sich die Konsequenz, dass bei verschiedenen Programmdurchläufen mit gleichen Eingabedateien unterschiedliche Cluster berechnet werden können. Nach der Wahl der Clusterzentren beginnt der iterative Teil des Algorithmus.
 
@@ -89,6 +90,15 @@ Für jedes Objekt wird mit Hilfe des Abstandsmaßes der Abstand zu jedem Cluster
 Nachdem alle Objekte einem Cluster zugeordnet worden sind, wird das neue Clusterzentrum bestimmt, indem der Schwerpunkt aller dem Cluster zugeordneten Objekte berechnet wird.
 
 Dieser Vorgang wird solange wiederholt, bis nach einer Iteration kein Objekt mehr einem anderen Clusterzentrum zugeordnet wird. Alternativ kann auch eine prozentuale Schranke festgelegt werden (zum Beispiel: wiederhole bis weniger als 2\% der Objekte einem anderen Cluster zugeordnet werden).
+
+\subsection{Jaccard-Distanz}
+
+$$J_{\delta}(A,B) = 1 - J(A,B) = { { |A \cup B| - |A \cap B| } \over |A \cup B| }$$
+
+\subsection{Fuzzy-Mengen}
+$$\mbox{Attribute}  P$$
+$$J_{\delta}(A,B) = 1 - J(A,B) = \sum_{p \in P}\frac{max(p \in A,p \in B) - min(p \in A,p \in B)}{max(p \in A,p \in B)}$$
+
 
 \section{Implementation}
 
