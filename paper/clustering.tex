@@ -5,13 +5,13 @@
 
 %% Deutsche Anpassungen %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \usepackage[ngerman]{babel}
-%\usepackage[T1]{fontenc}
-%\usepackage[utf8]{inputenc}
-\usepackage{fontspec}
-\setromanfont[Mapping=tex-text,Alternate=1,Ligatures={Common,Diphthong}]{Palatino} 
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+%\usepackage{fontspec}
+%\setromanfont[Mapping=tex-text,Alternate=1,Ligatures={Common,Diphthong}]{Palatino} 
 
 % Paket für Graphiken
-%\usepackage[pdftex]{graphicx}
+\usepackage[pdftex]{graphicx}
 
 %\Paket für Hyperlinks
 \usepackage[
@@ -67,11 +67,11 @@ Die einzelnen Rechner im Hadoop-Cluster bearbeiten anschließend diese Maptasks.
 Für jedes Schlüssel-Wert-Paar wird die Map-Funktion aufgerufen.
 
 \subsection{Die Daten}
-Die Datenmenge, die uns zur Verfügung gestellt wurde, sind Objekte aus der \emph{DBPedia}\footnote{\url{http://dbpedia.org/}}.
+Die Datenmenge, die uns zur Verfügung gestellt wurde, sind Ressourcen aus der \emph{DBPedia}\footnote{\url{http://dbpedia.org/}}.
 Das \emph{DBPedia}-Projekt extrahiert Informationen aus der Online-Enzyklopädie \emph{Wikipedia}\footnote{\url{http://www.wikipedia.org/}}, bereitet diese auf und stellt diese strukturiert zur freien Verfügung.
 Einträge der \emph{DBPedia} entsprechen damit weitesgehend Artikeln der \emph{Wikipedia}.
 
-Als Beispiel für Informationen in der DBPedia sind die Infoboxen zu nennen, die in vielen Artikeln wie z.B. \emph{Europa}\footnote{\url{http://de.wikipedia.org/wiki/Europa}} auf der rechten Seite existieren.
+Als Hauptquelle für Informationen in der DBPedia sind die Infoboxen zu nennen, die in vielen Artikeln wie z.B. \emph{Europa}\footnote{\url{http://de.wikipedia.org/wiki/Europa}} auf der rechten Seite existieren.
 
 \subsection{Clustering}
 Algorithmen, beziehungsweise Verfahren, die eine Menge von Objekten zu Gruppen (Cluster) mit jeweils ähnlichen Eigenschaften zusammenfassen, bezeichnet man als Clusteranalyseverfahren.
