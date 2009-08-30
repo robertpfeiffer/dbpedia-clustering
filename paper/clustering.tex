@@ -99,7 +99,16 @@ Das erste Problem bei der Implementierung des k-Means Algorithmus stellte die Ge
 - andere Möglichkeit: kartesisches Produkt
 
 \subsection{Berechnung der Cluster}
-Nach dem die Clusterzentren mittels des Distributed Cache auf den einzelnen Nodes verteilt wurden, beginnt die eigentliche Berechnung. Der iterative Teil des k-Means-Algorithmus lässt sich relativ leicht auf das MapReduce-Schema abbilden. Für jedes Subjekt wird eine Map-Funktion aufgerufen. Diese berechnet den Abstand des Subjektes zu jedem Clusterzentrum, welche mittels Distributed Cache zur Verfügung stehen. Das Resultat ist ein Schlüssel-Wert-Paar, bestehend aus dem Schlüssel des nächsten Centers und dem Vektor des Subjektes.
+Nach dem die Clusterzentren mittels des Distributed Cache auf den einzelnen Nodes verteilt wurden, beginnt die eigentliche Berechnung.
+Der iterative Teil des k-Means-Algorithmus lässt sich relativ leicht auf das MapReduce-Schema abbilden. Für jedes Subjekt wird eine Map-Funktion aufgerufen. 
+Diese berechnet den Abstand des Subjektes zu jedem Clusterzentrum, welche mittels Distributed Cache zur Verfügung stehen.
+
+Für die Abstandsberechnung haben wir ein Interface \emph{Distance} eingeführt, welches unter anderem die Funktion \emph{between} bereitstellt.
+Diese Funktion erwartet als Eingabe zwei Vektoren gleicher Länge und gibt eine reele Zahl zurück, welche den Abstand zwischen den beiden Vektoren repräsentiert.
+Wir haben mit dem \emph{Euklidischen Abstandsmaß} und der \emph{Jaccard Distance} zwei verschiedene Implementationen des Interfaces erstellt.
+Welche Implementation verwendet wird, ist dem Benutzer überlassen, der dies in der Konfigurationsdatei einstellen kann.
+
+Das Resultat der Map-Funktion ist ein Schlüssel-Wert-Paar, bestehend aus dem Schlüssel des nächsten Centers und dem Vektor des Subjektes.
 
 Die Reduce-Phase beginnt, sobald für jedes Subjekt das nächste Clusterzentrum berechnet wurde. ...
 
