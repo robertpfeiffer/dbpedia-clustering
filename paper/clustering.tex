@@ -112,7 +112,7 @@ $$J_{\delta}(A,B) = 1 - J(A,B) = \sum_{p \in P}\frac{max(p \in A,p \in B) - min(
     - keine Information über die Gesamtgröße
 
 \subsection{Generierung der Clusterzentren}
-Das erste Problem bei der Implementierung des k-Means Algorithmus stellte die Generierung der initialen Clusterzentren dar. Im Hadoop-Framework werden eine Map- und eine Reduce-Funktion zu einem Job zusammengefasst und es ist möglich, in einem Programm mehrere Jobs hintereinander auszuführen. Dadurch bestand eine Möglichkeit darin, mittels eines Jobs die Zentren zu generieren und mit Hilfe eines zweiten Jobtyps den iterativen Teil des Algorithmus auszuführen. Die zweite von uns erarbeitete Idee war, die Clusterzentren vor dem Starten des Hadoop-Programmes seperat zu generieren und als weiteren Eingabeparameter mitzuliefern. Wir haben uns für das zweite Verfahren entschieden, da es zum einen zu diesem Zeitpunkt für uns leichter zu implementieren war und zum anderen durch die einmalige Generierung einen Geschwindigkeitsvorteil darstellte. Für eine finale Version des Programms wäre es jedoch von Vorteil, wenn der Benutzer nicht selbst die Clusterzentren generieren müsste.
+Das erste Problem bei der Implementierung des \emph{k-Means} Algorithmus stellte die Generierung der initialen Clusterzentren dar. Im Hadoop-Framework werden eine Map- und eine Reduce-Funktion zu einem Job zusammengefasst und es ist möglich, in einem Programm mehrere Jobs hintereinander auszuführen. Dadurch bestand eine Möglichkeit darin, mittels eines Jobs die Zentren zu generieren und mit Hilfe eines zweiten Jobtyps den iterativen Teil des Algorithmus auszuführen. Die zweite von uns erarbeitete Idee war, die Clusterzentren vor dem Starten des Hadoop-Programmes seperat zu generieren und als weiteren Eingabeparameter mitzuliefern. Wir haben uns für das zweite Verfahren entschieden, da es zum einen zu diesem Zeitpunkt für uns leichter zu implementieren war und zum anderen durch die einmalige Generierung einen Geschwindigkeitsvorteil darstellte. Für eine finale Version des Programms wäre es jedoch von Vorteil, wenn der Benutzer nicht selbst die Clusterzentren generieren müsste.
 
 % hat auch Vorteile beim evaluieren
 
@@ -123,7 +123,7 @@ Das erste Problem bei der Implementierung des k-Means Algorithmus stellte die Ge
 %- Nachteile: bricht das Map/Reduce Konzept\\
 %- andere Möglichkeit: kartesisches Produkt
 
-Um die Cluster in einer Iteration des K-Means-Algorithmus neu zu bestimmen, muss der Abstand jedes Subjektes von jedem Zentrum berechnet werden. Die Eingabedaten müssen für die Verarbeitung mit Map-Reduce so aufgeteilt werden, dass dies möglich ist.
+Um die Cluster in einer Iteration des \emph{k-Means}-Algorithmus neu zu bestimmen, muss der Abstand jedes Subjektes von jedem Zentrum berechnet werden. Die Eingabedaten müssen für die Verarbeitung mit Map-Reduce so aufgeteilt werden, dass dies möglich ist.
 
 Anstatt das kartesische Produkt von Clusterzentren und Subjekten zu bilden und anschließend zu verteilen, wird eine Liste von Zentren den Mappern zu Beginn jeder Iteration als Parameter übergeben. Da die Anzahl der Cluster, und demzufolge auch die der Clusterzentren, viel kleiner als die Anzahl der Subjekte ist, bewirkt dieses Vorgehen einen sehr geringen Kommuniakationsaufwand. Da im Map-Schritt alle Zentren bekannt sind, kann das nächste Zentrum, und damit die Clusterzugehörigkeit jedes Subjektes, bereits im Map-Schritt bestimmt werden. 
 
@@ -133,14 +133,15 @@ Die Knoten können jederzeit auf die lokalen Dateien lesend zugreifen. In unsere
 % "mit der Erzeugung" statt "vor der Erzeugung" ?
 
 \subsection{Berechnung der Cluster}
-Nachdem die Clusterzentren mittels des \emph{Distributed Cache} auf den einzelnen Nodes verteilt wurden, beginnt die eigentliche Berechnung.
-Der iterative Teil des k-Means-Algorithmus lässt sich relativ leicht auf das MapReduce-Schema abbilden. Für jedes Subjekt wird eine Map-Funktion aufgerufen. 
-Diese berechnet den Abstand des Subjektes zu jedem Clusterzentrum, welche mittels Distributed Cache zur Verfügung stehen.
+\label{sec:BerechnungDerCluster}
+Nachdem die Clusterzentren mittels des \emph{Distributed Cache} auf die einzelnen Knoten verteilt wurden, beginnt die eigentliche Berechnung.
+Der iterative Teil des \emph{k-Means}-Algorithmus lässt sich relativ leicht auf das MapReduce-Schema abbilden. Für jedes Subjekt wird eine Map-Funktion aufgerufen. 
+Diese berechnet den Abstand des Subjektes zu jedem Clusterzentrum, welche mittels \emph{Distributed Cache} zur Verfügung stehen.
 
 Für die Abstandsberechnung haben wir ein Interface \emph{Distance} eingeführt, welches unter anderem die Funktion \emph{between} bereitstellt.
 Diese Funktion erwartet als Eingabe zwei Vektoren gleicher Länge und gibt eine reele Zahl zurück, welche den Abstand zwischen den beiden Vektoren repräsentiert.
 Wir haben mit dem \emph{Euklidischen Abstandsmaß} und der \emph{Jaccard Distance} zwei verschiedene Implementationen des Interfaces erstellt.
-Dem Anwender ist es selbst überlassen, welche Implementation er verwenden möchte, da er dies mittels der Konfigurationsdatei einstellen kann.
+Dem Anwender ist es selbst überlassen, welche Implementation er verwenden möchte. Er kann dies durch die Konfigurationsdatei einstellen.
 
 Das Resultat der Map-Funktion ist ein Schlüssel-Wert-Paar, bestehend aus dem Schlüssel des nächsten Clusterzentrums und dem Vektor des Subjektes.
 
@@ -151,6 +152,18 @@ wird erst die Summe aller Vektoren gebildet und diese anschließend durch die An
 Die Reduce-Funktion gibt anschließend ein Schlüssel-Wert-Paar mit dem Schlüssel des Clusters und dem neuen Schwerpunkt als Vektor zurück.
 
 \subsection{Abbruch der Iteration}
+Da der \emph{k-Means}-Algorithmus erst nach mehreren, im Vorfeld nicht genau bestimmbaren, Iterationen das gewünschte Ergebnis liefert,
+muss der in \ref{sec:BerechnungDerCluster} beschriebene Prozess mehrmals ausgeführt werden. Allerdings genügt es nicht, 
+nur den Job, der die beschriebenen Map- und Reduce-Funktionen enthält, erneut anzustoßen. Zuvor muss die Ausgabe der Reduce-Funktion, 
+welche die neu berechneten Clusterzentren enthält, in den \emph{Distributed Cache} verschoben werden, 
+um in der nächsten Iteration nicht mit den selben Daten erneut zu rechnen.
+
+Nach der Definition von \emph{k-Means} wird dieser Zyklus beendet, sobald keine bzw. nur noch sehr wenige Subjekte einem anderen Cluster zugeordnet wurden.
+Dies stellte sich bei unserer Implementation als Problem heraus, da aus Platz- und Geschwindigkeitsgründen keine Informationen über die Zuordnung von Subjekten zu Clustern gespeichert werden. Diese Informationen stehen nur zu Beginn des Reduce-Schrittes zur Verfügung, nicht aber nach Abschluss des Jobs.
+Da das Mitführen der Zuordnungen sowie das dauerhafte Speichern sowohl die, zwischen den einzelnen Knoten zu übertragenen, Datenmengen stark erhöht,
+als auch in einer komplexeren Programmstruktur gemündet hätte, entschieden wir uns gegen diese Lösung. 
+Stattdessen berechnen wir den Fortschritt über die prozentuale Veränderung der Clusterzentren. Bevor die alten Clusterzentren im \emph{Distributed Cache} durch die neuen ersetzt werden, wird für jedes neu berechnete Clusterzentrum der Abstand zum alten Clusterzentrum berechnet. 
+Die größtmögliche Entfernung von zwei Vektoren entspricht einer Veränderung von 100\%. Sinkt der Durchschnitt aller Veränderungen unter eine, vom Benutzer definierte, Schranke, so wird der Zyklus abgebrochen.
 
 \section{Evaluierung}
 Eingabegröße
@@ -158,6 +171,7 @@ Anzahl der Cluster
 Abbruch
 
 \section{Fazit}
+- HDFS vs. lokales Dateisystem
 TODO
 
 \begin{thebibliography}{------------}
