@@ -108,7 +108,8 @@ $$J_{\delta}(A,B) = %1 - J(A,B) =
 Ein Vorteil der Jaccard-Distanz gegenüber dem euklidischen Abstandsmaß ist, dass Elemente, die in den jeweiligen Mengen enthalten sind, stärker berücksichtigt werden, als nicht enthaltene Elemente. Beim Euklidischen Abstand beeinflussen Elemente, die in beiden Mengen fehlen oder vorhanden sind, das Abstandsmaß gleich.
 
 \subsection{Fuzzy-Mengen}
-Da die Clusterzentren nach der ersten Iteration gemittelte Werte enthalten, können sie nicht wie die Subjekte als einfache Mengen dargestellt werden.
+\label{sec:Fuzzy}
+Da die Clusterzentren gemittelte Werte enthalten, können sie nicht wie die Subjekte als einfache Mengen dargestellt werden.
 Stattdessen werden Fuzzy-Mengen benutzt, in denen ein Element zu einem gewissen Grad zwischen 0 und 1 enthalten sein kann.
 Dies wird durch die Funktion $\mu : M \times E \rightarrow [0,1] $ beschrieben. Dabei bedeutet $m(A,e) = 0$ soviel wie $ e \not\in A $ und $m(A,e) = 1$ entspricht $ e \in A $ aus der normalen Mengenlehre.
 
@@ -166,19 +167,24 @@ Der \emph{Distributed Cache} bietet die Möglichkeit, größere Datenmengen an d
 \subsection{Berechnung der Clusterzentren}
 \label{sec:BerechnungDerCluster}
 % Nachdem die Clusterzentren mittels des \emph{Distributed Cache} auf die einzelnen Knoten verteilt wurden, beginnt die eigentliche Berechnung des .
-Der iterative Teil des \emph{k-Means}-Algorithmus lässt sich relativ leicht auf das MapReduce-Schema abbilden. Für jedes Subjekt wird eine Map-Funktion aufgerufen. 
-Diese berechnet den Abstand des Subjektes zu jedem Clusterzentrum, welche mittels \emph{Distributed Cache} zur Verfügung stehen.
+Der iterative Teil des \emph{k-Means}-Algorithmus lässt sich relativ leicht auf das MapReduce-Schema abbilden.
 
+% Map
+Für jedes Subjekt wird eine Map-Funktion aufgerufen.
+Diese berechnet den Abstand des Subjektes zu jedem Clusterzentrum, welche mittels \emph{Distributed Cache} zur Verfügung stehen.
 Für die Abstandsberechnung haben wir ein Interface \emph{Distance} eingeführt, welches unter anderem die Funktion \emph{between} bereitstellt.
 Diese Funktion erwartet als Eingabe zwei Vektoren gleicher Länge und gibt eine reelle Zahl zurück, welche den Abstand zwischen den beiden Vektoren repräsentiert.
-Wir haben mit dem \emph{Euklidischen Abstandsmaß} und der \emph{Jaccard Distance} zwei verschiedene Implementationen des Interfaces erstellt.
-Dem Anwender ist es selbst überlassen, welche Implementation er verwenden möchte. Er kann dies durch die Konfigurationsdatei einstellen.
-
+Wir haben mit dem \emph{Euklidischen Abstandsmaß} und der \emph{Jaccard-Distanz} zwei verschiedene Implementationen des Interfaces erstellt.
+Da für die Berechnung der Jaccard-Distanz beide Vektoren bzw. Mengen Werte aus dem gleichen Wertebereich enthalten müssen,
+die Clusterzentren jedoch im Gegensatz zu den Subjekte auch gemittelte Werte enthalten können, haben wir für die Berechnung die in \ref{sec:Fuzzy} beschriebenen Fuzzy-Mengen benutzt.
+% Dem Anwender ist es selbst überlassen, welche Implementation er verwenden möchte. Er kann dies durch die Konfigurationsdatei einstellen.
 Das Resultat der Map-Funktion ist ein Schlüssel-Wert-Paar, bestehend aus dem Schlüssel des nächsten Clusterzentrums und dem Vektor des Subjektes.
 
+% Reduce
 Die Reduce-Phase beginnt, sobald für jedes Subjekt das nächste Clusterzentrum berechnet wurde.
-Für jeden eindeutigen Schlüssel wird die Reduce-Funktion genau einmal gerufen. Als Wert wird eine Liste aller Vektoren übergeben, 
-die diesem Clusterzentrum (sprich diesem Schlüssel) zugeordnet wurden. Um den neuen Schwerpunkt des Clusterzentrums zu berechnen,
+Für jeden eindeutigen Schlüssel wird die Reduce-Funktion genau einmal gerufen.
+Als Wert wird eine Liste aller Vektoren übergeben, die diesem Clusterzentrum (sprich diesem Schlüssel) zugeordnet wurden. 
+Um den neuen Schwerpunkt des Clusterzentrums zu berechnen,
 wird erst die Summe aller Vektoren gebildet und diese anschließend durch die Anzahl der Vektoren dividiert.
 Die Reduce-Funktion gibt anschließend ein Schlüssel-Wert-Paar mit dem Schlüssel des Clusters und dem neuen Schwerpunkt als Vektor zurück.
 
@@ -189,10 +195,10 @@ muss der in \ref{sec:BerechnungDerCluster} beschriebene Prozess mehrmals ausgef�
 % welche die neu berechneten Clusterzentren enthält, in den \emph{Distributed Cache} verschoben werden, 
 % um in der nächsten Iteration nicht mit den selben Daten erneut zu rechnen.
 Nach der Definition von \emph{k-Means} wird dieser Zyklus beendet, sobald keine bzw. nur noch sehr wenige Subjekte einem anderen Cluster zugeordnet wurden.
-Dies stellte sich bei unserer Implementation als Problem heraus, da aus Platz- und Geschwindigkeitsgründen keine Informationen über die Zuordnung von Subjekten zu Clustern gespeichert werden. Diese Informationen stehen nur zu Beginn des Reduce-Schrittes zur Verfügung, nicht aber nach Abschluss des Jobs.
-Da das Mitführen der Zuordnungen sowie das dauerhafte Speichern sowohl die zwischen den einzelnen Knoten zu übertragenen Datenmengen stark erhöht,
-als auch in einer komplexeren Programmstruktur gemündet hätte, entschieden wir uns gegen diese Lösung. 
-Stattdessen berechnen wir den Fortschritt über die prozentuale Veränderung der Clusterzentren. Bevor die alten Clusterzentren im \emph{Distributed Cache} durch die neuen ersetzt werden, wird für jedes neu berechnete Clusterzentrum der Abstand zum alten Clusterzentrum berechnet. 
+Die Umsetzung stellte sich bei unserer Implementation als Problem heraus, da aus Platz- und Geschwindigkeitsgründen keine Informationen über die Zuordnung von Subjekten zu Clustern gespeichert werden. 
+% Diese Informationen stehen nur zu Beginn des Reduce-Schrittes zur Verfügung, nicht aber nach Abschluss des Jobs.
+Da das Mitführen der Zuordnungen sowie das dauerhafte Speichern sowohl die zwischen den einzelnen Knoten zu übertragenen Datenmengen stark erhöht, als auch in einer komplexeren Programmstruktur gemündet hätte, entschieden wir uns gegen diese Lösung. 
+Stattdessen berechnen wir den Fortschritt über die prozentuale Veränderung der Clusterzentren. Bevor die alten Clusterzentren im \emph{Distributed Cache} durch die neuen ersetzt werden, wird für jedes neu berechnete Clusterzentrum der Abstand zum alten Clusterzentrum berechnet.
 Die größtmögliche Entfernung von zwei Vektoren entspricht einer Veränderung von 100\%. Sinkt der Durchschnitt aller Veränderungen unter eine, vom Benutzer definierte, Schranke, so wird der Zyklus abgebrochen.
 
 \section{Evaluierung}
