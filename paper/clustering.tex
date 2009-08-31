@@ -45,7 +45,7 @@ urlcolor=black
 \section{Einleitung}
 Mit der fortschreitenden Nutzung der Computertechnik in allen Lebensbereichen steigt auch das zu bearbeitende Datenvolumen stetig an. Damit auf immer größeren Datenmengen weiterhin effizient Berechnungen ausgeführt werden können, wurde von Google\footnote{\url{http://www.google.com/}} ein Berechnungsmodell namens MapReduce entwickelt. Mit dieser Architektur ist es möglich, Berechnungen auf mehrere Computer zu verteilen und parallel ablaufen zu lassen.
 
-Im Seminar \emph{Map/Reduce Algorithms on Hadoop}\footnote{\url{http://www.hpi.uni-potsdam.de/naumann/lehre/ss_09/mapreduce_algorithms_on_hadoop.html}} haben wir uns mit dem, in Java implementierem, MapReduce-Framework \emph{Hadoop}\footnote{\url{http://hadoop.apache.org/}} auseinandergesetzt und einen Algorithmus implementiert, der eine Menge von Objekten anhand ihrer Ähnlichkeit gruppiert.
+Im Seminar \emph{Map/Reduce Algorithms on Hadoop}\footnote{\url{http://www.hpi.uni-potsdam.de/naumann/lehre/ss_09/mapreduce_algorithms_on_hadoop.html}} haben wir uns mit dem in Java implementieten, MapReduce-Framework \emph{Hadoop}\footnote{\url{http://hadoop.apache.org/}} auseinandergesetzt und einen Algorithmus implementiert, der eine Menge von Objekten anhand ihrer Ähnlichkeit gruppiert.
 
 \section{Grundlagen}
 
@@ -77,7 +77,7 @@ Die Daten werden als RDF-Tripel der Form $(Subject, Attribut, Wert)$ in der DBPe
 Es gibt ca. 44.000 verschiedene Attribute in der DBPedia, wobei davon auszugehen ist, dass gleiche Attribute auch die gleiche Semantik haben. Dadurch lassen sich aus dem Gruppieren der Subjekte nach ähnlichen Attributmengen möglicherweise semantische Rückschlüsse in Bezug auf die Subjekt-Gruppen ziehen.
 
 \subsubsection{Clustering}
-Algorithmen, beziehungsweise Verfahren, die eine Menge von Objekten zu Gruppen (Cluster) mit jeweils ähnlichen Eigenschaften zusammenfassen, bezeichnet man als Clusteranalyseverfahren.
+Algorithmen, beziehungsweise Verfahren, die eine Menge von Objekten zu Gruppen (Cluster) mit jeweils ähnlichen Eigenschaften zusammenfassen, bezeichnet man als Clusteranalyseverfahren. % Heuristik?
 % Es gibt eine ganze Reihe von unterschiedlichen Ansätzen zur Analyse, die alle unterschiedliche Vor- und Nachteile haben.
 % Grundsätzlich unterscheidet man zwischen partitionierenden und hierarchischen Analyseverfahren.
 
@@ -89,12 +89,13 @@ Als Beispiele sind das \emph{Euklidische Abstandsmaß} und die \emph{Jaccard-Dis
 Wir haben das partitionierende Clusteranalyseverfahren \emph{k-Means}\footnote{\url{http://de.wikipedia.org/wiki/K-Means-Algorithmus}} angewendet. % vielleicht Literatur statt weblink
 \emph{k-Means} zeichnet sich durch seine hohe Geschwindigkeit aus, liefert jedoch nicht zwingend die optimale Lösung. Desweiteren muss man bei \emph{k-Means} die Anzahl der gewünschten Cluster im Vorfeld vorgeben.
 
-Zu Beginn des Algorithmus wählt man zufällig die gewünschte Anzahl von Clustern aus der Objektmenge aus. Diese Objekte bilden die initialen Clusterzentren. Aus der zufälligen Auswahl der Clusterzentren ergibt sich die Konsequenz, dass bei verschiedenen Programmdurchläufen mit gleichen Eingabedateien unterschiedliche Cluster berechnet werden können. Nach der Wahl der Clusterzentren beginnt der iterative Teil des Algorithmus.
+Zu Beginn des Algorithmus wählt man zufällig die gewünschte Anzahl von Clustern aus der Objektmenge aus. Diese Objekte bilden die initialen Clusterzentren. Die zufällige Auswahl der Clusterzentren bewirkt, dass bei verschiedenen Programmdurchläufen mit gleichen Eingabedateien unterschiedliche Cluster berechnet werden können. Nach der Wahl der Clusterzentren beginnt der iterative Teil des Algorithmus.
 
 Für jedes Objekt wird mit Hilfe eines Abstandsmaßes der Abstand zu jedem Clusterzentrum berechnet. Anschließend wird das Objekt demjenigen Cluster zugeordnet, zu dessen Clusterzentrum es den geringsten Abstand aufweist.
 Nachdem alle Objekte einem Cluster zugeordnet worden sind, wird das neue Clusterzentrum bestimmt, indem der Schwerpunkt aller dem Cluster zugeordneten Objekte berechnet wird.
 
-Dieser Vorgang wird solange wiederholt, bis nach einer Iteration kein Objekt mehr einem anderen Clusterzentrum zugeordnet wird. Alternativ kann auch eine prozentuale Schranke festgelegt werden (zum Beispiel: wiederhole bis weniger als 2\% der Objekte einem anderen Cluster zugeordnet werden).
+Dieser Vorgang wird solange wiederholt, bis nach einer Iteration kein Objekt mehr einem anderen Clusterzentrum zugeordnet wird.
+%Alternativ kann auch eine prozentuale Schranke festgelegt werden (zum Beispiel: wiederhole bis weniger als 2\% der Objekte einem anderen Cluster zugeordnet werden). %Das kommt unten doch 
 
 \subsubsection{Jaccard-Distanz}
 Die Jaccard-Distanz ist ein Abstandsmaß, dass die Ähnlichkeit zwischen Mengen angibt. Dabei sind zwei Mengen einander ähnlicher, je mehr Elemente sie gemeinsam haben. Die Jaccard-Distanz von einer Menge zu sich selbst ist Null.
@@ -218,26 +219,28 @@ Es wurden jeweils 5 K-Means-Iterationen und ein Output-Job, also insgesamt 6 Had
 \caption{Unterschiedliche Eingabegrößen}
 \label{fig:subjects}
 \end{figure}
-Diese Messreihe zeigt, dass die Laufzeit des Algortithmus proportional zur Anzahl der Subjekte ist.
+Diese Messreihe in Abbildung \ref{fig:subjects} zeigt, dass die Laufzeit des Algortithmus proportional zur Anzahl der Subjekte ist.
 
 \subsubsection{Anzahl der Cluster}
-Bei der zweiten Testreihe lag die Anzahl der Subjekte konstant bei 35.000. Die Anzahl der Cluster wurde auf 50,100,150,300,500 und 1.000 variiert. Dazu wurden jeweils unterschiedliche initiale Clusterzentren generiert.
+Bei der zweiten Testreihe lag die Anzahl der Subjekte konstant bei 35.000. Die Anzahl der Cluster wurde auf 50, 100, 150, 300, 500 und 1.000 variiert. % nur 50-1000 ?
+Dazu wurden jeweils unterschiedliche initiale Clusterzentren generiert.
 \begin{figure}[!ht]
 \centering
 \includegraphics[width=0.99\textwidth]{charts/clustercenters.png}
 \caption{Unterschiedliche Anzahl von Clusterzentren}
 \label{fig:centers}
 \end{figure}
-Diese Messreihe zeigt, dass die Laufzeit des Algortithmus proportional zur Anzahl der Cluster ist.
+Diese Messreihe in Abbildung \ref{fig:centers} zeigt, dass die Laufzeit des Algortithmus proportional zur Anzahl der Cluster ist.
 
 \subsubsection{Ermittelung der Abbruchbedingung}
-Die Laufzeitabschätzung geht von einer konstanten Anzahl von Iterationen bis zur 
+Die Laufzeitabschätzung geht von einer konstanten Anzahl von Iterationen bis zur Konvergenz aus. Um diesen Abstand zu bestimmen, wurde gemessen, wie stark sich Cluster in jeder Iteration verändern. Dazu wurden drei Testfälle mit 35.000 Subjekten und zwischen 50 ind 150 Clustern betrachtet.
 \begin{figure}[!ht]
 \centering
 \includegraphics[width=0.99\textwidth]{charts/iterations_log.png}
 \caption{Abbruch}
 \label{fig:iterations}
 \end{figure}
+Wie aus Abbildung \ref{fig:iteratons} hervorgeht, nähern sich die Cluster schnell einem relativ stabilen Zustand an.
 
 \section{Fazit}
 % - Erfahrungen mit verteiltem Rechnen
