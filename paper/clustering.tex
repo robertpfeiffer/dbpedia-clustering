@@ -45,7 +45,7 @@ urlcolor=black
 \section{Einleitung}
 Mit der fortschreitenden Nutzung der Computertechnik in allen Lebensbereichen steigt auch das zu bearbeitende Datenvolumen stetig an. Damit auf immer größeren Datenmengen weiterhin effizient Berechnungen ausgeführt werden können, wurde von \emph{Google}\footnote{\url{http://www.google.com/}} ein Berechnungsmodell namens MapReduce entwickelt. Mit dieser Architektur ist es möglich, Berechnungen auf mehrere Computer zu verteilen und parallel ablaufen zu lassen.
 
-Im Seminar \emph{Map/Reduce Algorithms on Hadoop}\footnote{\url{http://www.hpi.uni-potsdam.de/naumann/lehre/ss_09/mapreduce_algorithms_on_hadoop.html}} haben wir uns mit dem in Java implementieten, MapReduce-Framework \emph{Hadoop}\footnote{\url{http://hadoop.apache.org/}} auseinandergesetzt und einen Algorithmus implementiert, der eine Menge von Objekten anhand ihrer Ähnlichkeit gruppiert.
+Im Seminar \emph{Map/Reduce Algorithms on Hadoop}\footnote{\url{http://www.hpi.uni-potsdam.de/naumann/lehre/ss_09/mapreduce_algorithms_on_hadoop.html}} haben wir uns mit dem in Java entwickelten, MapReduce-Framework \emph{Hadoop}\footnote{\url{http://hadoop.apache.org/}} auseinandergesetzt und einen Algorithmus implementiert, der eine Menge von Objekten anhand ihrer Ähnlichkeit gruppiert.
 
 \section{Grundlagen}
 
@@ -203,13 +203,13 @@ Die größtmögliche Entfernung von zwei Vektoren entspricht einer Veränderung 
 \section{Evaluierung}
 
 \subsubsection{Laufzeitabschätzung}
-Die Laufzeit unserer Implementierung ist abhängig von der Anzahl der Subjekte und der Anzahl der Cluster. Da im Map-Schritt die Abstände aller $k$ Cluster zu allen $s$ Subjekten berechnet werden, liegt die Laufzeitkomplexität des gesamten Map-Teils schrittes in $O(s \cdot k)$. 
+Die Laufzeit unserer Implementierung ist abhängig von der Anzahl der Subjekte und der Anzahl der Cluster. Da im Map-Schritt die Abstände aller $k$ Cluster zu allen $s$ Subjekten berechnet werden, liegt die Laufzeitkomplexität des gesamten Map-Schrittes in $O(s \cdot k)$. 
 Im Reduce-Teil werden alle Cluster gemittelt. Jede Reduce-Funktion berechnet den Mittelwert eines Clusters. 
 Je kleiner ein Cluster ist, desto schneller lässt sich sein Schwerpunkt berechnen, doch da jedes Subjekt zu genau einem dieser Cluster gehört, werden alle Subjekte jeweils einmal in eine Berechnung eines Schwerpunktes einbezogen. 
 Damit liegt die Komplexität des gesamten Reduce-Schrittes in $O(s)$.
 Die Gesamtkomplexität liegt damit in $O(k \cdot s + s)$
 
-Diese theoritische Herleitung der Laufzeitkomplexität wurde in Testreihen mit unterschiedlichen variablen Größen bestätigt.
+Diese theoretische Herleitung der Laufzeitkomplexität wurde in Testreihen mit unterschiedlichen variablen Größen bestätigt.
 
 \subsubsection{Konfiguration}
 Bei vorangegangenen Tests wurden starke Unterschiede in der Laufzeit festgestellt, die sich darauf zurückführen lassen, dass die Rechner im Cluster unterschiedlich schnell und unterschiedlich ausgelastet sind. Nach näherer Untersuchung wurde herausgefunden, dass 2 Knoten im Cluster um den Faktor 8 schneller sind, als die übrigen 6 Rechner. Deshalb wurde die Splitsize so konfiguriert, dass die Eingabe auf ca. 22 Map-Tasks verteilt werden konnte. Dadurch wird gewährleistet, dass keiner der 8 Knoten des Clusters auf die anderen lange warten muss.
