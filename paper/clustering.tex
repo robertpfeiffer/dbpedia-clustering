@@ -95,7 +95,8 @@ Zu Beginn des Algorithmus wählt man zufällig die gewünschte Anzahl von Cluste
 Für jedes Objekt wird mit Hilfe eines Abstandsmaßes der Abstand zu jedem Clusterzentrum berechnet. Anschließend wird das Objekt demjenigen Cluster zugeordnet, zu dessen Clusterzentrum es den geringsten Abstand aufweist.
 Nachdem alle Objekte einem Cluster zugeordnet worden sind, wird das neue Clusterzentrum bestimmt, indem der Schwerpunkt aller dem Cluster zugeordneten Objekte berechnet wird.
 
-Dieser Vorgang wird solange wiederholt, bis nach einer Iteration kein Objekt mehr einem anderen Clusterzentrum zugeordnet wird. Alternativ kann auch eine prozentuale Schranke festgelegt werden (zum Beispiel: wiederhole bis weniger als 2\% der Objekte einem anderen Cluster zugeordnet werden).
+Dieser Vorgang wird solange wiederholt, bis nach einer Iteration kein Objekt mehr einem anderen Clusterzentrum zugeordnet wird.
+%Alternativ kann auch eine prozentuale Schranke festgelegt werden (zum Beispiel: wiederhole bis weniger als 2\% der Objekte einem anderen Cluster zugeordnet werden). %Das kommt unten doch 
 
 \subsubsection{Jaccard-Distanz}
 Die Jaccard-Distanz ist ein Abstandsmaß, dass die Ähnlichkeit zwischen Mengen angibt. Dabei sind zwei Mengen einander ähnlicher, je mehr Elemente sie gemeinsam haben. Die Jaccard-Distanz von einer Menge zu sich selbst ist Null.
@@ -220,26 +221,28 @@ Es wurden jeweils 5 K-Means-Iterationen und ein Output-Job, also insgesamt 6 Had
 \caption{Unterschiedliche Eingabegrößen}
 \label{fig:subjects}
 \end{figure}
-Diese Messreihe zeigt, dass die Laufzeit des Algortithmus proportional zur Anzahl der Subjekte ist.
+Diese Messreihe in Abbildung \ref{fig:subjects} zeigt, dass die Laufzeit des Algortithmus proportional zur Anzahl der Subjekte ist.
 
 \subsection{Anzahl der Cluster}
-Bei der zweiten Testreihe lag die Anzahl der Subjekte konstant bei 35.000. Die Anzahl der Cluster wurde auf 50,100,150,300,500 und 1.000 variiert. Dazu wurden jeweils unterschiedliche initiale Clusterzentren generiert.
+Bei der zweiten Testreihe lag die Anzahl der Subjekte konstant bei 35.000. Die Anzahl der Cluster wurde auf 50, 100, 150, 300, 500 und 1.000 variiert. % nur 50-1000 ?
+Dazu wurden jeweils unterschiedliche initiale Clusterzentren generiert.
 \begin{figure}[!ht]
 \centering
 \includegraphics[width=0.99\textwidth]{charts/clustercenters.png}
 \caption{Unterschiedliche Anzahl von Clusterzentren}
 \label{fig:centers}
 \end{figure}
-Diese Messreihe zeigt, dass die Laufzeit des Algortithmus proportional zur Anzahl der Cluster ist.
+Diese Messreihe in Abbildung \ref{fig:centers} zeigt, dass die Laufzeit des Algortithmus proportional zur Anzahl der Cluster ist.
 
 \subsection{Ermittelung der Abbruchbedingung}
-Die Laufzeitabschätzung geht von einer konstanten Anzahl von Iterationen bis zur
+Die Laufzeitabschätzung geht von einer konstanten Anzahl von Iterationen bis zur Konvergenz aus. Um diesen Abstand zu bestimmen wurde gemessen, wie stark sich Cluster in jeder Iteration verändern. Dazu wurden drei Testfälle mit 35.000 Subjekten und zwischen 50 ind 150 Clustern betrachtet.
 \begin{figure}[!ht]
 \centering
 \includegraphics[width=0.99\textwidth]{charts/iterations_log.png}
 \caption{Abbruch}
 \label{fig:iterations}
 \end{figure}
+Wie aus Abbildung \ref{fig:iteratons} hervorgeht, nähern sich die Cluster schnell einem relativ stabilen Zustand an.
 
 \section{Fazit}
 - HDFS vs. lokales Dateisystem
