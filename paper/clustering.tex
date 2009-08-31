@@ -49,7 +49,7 @@ Im Seminar \emph{Map/Reduce Algorithms on Hadoop}\footnote{\url{http://www.hpi.u
 
 \section{Grundlagen}
 
-\subsection{MapReduce}
+\subsubsection{MapReduce}
 MapReduce ist ein Programmiermodell, welches erstmals 2004 vorgestellt wurde \cite{DG04} und Prinzipien funktionaler Programmierung aufgreift. 
 Der MapReduce Ansatz besteht im Allgemeinen aus zwei Funktionen: \emph{Map} und \emph{Reduce}. In der Map-Funktion wird ein Problem in mehrere Teilprobleme zerlegt, die idealerweise parallel und unabhängig voneinander ausgeführt werden.
 Anschließend werden die Ergebnisse der Teilprobleme in der Reduce-Funktion wieder zu einem Gesamtergebnis zusammengesetzt.
@@ -59,7 +59,7 @@ Die Reduce-Funktion erhält als Eingabe einen Schlüssel und alle dazugehörigen
 Diese Werte werden je nach vorgegebener Berechnung zusammengeführt und dem Schlüssel zugeordnet.
 Reduce gibt anschließend wiederum Schlüssel-Wert-Paare zurück.
 
-\subsection{Hadoop}
+\subsubsection{Hadoop}
 Hadoop ist ein in Java implementiertes Open Source Framework, welches auf dem MapReduce-Modell basiert.
 Die Kernkomponenten stellen Schnittstellen für verteilte Dateioperationen und Ein-/Ausgabe sowie ein verteiltes Dateisystem (HDFS) bereit.
 Eine Aufgabe, die auf der Hadoop-Plattform ausgeführt werden soll, ist ein Job.
@@ -69,7 +69,7 @@ generiert die Map- und Reduce-Tasks und verteilt diese an die einzelnen Nodes im
 % Das Hadoop Framework übernimmt die Zerlegung der Eingabedatei und ruft für jedes Schlüssel-Wert-Paar die angegebene Map-Funktion auf.
 % Der Task-Tracker überwacht den Fortschritt auf den Nodes und teilt ihnen bei Bedarf weitere Tasks zu. 
 
-\subsection{DBPedia}
+\subsubsection{DBPedia}
 Das \emph{DBPedia}-Projekt\footnote{\url{http://dbpedia.org/}} extrahiert Informationen aus der Online-Enzyklopädie \emph{Wikipedia}\footnote{\url{http://www.wikipedia.org/}}, bereitet diese auf und stellt diese strukturiert zur freien Verfügung.
 Als Hauptquelle für Informationen in der \emph{DBPedia} sind die Infoboxen zu nennen, die in vielen \emph{Wikipedia}-Artikeln auf der rechten Seite existieren.
 
@@ -77,7 +77,7 @@ Die Daten werden als RDF-Tripel der Form $(Subject, Attribut, Wert)$ in der DBPe
 Die ca. 44.000 verschiedenen Attribute der DBPedia sind in eine Ontologie eingeordnet.
 Da alle Ressourcen aus dieser Ontologie stammen, kann man davon ausgehen, dass gleiche Attribute die gleiche Semantik haben. Dadurch lassen sich aus dem Gruppieren der Subjekte nach ähnlichen Attributmengen möglicherweise semantische Rückschlüsse ziehen.
 
-\subsection{Clustering}
+\subsubsection{Clustering}
 Algorithmen, beziehungsweise Verfahren, die eine Menge von Objekten zu Gruppen (Cluster) mit jeweils ähnlichen Eigenschaften zusammenfassen, bezeichnet man als Clusteranalyseverfahren.
 Es gibt eine ganze Reihe von unterschiedlichen Ansätzen zur Analyse, die alle unterschiedliche Vor- und Nachteile haben.
 Grundsätzlich unterscheidet man zwischen partitionierenden und hierarchischen Analyseverfahren.
@@ -86,7 +86,7 @@ Für viele Clusterverfahren wird ein Abstandsmaß benötigt. Dieses gibt für zw
 %Es gibt verschiedene Abstandsmaße, die für unterschiedlichen Daten unterschiedlich gute Ergebnisse liefern.
 Als Beispiele sind das \emph{Euklidische Abstandsmaß} und die \emph{Jaccard-Distanz} zu nennen.
 
-\subsection{k-Means}
+\subsubsection{k-Means}
 Wir haben das partitionierende Clusteranalyseverfahren \emph{k-Means}\footnote{\url{http://de.wikipedia.org/wiki/K-Means-Algorithmus}} angewendet. % vielleicht Literatur statt weblink
 \emph{k-Means} zeichnet sich durch seine hohe Geschwindigkeit aus, liefert jedoch nicht zwingend die optimale Lösung. Desweiteren muss man bei \emph{k-Means} die Anzahl der gewünschten Cluster im Vorfeld vorgeben.
 
@@ -97,7 +97,7 @@ Nachdem alle Objekte einem Cluster zugeordnet worden sind, wird das neue Cluster
 
 Dieser Vorgang wird solange wiederholt, bis nach einer Iteration kein Objekt mehr einem anderen Clusterzentrum zugeordnet wird. Alternativ kann auch eine prozentuale Schranke festgelegt werden (zum Beispiel: wiederhole bis weniger als 2\% der Objekte einem anderen Cluster zugeordnet werden).
 
-\subsection{Jaccard-Distanz}
+\subsubsection{Jaccard-Distanz}
 Die Jaccard-Distanz ist ein Abstandsmaß, dass die Ähnlichkeit zwischen Mengen angibt. Dabei sind zwei Mengen einander ähnlicher, je mehr Elemente sie gemeinsam haben. Die Jaccard-Distanz von einer Menge zu sich selbst ist Null.
 
 %Die Jaccard-Distanz basiert auf dem Jaccard-Index, dem Quotienten aus Schnitt- und Vereinigungsmenge zweier Mengen.
@@ -107,7 +107,7 @@ $$J_{\delta}(A,B) = %1 - J(A,B) =
 
 Ein Vorteil der Jaccard-Distanz gegenüber dem euklidischen Abstandsmaß ist, dass Elemente, die in den jeweiligen Mengen enthalten sind, stärker berücksichtigt werden, als nicht enthaltene Elemente. Beim Euklidischen Abstand beeinflussen Elemente, die in beiden Mengen fehlen oder vorhanden sind, das Abstandsmaß gleich.
 
-\subsection{Fuzzy-Mengen}
+\subsubsection{Fuzzy-Mengen}
 \label{sec:Fuzzy}
 Da die Clusterzentren gemittelte Werte enthalten, können sie nicht wie die Subjekte als einfache Mengen dargestellt werden.
 Stattdessen werden Fuzzy-Mengen benutzt, in denen ein Element zu einem gewissen Grad zwischen 0 und 1 enthalten sein kann.
@@ -123,7 +123,7 @@ $$J_{\delta}(A,B) = \frac{\sum\limits_{p \in P}max\bigl(\mu(p, A)\mu(p, B)\bigr)
 
 \section{Implementation}
 
-\subsection{Datenformat}
+\subsubsection{Datenformat}
 %- Problem: Daten sind große Matrizen\\
 %- Vorteile:\\
 %    - Hadoop Format, dadurch gibt es bereits ein Interface und Hadoop kann den Input splitten\\
@@ -142,12 +142,12 @@ Die Originaldatei mit einer Größe von mehr als 120GB konnte somit auf unter 10
 Dies ist vor allem bei der Übertragung der Eingabe auf die einzelnen Nodes im Hadoop-Cluster von großem Vorteil.
 Auf der anderen Seite sind die Dateien, unter anderem wegen der Kompression, für den Menschen nicht lesbar.
 
-\subsection{Generierung der Clusterzentren}
+\subsubsection{Generierung der Clusterzentren}
 Das erste Problem bei der Implementierung des \emph{k-Means} Algorithmus stellte die Generierung der initialen Clusterzentren dar. Hadoop erlaubt es, in einem Programm mehrere Jobs hintereinander auszuführen. Dadurch bestand eine Möglichkeit darin, mittels eines Jobs die Zentren zu generieren und mit Hilfe eines zweiten Jobtyps den iterativen Teil des Algorithmus auszuführen. Die zweite von uns erarbeitete Idee war, die Clusterzentren vor dem Starten des Hadoop-Programmes separat zu generieren und als weiteren Eingabeparameter mitzuliefern. Wir haben uns für dieses Verfahren entschieden, da es zum einen zu diesem Zeitpunkt für uns leichter zu implementieren war und zum anderen durch die einmalige Generierung einen Geschwindigkeitsvorteil darstellt. Für eine finale Version des Programms wäre es jedoch von Vorteil, wenn der Benutzer nicht selbst die Clusterzentren generieren müsste.
 
 % hat auch Vorteile beim evaluieren
 
-\subsection{Distributed Cache}
+\subsubsection{Distributed Cache}
 %- Problem: Verteilung der Centroids\\
 %- Lösung mittels Distributed Cache\\
 %- Vorteile: in Hadoop, synchrone Datenhaltung, wenig Overhead für die restlichen berechnungen\\
@@ -164,7 +164,7 @@ Der \emph{Distributed Cache} bietet die Möglichkeit, größere Datenmengen an d
 
 % Die Knoten können jederzeit auf die lokalen Dateien lesend zugreifen. In unserer Implementierung werden mit der Erzeugung der Mapper die Clusterzentren auf den Knoten ausgelesen und anschließend im Hauptspeicher gehalten.
 
-\subsection{Berechnung der Clusterzentren}
+\subsubsection{Berechnung der Clusterzentren}
 \label{sec:BerechnungDerCluster}
 % Nachdem die Clusterzentren mittels des \emph{Distributed Cache} auf die einzelnen Knoten verteilt wurden, beginnt die eigentliche Berechnung des .
 Der iterative Teil des \emph{k-Means}-Algorithmus lässt sich relativ leicht auf das MapReduce-Schema abbilden.
@@ -188,7 +188,7 @@ Um den neuen Schwerpunkt des Clusterzentrums zu berechnen,
 wird erst die Summe aller Vektoren gebildet und diese anschließend durch die Anzahl der Vektoren dividiert.
 Die Reduce-Funktion gibt anschließend ein Schlüssel-Wert-Paar mit dem Schlüssel des Clusters und dem neuen Schwerpunkt als Vektor zurück.
 
-\subsection{Abbruch der Iteration}
+\subsubsection{Abbruch der Iteration}
 Da der \emph{k-Means}-Algorithmus erst nach mehreren, im Vorfeld nicht genau bestimmbaren, Iterationen das gewünschte Ergebnis liefert,
 muss der in \ref{sec:BerechnungDerCluster} beschriebene Prozess mehrmals ausgeführt werden.
 % Allerdings genügt es nicht, nur den Job, der die beschriebenen Map- und Reduce-Funktionen enthält, erneut anzustoßen. Zuvor muss die Ausgabe der Reduce-Funktion, 
