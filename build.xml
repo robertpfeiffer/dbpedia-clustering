@@ -35,7 +35,7 @@
   </target>
   
 
-  <target name="jar" 
+  <target name="make-jar" 
 	  depends="compile">
     <jar destfile="${dir.dist}/${project.name}.jar" 
 	 basedir="${dir.classes}">
@@ -44,4 +44,9 @@
       </manifest>
     </jar>
   </target>
+
+  <target name="deploy-on-server" depends="make-jar" description="copy JAR to hadoop server">
+    <scp file="${dir.dist}/${project.name}.jar" todir="${server.user}:${server.pwd}@${server.ip}:${server.dir}" trust="true"/>
+  </target>
+
 </project>
