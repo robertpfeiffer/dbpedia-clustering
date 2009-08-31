@@ -211,7 +211,7 @@ Diese theoritische Herleitung der Laufzeitkomplexität wurde in Testreihen mit u
 \subsubsection{Anzahl der Subjekte}
 Bei dieser Testreihe wurden jeweils Einagbedateien mit 3.500, 7.000, 14.000, 35.000, 70.000, 175.000 und 350.000 Subjekten für den Clustering-Algorithmus verwendet.
 Die Anzahl der Cluster war dabei konstant 100.
-Bei vorangegangenen Tests wurden starke Unterschiede in der Laufzeit festgestellt, die sich darauf zurückfuhren lassen, dass die Rechner im Cluster unterschiedlich schnell und unterschiedlich ausgelastet sind. Deshalb wurde die Splitsize so konfiguriert, dass die Eingabe auf circa 24 Map-Tasks verteilt werden konnte. Dadurch wird gewährleistet, dass keiner der 8 Rechner des Clusters auf die anderen lange warten muss.
+Bei vorangegangenen Tests wurden starke Unterschiede in der Laufzeit festgestellt, die sich darauf zurückführen lassen, dass die Rechner im Cluster unterschiedlich schnell und unterschiedlich ausgelastet sind. Deshalb wurde die Splitsize so konfiguriert, dass die Eingabe auf circa 24 Map-Tasks verteilt werden konnte. Dadurch wird gewährleistet, dass keiner der 8 Knoten des Clusters auf die anderen lange warten muss.
 Es wurden jeweils 5 K-Means-Iterationen und ein Output-Job, also insgesamt 6 Hadoop-Jobs ausgeführt. Dadurch fallen Schwankungen bei einzelnen Tasks weniger ins Gewicht.
 \begin{figure}[!ht]
 \centering
@@ -224,6 +224,7 @@ Diese Messreihe in Abbildung \ref{fig:subjects} zeigt, dass die Laufzeit des Alg
 \subsubsection{Anzahl der Cluster}
 Bei der zweiten Testreihe lag die Anzahl der Subjekte konstant bei 35.000. Die Anzahl der Cluster wurde auf 50, 100, 150, 300, 500 und 1.000 variiert. % nur 50-1000 ?
 Dazu wurden jeweils unterschiedliche initiale Clusterzentren generiert.
+Es wurden wiederum 5 K-Means-Iterationen und ein Output-Job ausgeführt.
 \begin{figure}[!ht]
 \centering
 \includegraphics[width=0.99\textwidth]{charts/clustercenters.png}
@@ -233,7 +234,8 @@ Dazu wurden jeweils unterschiedliche initiale Clusterzentren generiert.
 Diese Messreihe in Abbildung \ref{fig:centers} zeigt, dass die Laufzeit des Algortithmus proportional zur Anzahl der Cluster ist.
 
 \subsubsection{Ermittelung der Abbruchbedingung}
-Die Laufzeitabschätzung geht von einer konstanten Anzahl von Iterationen bis zur Konvergenz aus. Um diesen Abstand zu bestimmen, wurde gemessen, wie stark sich Cluster in jeder Iteration verändern. Dazu wurden drei Testfälle mit 35.000 Subjekten und zwischen 50 ind 150 Clustern betrachtet.
+Die Laufzeitabschätzung geht von einer konstanten Anzahl von Iterationen bis zur Konvergenz aus. Um diesen Abstand zu bestimmen, wurde gemessen, wie stark sich die Cluster in jeder Iteration verändern. Dazu wurden drei Testfälle mit 35.000 Subjekten und zwischen 50 ind 150 Clustern betrachtet. Bei dem Testfall mit 50 Clustern lag die Abbruchschrank bei 2\% durchschnittlichen Clusterzentrenverschiebungen, bei 100 Clustern bei 1\% und bei 150 Clustern bei 0,5\%.
+Durch die logarithmische Skalierung nicht auf den ersten Blick ersichtlich, konvergierten die 3 Testfälle trotz unterschiedlicher Clusteranzahl annähernd gleich schnell.
 \begin{figure}[!ht]
 \centering
 \includegraphics[width=0.99\textwidth]{charts/iterations_log.png}
