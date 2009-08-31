@@ -43,7 +43,7 @@ urlcolor=black
 \maketitle
 
 \section{Einleitung}
-Mit der fortschreitenden Nutzung der Computertechnik in allen Lebensbereichen steigt auch das zu bearbeitende Datenvolumen stetig an. Damit auf immer größeren Datenmengen weiterhin effizient Berechnungen ausgeführt werden können, wurde von Google\footnote{\url{http://www.google.com/}} ein Berechnungsmodell namens MapReduce entwickelt. Mit dieser Architektur ist es möglich, Berechnungen auf mehrere Computer zu verteilen und parallel ablaufen zu lassen.
+Mit der fortschreitenden Nutzung der Computertechnik in allen Lebensbereichen steigt auch das zu bearbeitende Datenvolumen stetig an. Damit auf immer größeren Datenmengen weiterhin effizient Berechnungen ausgeführt werden können, wurde von \emph{Google}\footnote{\url{http://www.google.com/}} ein Berechnungsmodell namens MapReduce entwickelt. Mit dieser Architektur ist es möglich, Berechnungen auf mehrere Computer zu verteilen und parallel ablaufen zu lassen.
 
 Im Seminar \emph{Map/Reduce Algorithms on Hadoop}\footnote{\url{http://www.hpi.uni-potsdam.de/naumann/lehre/ss_09/mapreduce_algorithms_on_hadoop.html}} haben wir uns mit dem in Java implementieten, MapReduce-Framework \emph{Hadoop}\footnote{\url{http://hadoop.apache.org/}} auseinandergesetzt und einen Algorithmus implementiert, der eine Menge von Objekten anhand ihrer Ähnlichkeit gruppiert.
 
@@ -87,7 +87,7 @@ Als Beispiele sind das \emph{Euklidische Abstandsmaß} und die \emph{Jaccard-Dis
 
 \subsubsection{k-Means}
 Wir haben das partitionierende Clusteranalyseverfahren \emph{k-Means} angewendet.
-\emph{k-Means} zeichnet sich durch seine hohe Geschwindigkeit aus, liefert jedoch nicht zwingend die optimale Lösung. Desweiteren muss man bei \emph{k-Means} die Anzahl der gewünschten Cluster im Vorfeld vorgeben.
+\emph{k-Means} zeichnet sich durch seine hohe Geschwindigkeit aus, liefert jedoch nicht zwingend die optimale Lösung. Des Weiteren muss man bei \emph{k-Means} die Anzahl der gewünschten Cluster im Vorfeld vorgeben.
 
 Zu Beginn des Algorithmus wählt man zufällig die gewünschte Anzahl von Clustern aus der Objektmenge aus. Diese Objekte bilden die initialen Clusterzentren. Die zufällige Auswahl der Clusterzentren bewirkt, dass bei verschiedenen Programmdurchläufen mit gleichen Eingabedateien unterschiedliche Cluster berechnet werden können. Nach der Wahl der Clusterzentren beginnt der iterative Teil des Algorithmus.
 
@@ -155,7 +155,7 @@ Das erste Problem bei der Implementierung des \emph{k-Means} Algorithmus stellte
 
 Um die Cluster in einer Iteration des \emph{k-Means}-Algorithmus neu zu bestimmen, muss der Abstand jedes Subjektes von jedem Zentrum berechnet werden. Dafür müssen alle Clusterzentren auf jedem Node zur Verfügung stehen.
 
-Anstatt das kartesische Produkt von Clusterzentren und Subjekten zu bilden und anschließend zu verteilen, bestand die Idee darin, den Mappern zu Beginn jeder Iterationvon die Zentren als Parameter zu übergeben. Da die Anzahl der Cluster, und demzufolge auch die der Clusterzentren, viel kleiner als die Anzahl der Subjekte ist, bewirkt dieses Vorgehen einen sehr viel geringeren Kommunikationsaufwand.
+Anstatt das kartesische Produkt von Clusterzentren und Subjekten zu bilden und anschließend zu verteilen, bestand die Idee darin, den Mappern zu Beginn jeder Iteration die Zentren als Parameter zu übergeben. Da die Anzahl der Cluster, und demzufolge auch die der Clusterzentren, viel kleiner als die Anzahl der Subjekte ist, bewirkt dieses Vorgehen einen sehr viel geringeren Kommunikationsaufwand.
 % Da im Map-Schritt alle Zentren bekannt sind, kann das nächste Zentrum, und damit die Clusterzugehörigkeit jedes Subjektes, bereits im Map-Schritt bestimmt werden.
 % Parameter können jedoch nicht direkt an die Mapper übergeben werden, da die Job-Konfiguarion nicht die Mapper kennt, sondern nur deren Klassennamen. 
 % Die Mapper werden erst auf den Knoten erzeugt. Um den Mappern zusätzliche Parameter zu übergeben, werden deshalb zusätzliche Einträge in der Konfiguration sowie der \emph{Distributed Cache} verwendet. 
@@ -189,7 +189,7 @@ Die Reduce-Funktion gibt anschließend ein Schlüssel-Wert-Paar mit dem Schlüss
 
 \subsubsection{Abbruch der Iteration}
 Da der \emph{k-Means}-Algorithmus erst nach mehreren, im Vorfeld nicht genau bestimmbaren, Iterationen das gewünschte Ergebnis liefert,
-muss der in \ref{sec:BerechnungDerCluster} beschriebene Prozess mehrmals ausgeführt werden.
+muss der in \ref{sec:BerechnungDerCluster} \emph{Berechnung der Clusterzentren} beschriebene Prozess mehrmals ausgeführt werden.
 % Allerdings genügt es nicht, nur den Job, der die beschriebenen Map- und Reduce-Funktionen enthält, erneut anzustoßen. Zuvor muss die Ausgabe der Reduce-Funktion, 
 % welche die neu berechneten Clusterzentren enthält, in den \emph{Distributed Cache} verschoben werden, 
 % um in der nächsten Iteration nicht mit den selben Daten erneut zu rechnen.
@@ -252,10 +252,17 @@ Wie aus Abbildung \ref{fig:iterations} hervorgeht, nähern sich die Cluster schn
 \end{figure}
 
 \section{Fazit}
-% - Erfahrungen mit verteiltem Rechnen
-% - Hadoop kennen gelernt
-% - neue Probleme
-% - Probleme HDFS vs. lokales Dateisystem
+Das Arbeiten mit Hadoop hat uns tiefe Einblicke in die Welt des verteilten Rechnens nach dem MapReduce-Schema gewährt.
+Wir haben viele Erfahrungen dabei gesammelt, sind aber auch auf neue Probleme gestoßen.
+Als Beispiel muss man bei der Arbeit mit Hadoop immer im Auge behalten, ob man Dateien im lokalen Dateisystem der einzelnen Knoten oder im verteilten Dateisystem HDFS bearbeitet.
+Des Weiteren wird die Komplexität der Programme stark erhöht, in dem Eingabedateien in bestimmten Formaten vorliegen müssen, Zwischenergebnisse möglichst effizient zu erstellen und verteilen sind und für jede Teilaufgabe abzuwägen ist, ob diese besser verteilt oder auf einem einzelnen Rechner auszuführen ist.
+Hadoop gibt dafür zwar einen festen Programmrahmen vor, jedoch mussten wir feststellen, dass nicht jedes Problem ohne Weiteres in das vorgegebene Schema zu überführen ist, wie es die Beispielpgrogramme suggerieren.
+Aber obwohl Hadoop zum aktuellen Zeitpunkt erst in der Version 0.20 vorliegt, und für das Wechseln auf neuere Versionen teilweise große Verändungen nötig waren, hilft es bei der Programmierung von verteilten Aufgaben sehr stark und läuft auch schon bemerkenswert stabil.
+
+MapReduce schafft die Möglichkeit auch große Datenmengen relativ effizient und schnell zu bearbeiten.
+Durch den Ansatz, Probleme in von einander unabhängige Teilprobleme aufzuspalten und parallel zu berechnen, wird von Anfang versucht, bekannte Probleme der Synchronisation von Prozessen und Sperrung von exklusiven Ressourcen entgegenzutreten. Nicht ohne Grund verwenden große Firmen, die unvorstellbare Mengen von Daten bearbeiten, wie Google, Yahoo! oder Facebook dieses Modell tagtäglich. 
+
+Trotz Euphorie darf man nicht außer Acht lassen, dass große Datenmengen auch bei der Berechnung auf einem Cluster aus vielen tausend Rechnern immer noch große Datenmengen sind. Unser Programm würde für das Clustern von allen ~4 Millionen Subjekten auf dem benutzten Cluster von 8 Knoten rund 295 Tage benötigen.
 
 \begin{thebibliography}{------------}
 
