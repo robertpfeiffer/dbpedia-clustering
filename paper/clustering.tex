@@ -73,8 +73,8 @@ generiert die Map- und Reduce-Tasks und verteilt diese an die einzelnen Nodes im
 Das \emph{DBPedia}-Projekt\footnote{\url{http://dbpedia.org/}} extrahiert Informationen aus der Online-Enzyklopädie \emph{Wikipedia}\footnote{\url{http://www.wikipedia.org/}}, bereitet diese auf und stellt diese strukturiert zur freien Verfügung.
 Als Hauptquelle für Informationen in der \emph{DBPedia} sind die Infoboxen zu nennen, die in vielen \emph{Wikipedia}-Artikeln auf der rechten Seite existieren.
 
-Die Daten werden als RDF-Tripel der Form $(Subject, Attribut, Wert)$ in der DBPedia gehalten (z.B. $(Berlin, populationTotal, 3429300)$).
-Es gibt ca. 44.000 verschiedene Attribute in der DBPedia, wobei davon auszugehen ist, dass gleiche Attribute auch die gleiche Semantik haben. Dadurch lassen sich aus dem Gruppieren der Subjekte nach ähnlichen Attributmengen möglicherweise semantische Rückschlüsse in Bezug auf die Subjekt-Gruppen ziehen.
+Die Daten werden als RDF-Tripel der Form $(Subject, Attribut, Wert)$ in der \emph{DBPedia} gehalten (z.B. $(Berlin, populationTotal, 3429300)$).
+Es gibt ca. 44.000 verschiedene Attribute in der \emph{DBPedia}, wobei davon auszugehen ist, dass gleiche Attribute auch die gleiche Semantik haben. Dadurch lassen sich aus dem Gruppieren der Subjekte nach ähnlichen Attributmengen möglicherweise semantische Rückschlüsse in Bezug auf die Subjekt-Gruppen ziehen.
 
 \subsubsection{Clustering}
 Algorithmen, beziehungsweise Verfahren, die eine Menge von Objekten zu Gruppen (Cluster) mit jeweils ähnlichen Eigenschaften zusammenfassen, bezeichnet man als Clusteranalyseverfahren. % Heuristik?
@@ -142,7 +142,7 @@ Die Originaldatei mit einer Größe von mehr als 120GB konnte somit auf unter 10
 Dies ist vor allem bei der Übertragung der Eingabe auf die einzelnen Nodes im Hadoop-Cluster von großem Vorteil.
 
 \subsubsection{Generierung der Clusterzentren}
-Das erste Problem bei der Implementierung des \emph{k-Means} Algorithmus stellte die Generierung der initialen Clusterzentren dar. Hadoop erlaubt es, in einem Programm mehrere Jobs hintereinander auszuführen. Dadurch bestand eine Möglichkeit darin, mittels eines Jobs die Zentren zu generieren und mit Hilfe eines zweiten Jobtyps den iterativen Teil des Algorithmus auszuführen. Die zweite von uns erarbeitete Idee war, die Clusterzentren vor dem Starten des Hadoop-Programmes separat zu generieren und als weiteren Eingabeparameter mitzuliefern. Wir haben uns für dieses Verfahren entschieden, da es zum einen zu diesem Zeitpunkt für uns leichter zu implementieren war und zum anderen durch die einmalige Generierung einen Geschwindigkeitsvorteil darstellt. Für eine finale Version des Programms wäre es jedoch von Vorteil, wenn der Benutzer nicht selbst die Clusterzentren generieren müsste.
+Das erste Problem bei der Implementierung des \emph{k-Means}-Algorithmus stellte die Generierung der initialen Clusterzentren dar. Hadoop erlaubt es, in einem Programm mehrere Jobs hintereinander auszuführen. Dadurch bestand eine Möglichkeit darin, mittels eines Jobs die Zentren zu generieren und mit Hilfe eines zweiten Jobtyps den iterativen Teil des Algorithmus auszuführen. Die zweite von uns erarbeitete Idee war, die Clusterzentren vor dem Starten des Hadoop-Programmes separat zu generieren und als weiteren Eingabeparameter mitzuliefern. Wir haben uns für dieses Verfahren entschieden, da es zum einen zu diesem Zeitpunkt für uns leichter zu implementieren war und zum anderen durch die einmalige Generierung einen Geschwindigkeitsvorteil darstellt. Für eine finale Version des Programms wäre es jedoch von Vorteil, wenn der Benutzer nicht selbst die Clusterzentren generieren müsste.
 
 % hat auch Vorteile beim evaluieren
 
@@ -217,7 +217,7 @@ Bei vorangegangenen Tests wurden starke Unterschiede in der Laufzeit festgestell
 \subsubsection{Unterschiedliche Subjektanzahl}
 Bei dieser Testreihe wurden jeweils Einagbedateien mit 3.500, 7.000, 14.000, 35.000, 70.000, 175.000 und 350.000 Subjekten für den Clustering-Algorithmus verwendet.
 Die Anzahl der Cluster betrug dabei konstant 100.
-Es wurden jeweils 5 K-Means-Iterationen und ein Output-Job, also insgesamt 6 Hadoop-Jobs ausgeführt. Dadurch fallen Schwankungen bei einzelnen Tasks weniger ins Gewicht.
+Es wurden jeweils 5 \emph{k-Means}-Iterationen und ein Output-Job, also insgesamt 6 Hadoop-Jobs ausgeführt. Dadurch fallen Schwankungen bei einzelnen Tasks weniger ins Gewicht.
 \begin{figure}[!ht]
 \centering
 \includegraphics[width=0.99\textwidth]{charts/subjects.png}
@@ -229,7 +229,7 @@ Diese Messreihe in Abbildung \ref{fig:subjects} zeigt, dass die Laufzeit des Alg
 \subsubsection{Unterschiedliche Clusteranzahl}
 Bei der zweiten Testreihe lag die Anzahl der Subjekte konstant bei 35.000. Die Anzahl der Cluster wurde zwischen 50, 100, 150, 300, 500 und 1.000 variiert. % nur 50-1000 ?
 Dazu wurden jeweils unterschiedliche initiale Clusterzentren generiert.
-Es wurden wiederum 5 K-Means-Iterationen und ein Output-Job ausgeführt.
+Es wurden wiederum 5 \emph{k-Means}-Iterationen und ein Output-Job ausgeführt.
 \begin{figure}[!ht]
 \centering
 \includegraphics[width=0.99\textwidth]{charts/clustercenters.png}
@@ -276,8 +276,8 @@ Trotz allem darf nicht außer Acht gelassen werden, dass Berechnungen auf große
   Dean, Jeffrey; Ghemawat, Sanjay.\\
   {\em MapReduce: Simplified Data Processing on Large Clusters}.\\
   San Francisco, CA, 2004
-\bibitem[k-Means]{k-Means}
-  \url{http://de.wikipedia.org/wiki/K-Means-Algorithmus}
+% \bibitem[k-Means]{k-Means}
+%   \url{http://de.wikipedia.org/wiki/K-Means-Algorithmus}
   
 \end{thebibliography}
 \end{document}
