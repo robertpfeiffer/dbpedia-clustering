@@ -10,7 +10,7 @@
 
         <property>
                 <name>kmeans.subject.length</name>
-                <value>800</value>
+                <value>42644</value>
                 <description>number of attributes</description>
         </property>
 
