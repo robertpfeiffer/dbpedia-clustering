@@ -255,14 +255,15 @@ Wie aus Abbildung \ref{fig:iterations} hervorgeht, nähern sich die Cluster schn
 Das Arbeiten mit Hadoop hat uns tiefe Einblicke in die Welt des verteilten Rechnens nach dem MapReduce-Schema gewährt.
 Wir haben viele Erfahrungen dabei gesammelt, sind aber auch auf neue Probleme gestoßen.
 Als Beispiel muss man bei der Arbeit mit Hadoop immer im Auge behalten, ob man Dateien im lokalen Dateisystem der einzelnen Knoten oder im verteilten Dateisystem HDFS bearbeitet.
-Des Weiteren wird die Komplexität der Programme stark erhöht, in dem Eingabedateien in bestimmten Formaten vorliegen müssen, Zwischenergebnisse möglichst effizient zu erstellen und verteilen sind und für jede Teilaufgabe abzuwägen ist, ob diese besser verteilt oder auf einem einzelnen Rechner auszuführen ist.
-Hadoop gibt dafür zwar einen festen Programmrahmen vor, jedoch mussten wir feststellen, dass nicht jedes Problem ohne Weiteres in das vorgegebene Schema zu überführen ist, wie es die Beispielpgrogramme suggerieren.
-Aber obwohl Hadoop zum aktuellen Zeitpunkt erst in der Version 0.20 vorliegt, und für das Wechseln auf neuere Versionen teilweise große Verändungen nötig waren, hilft es bei der Programmierung von verteilten Aufgaben sehr stark und läuft auch schon bemerkenswert stabil.
+Des Weiteren wird die Komplexität der Programme stark erhöht, indem Eingabedateien in bestimmten Formaten vorliegen müssen, Zwischenergebnisse möglichst effizient zu erstellen und verteilen sind und für jede Teilaufgabe abzuwägen ist, ob diese besser verteilt oder auf einem einzelnen Rechner auszuführen ist.
+Hadoop gibt dafür zwar einen festen Programmrahmen vor, jedoch mussten wir feststellen, dass nicht jedes Problem ohne Weiteres in das vorgegebene Schema zu überführen ist, wie es die Beispielprogramme suggerieren.
+Aber obwohl Hadoop zum aktuellen Zeitpunkt erst in der Version 0.20 vorliegt, und für das Wechseln auf neuere Versionen teilweise große Verändungen nötig waren, hilft es bei der Programmierung von verteilten Aufgaben stark und läuft bereits bemerkenswert stabil.
 
-MapReduce schafft die Möglichkeit auch große Datenmengen relativ effizient und schnell zu bearbeiten.
-Durch den Ansatz, Probleme in von einander unabhängige Teilprobleme aufzuspalten und parallel zu berechnen, wird von Anfang versucht, bekannte Probleme der Synchronisation von Prozessen und Sperrung von exklusiven Ressourcen entgegenzutreten. Nicht ohne Grund verwenden große Firmen, die unvorstellbare Mengen von Daten bearbeiten, wie Google, Yahoo! oder Facebook dieses Modell tagtäglich. 
+MapReduce schafft die Möglichkeit große Datenmengen relativ effizient und schnell zu bearbeiten.
+Der Ansatz Probleme in voneinander unabhängige Teilprobleme aufzuspalten und parallel zu lösen, tritt dem Problem der Synchronisation von Prozessen und Sperrung von exklusiven Ressourcen entgegen. Nicht ohne Grund verwenden große
+Firmen wie Google, Yahoo! und Facebook dieses Modell tagtäglich um ihre enormen Datenmengen verarbeiten zu können.
 
-Trotz Euphorie darf man nicht außer Acht lassen, dass große Datenmengen auch bei der Berechnung auf einem Cluster aus vielen tausend Rechnern immer noch große Datenmengen sind. Unser Programm würde für das Gruppieren von allen ~4 Millionen Subjekten auf dem benutzten Hadoop-Cluster von 8 Knoten rund 295 Tage benötigen.
+Trotz allem darf man nicht außer Acht lassen, dass große Datenmengen auch bei der Berechnung auf einem Cluster aus vielen tausend Rechnern immer noch große Datenmengen sind. Unser Programm würde für das Gruppieren von allen ~4 Millionen Subjekten auf dem benutzten Hadoop-Cluster von 8 Knoten rund 295 Tage benötigen.
 
 \begin{thebibliography}{------------}
 
