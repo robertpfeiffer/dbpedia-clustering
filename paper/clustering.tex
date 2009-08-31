@@ -56,8 +56,8 @@ Im Seminar \emph{Map/Reduce Algorithms on Hadoop}\footnote{\url{http://www.hpi.u
 \section{Grundlagen}
 
 \subsection{MapReduce}
-MapReduce ist ein Programmiermodell, welches erstmals 2004 vorgestellt wurde \cite{DG04}.
-Der MapReduce Ansatz beinhaltet allgemein zwei Funktionen: die Map- und die Reduce-Funktion. In der Map-Funktion wird ein Problem in mehrere Teilprobleme zerlegt, die idealerweise parallel und unabhängig voneinander ausgeführt werden.
+MapReduce ist ein Programmiermodell, welches erstmals 2004 vorgestellt wurde \cite{DG04} und Prinzipien funktionaler Programmierung aufgreift. 
+Der MapReduce Ansatz besteht im Allgemeinen aus zwei Funktionen: \emph{Map} und \emph{Reduce}. In der Map-Funktion wird ein Problem in mehrere Teilprobleme zerlegt, die idealerweise parallel und unabhängig voneinander ausgeführt werden.
 Anschließend werden die Ergebnisse der Teilprobleme in der Reduce-Funktion wieder zu einem Gesamtergebnis zusammengesetzt.
 
 Die Map-Funktion erwartet als Eingabe Schlüssel-Wert-Paare und gibt neue Schlüssel-Wert-Paare als Ergebnis aus.
@@ -80,15 +80,11 @@ Der Job-Tracker überwacht den Gesamtfortschritt eines MapReduce-Schrittes, gene
 Die Datenmenge, die uns zur Verfügung gestellt wurde, sind Ressourcen aus der \emph{DBPedia}\footnote{\url{http://dbpedia.org/}}.
 Das \emph{DBPedia}-Projekt extrahiert Informationen aus der Online-Enzyklopädie \emph{Wikipedia}\footnote{\url{http://www.wikipedia.org/}}, bereitet diese auf und stellt diese strukturiert zur freien Verfügung.
 Einträge der \emph{DBPedia} entsprechen damit weitesgehend Artikeln der \emph{Wikipedia}.
-
 Als Hauptquelle für Informationen in der DBPedia sind die Infoboxen zu nennen, die in vielen Artikeln auf der rechten Seite existieren.
 
-Die Daten werden als RDF-Tripel der Form $(Ressource, Attribut, Wert)$ in der DBPedia gehalten. Dabei sind die Attribute in eine Ontologie eingeordnet.
-Ein Beispiel für ein solches Tripel ist $(Berlin, populationTotal, 3429300)$.
-
-Die Eingabedaten für das Clustering-Verfahren bestehen für jede Ressource aus der Menge der für sie verfügbaren Attribute. 
-Es gibt insgesamt ca. 44000 mögliche Attribute in der DBPedia. Da alle Ressourcen aus der Ontologie stammen, kann man davon ausgehen, dass gleiche Attribute die gleiche Semantik haben.
-Dadurch lassen sich aus dem Ergebnis des Clustering-Verfahrens nach diesen Attributen möglicherweise semantische Rückschlüsse ziehen.
+Die Daten werden als RDF-Tripel der Form $(Subject, Attribut, Wert)$ in der DBPedia gehalten (z.B. $(Berlin, populationTotal, 3429300)$).
+Die ca. 44.000 verschiedenen Attribute der DBPedia sind in eine Ontologie eingeordnet.
+Da alle Ressourcen aus dieser Ontologie stammen, kann man davon ausgehen, dass gleiche Attribute die gleiche Semantik haben. Dadurch lassen sich aus dem Gruppieren der Subjekte nach ähnlichen Attributmengen möglicherweise semantische Rückschlüsse ziehen.
 
 \subsection{Clustering}
 Algorithmen, beziehungsweise Verfahren, die eine Menge von Objekten zu Gruppen (Cluster) mit jeweils ähnlichen Eigenschaften zusammenfassen, bezeichnet man als Clusteranalyseverfahren.
