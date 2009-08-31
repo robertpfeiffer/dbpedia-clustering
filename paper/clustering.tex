@@ -145,7 +145,7 @@ Die Eingabedateien enthalten die Subjekte in einem Binärformat. Dabei wird jede
 
 \subsection{Sequence Files}
 Sequence Files sind ein Dateiformat von Hadoop. Sie enthalten Schlüssel-Wert-Paare von serialisierten Objekten. Die Schlüssel-Wert-Paare in einer sequence-File müssen jeweils vom gleichen Typ sein 
-Die meisten Hadoop-Klassen sind in Sequence Files serialisierbar.
+Die meisten Hadoop-Wrapper um Java-Typen, wie beispielsweise BytesWritable, sind in Sequence Files serialisierbar.
 Das Hadoop-Framework enthält neben dem Text-InputFormat unter anderem auch ein InputFormat für Sequence Files, sowie die Möglichkeit, Sequence Files aufzusplitten um sie auf verschiedene Map-Tasks zu verteilen.
 
 \subsection{Generierung der Clusterzentren}
