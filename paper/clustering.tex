@@ -12,6 +12,7 @@
 
 % Mateh
 \usepackage{amsmath}
+\usepackage{amssymb}
 
 % Paket für Graphiken
 \usepackage[pdftex]{graphicx}
@@ -71,7 +72,7 @@ Für jedes Schlüssel-Wert-Paar wird die Map-Funktion aufgerufen.
 
 \subsection{Die Daten}
 Die Datenmenge, die uns zur Verfügung gestellt wurde, sind Ressourcen aus der \emph{DBPedia}\footnote{\url{http://dbpedia.org/}}.
-Das \emph{DBPedia}-Projekt extrahiert Informationen aus der Online-Enzyklopädie \emph{Wikipedia}\footnote{\url{http://www.wikipedia.org/}}, bereitet diese auf und stellt diese strukturiert zur freien Verfügung. % Wirklich wiki zitieren? Christoph weiss was k-means ist
+Das \emph{DBPedia}-Projekt extrahiert Informationen aus der Online-Enzyklopädie \emph{Wikipedia}\footnote{\url{http://www.wikipedia.org/}}, bereitet diese auf und stellt diese strukturiert zur freien Verfügung.
 Einträge der \emph{DBPedia} entsprechen damit weitesgehend Artikeln der \emph{Wikipedia}.
 
 Als Hauptquelle für Informationen in der DBPedia sind die Infoboxen zu nennen, die in vielen Artikeln auf der rechten Seite existieren.
@@ -91,7 +92,7 @@ Grundsätzlich unterscheidet man zwischen partitionierenden und hierarchischen A
 Für viele Clusterverfahren wird ein Abstandsmaß benötigt. Dieses gibt für zwei Objekte einen Wert zurück, der angibt, wie weit die beiden Objekte voneinander entfernt sind. Kleinere Werte beschreiben üblicherweise geringere Abstände. Es gibt verschiedene Abstandsmaße, die für unterschiedlichen Daten unterschiedlich gute Ergebnisse liefern. Als Beispiele sind das \emph{Euklidische Abstandsmaß} und die \emph{Jaccard-Distanz} zu nennen.
 
 \subsection{k-Means}
-Wir haben das partitionierende Clusteranalyseverfahren \emph{k-Means}\footnote{\url{http://de.wikipedia.org/wiki/K-Means-Algorithmus}} angewendet.
+Wir haben das partitionierende Clusteranalyseverfahren \emph{k-Means}\footnote{\url{http://de.wikipedia.org/wiki/K-Means-Algorithmus}} angewendet. % vielleicht Literatur statt weblink
 \emph{k-Means} zeichnet sich durch seine hohe Geschwindigkeit aus, liefert jedoch nicht zwingend die optimale Lösung. Desweiteren muss man bei \emph{k-Means} die Anzahl der gewünschten Cluster im Vorfeld vorgeben.
 
 Zu Beginn des Algorithmus wählt man zufällig die gewünschte Anzahl von Clustern aus der Objektmenge aus. Diese Objekte bilden die initialen Clusterzentren. Aus der zufälligen Auswahl der Clusterzentren ergibt sich die Konsequenz, dass bei verschiedenen Programmdurchläufen mit gleichen Eingabedateien unterschiedliche Cluster berechnet werden können. Nach der Wahl der Clusterzentren beginnt der iterative Teil des Algorithmus.
@@ -102,12 +103,13 @@ Nachdem alle Objekte einem Cluster zugeordnet worden sind, wird das neue Cluster
 Dieser Vorgang wird solange wiederholt, bis nach einer Iteration kein Objekt mehr einem anderen Clusterzentrum zugeordnet wird. Alternativ kann auch eine prozentuale Schranke festgelegt werden (zum Beispiel: wiederhole bis weniger als 2\% der Objekte einem anderen Cluster zugeordnet werden).
 
 \subsection{Jaccard-Distanz}
-Die Jaccard-Distanz ist ein Abstandsmaß, dass die Ähnlichkeit zwischen Mengen angibt. Dabei wird 
+Die Jaccard-Distanz ist ein Abstandsmaß, dass die Ähnlichkeit zwischen Mengen angibt. Dabei sind zwei mengen einander ähnlicher, je mehr elemente sie gemeinam haben. Die Jaccard-Distanz von einer Menger zu sich selbst ist Null.
 
 $$J_{\delta}(A,B) = 1 - J(A,B) = { { |A \cup B| - |A \cap B| } \over |A \cup B| }$$
 
-\subsection{Fuzzy-Mengen}
+Ein Vorteil der Jaccard-Distanz gegenüber dem euklidischen Abstandsmaß ist, dass Elemente, die in den jeweiligen mengen enthalten sind, stärker berücksichtigt werden, als nicht enthaltene Elemente. Beim Euklidischen Abstand beeinflussen Elemente, die in beiden Mengen fehlen oder vorhanden sind, das Abstandsmaß gleich.
 
+\subsection{Fuzzy-Mengen}
 Da die Clusterzentren gemittelte Werte enthalte, können sie nicht wie die Subjekte als einfache Mengen dargestellt werden.
 Stattdessen werden Fuzzy-Mengen benutzt. Bei Fuzzy-Mengen kann ein Element zu einem gewissen Grad zwischen 0 und 1 enthalten sein.
 Dies wird durch die Funktion $\mu : M \times E \rightarrow [0,1] $ beschrieben. Dabei bedeutet $m(A,e) = 0$ soviel wie $ e \not\in A $ und $m(A,e) = 1$ entspricht $ e \in A $ aus der normalen Mengenlehre.
@@ -118,25 +120,24 @@ Die Identitäten für Schnitt- Vereinungsmengen in der Mengenlehre \begin{align*
 Damit lässt sich der Jaccard-Index numerisch auf folgende Weise berechnen:
 
 $P$ sei die Menge aller möglichen Attribute.
-$$J_{\delta}(A,B) = \frac{\sum_{p \in P}max\bigl(\mu(p, A)\mu(p, B)\bigr) - min\bigl(\mu(p, A),\mu(p, B))\bigr)}{\sum_{p \in P}max\bigl(\mu(p, A),\mu(p, B))\bigr)}$$
+$$J_{\delta}(A,B) = \frac{\sum\limits_{p \in P}max\bigl(\mu(p, A)\mu(p, B)\bigr) - min\bigl(\mu(p, A),\mu(p, B))\bigr)}{\sum\limits_{p \in P}max\bigl(\mu(p, A),\mu(p, B))\bigr)}$$
 
 \section{Implementation}
 
 \subsection{Datenformat}
-- Problem: Daten sind große Matrizen\\
-- Vorteile:\\
-    - Hadoop Format, dadurch gibt es bereits ein Interface und Hadoop kann den Input splitten\\
-    - komprimiert\\
-- Nachteile:\\
-    - kodiertes Format, daher für Menschen nicht lesbar\\
-    - keine Information über die Gesamtgröße
-Die Eingabedateien enthalten die Subjekte in einem Binärformat. Dabei wird jedes Subjekt durch ein Array von Bits repräsentiert, wobei die Stelle im Array immer ein Attribut repräsentiert. Wenn an einer Stelle ein 1-Bit steht, dann hat die Ressource das Attribut.
+%- Problem: Daten sind große Matrizen\\
+%- Vorteile:\\
+%    - Hadoop Format, dadurch gibt es bereits ein Interface und Hadoop kann den Input splitten\\
+%    - komprimiert\\
+%- Nachteile:\\
+%    - kodiertes Format, daher für Menschen nicht lesbar\\
+ %   - keine Information über die Gesamtgröße
+Die Eingabedateien enthalten die Subjekte in einem Binärformat. Dabei wird jedes Subjekt durch ein Array von Bits repräsentiert, wobei die Stelle im Array immer ein Attribut repräsentiert. Wenn an einer Stelle ein 1-Bit steht, dann besitzt die Ressource das Attribut.
 
 \subsection{Sequence Files}
-
 Sequence Files sind ein Dateiformat von Hadoop. Sie enthalten Schlüssel-Wert-Paare von serialisierten Objekten. Die Schlüssel-Wert-Paare in einer sequence-File müssen jeweils vom gleichen Typ sein 
 Die meisten Hadoop-Klassen sind in Sequence Files serialisierbar.
-Das Hadoop-Framework enthält neben dem Text-InputFormat unter anderem auch ein InputFormat für Sequence Files, sowie die Möglichkeit, Sequence Files  
+Das Hadoop-Framework enthält neben dem Text-InputFormat unter anderem auch ein InputFormat für Sequence Files, sowie die Möglichkeit, Sequence Files aufzusplitten um sie auf verschiedene Map-Tasks zu verteilen.
 
 \subsection{Generierung der Clusterzentren}
 Das erste Problem bei der Implementierung des \emph{k-Means} Algorithmus stellte die Generierung der initialen Clusterzentren dar. Im Hadoop-Framework werden eine Map- und eine Reduce-Funktion zu einem Job zusammengefasst und es ist möglich, in einem Programm mehrere Jobs hintereinander auszuführen. Dadurch bestand eine Möglichkeit darin, mittels eines Jobs die Zentren zu generieren und mit Hilfe eines zweiten Jobtyps den iterativen Teil des Algorithmus auszuführen. Die zweite von uns erarbeitete Idee war, die Clusterzentren vor dem Starten des Hadoop-Programmes seperat zu generieren und als weiteren Eingabeparameter mitzuliefern. Wir haben uns für das zweite Verfahren entschieden, da es zum einen zu diesem Zeitpunkt für uns leichter zu implementieren war und zum anderen durch die einmalige Generierung einen Geschwindigkeitsvorteil darstellte. Für eine finale Version des Programms wäre es jedoch von Vorteil, wenn der Benutzer nicht selbst die Clusterzentren generieren müsste.
@@ -185,7 +186,7 @@ muss der in \ref{sec:BerechnungDerCluster} beschriebene Prozess mehrmals ausgef�
 % um in der nächsten Iteration nicht mit den selben Daten erneut zu rechnen.
 Nach der Definition von \emph{k-Means} wird dieser Zyklus beendet, sobald keine bzw. nur noch sehr wenige Subjekte einem anderen Cluster zugeordnet wurden.
 Dies stellte sich bei unserer Implementation als Problem heraus, da aus Platz- und Geschwindigkeitsgründen keine Informationen über die Zuordnung von Subjekten zu Clustern gespeichert werden. Diese Informationen stehen nur zu Beginn des Reduce-Schrittes zur Verfügung, nicht aber nach Abschluss des Jobs.
-Da das Mitführen der Zuordnungen sowie das dauerhafte Speichern sowohl die, zwischen den einzelnen Knoten zu übertragenen, Datenmengen stark erhöht,
+Da das Mitführen der Zuordnungen sowie das dauerhafte Speichern sowohl die zwischen den einzelnen Knoten zu übertragenen Datenmengen stark erhöht,
 als auch in einer komplexeren Programmstruktur gemündet hätte, entschieden wir uns gegen diese Lösung. 
 Stattdessen berechnen wir den Fortschritt über die prozentuale Veränderung der Clusterzentren. Bevor die alten Clusterzentren im \emph{Distributed Cache} durch die neuen ersetzt werden, wird für jedes neu berechnete Clusterzentrum der Abstand zum alten Clusterzentrum berechnet. 
 Die größtmögliche Entfernung von zwei Vektoren entspricht einer Veränderung von 100\%. Sinkt der Durchschnitt aller Veränderungen unter eine, vom Benutzer definierte, Schranke, so wird der Zyklus abgebrochen.
