@@ -76,11 +76,10 @@ Für jedes Schlüssel-Wert-Paar wird die Map-Funktion aufgerufen. Der Task-Track
 
 Der Job-Tracker überwacht den Gesamtfortschritt eines MapReduce-Schrittes, generiert die Map- und Reduce-Tasks und kümmert sich um die Ein- und Ausgabe.
 
-\subsection{Die Daten}
-Die Datenmenge, die uns zur Verfügung gestellt wurde, sind Ressourcen aus der \emph{DBPedia}\footnote{\url{http://dbpedia.org/}}.
-Das \emph{DBPedia}-Projekt extrahiert Informationen aus der Online-Enzyklopädie \emph{Wikipedia}\footnote{\url{http://www.wikipedia.org/}}, bereitet diese auf und stellt diese strukturiert zur freien Verfügung.
-Einträge der \emph{DBPedia} entsprechen damit weitesgehend Artikeln der \emph{Wikipedia}.
-Als Hauptquelle für Informationen in der DBPedia sind die Infoboxen zu nennen, die in vielen Artikeln auf der rechten Seite existieren.
+\subsection{DBPedia}
+Die Datenmenge, die uns zur Verfügung gestellt wurde, ist eine Teilmenge von Ressourcen aus der \emph{DBPedia}.
+Das \emph{DBPedia}-Projekt\footnote{\url{http://dbpedia.org/}} extrahiert Informationen aus der Online-Enzyklopädie \emph{Wikipedia}\footnote{\url{http://www.wikipedia.org/}}, bereitet diese auf und stellt diese strukturiert zur freien Verfügung.
+Als Hauptquelle für Informationen in der \emph{DBPedia} sind die Infoboxen zu nennen, die in vielen \emph{Wikipedia}-Artikeln auf der rechten Seite existieren.
 
 Die Daten werden als RDF-Tripel der Form $(Subject, Attribut, Wert)$ in der DBPedia gehalten (z.B. $(Berlin, populationTotal, 3429300)$).
 Die ca. 44.000 verschiedenen Attribute der DBPedia sind in eine Ontologie eingeordnet.
