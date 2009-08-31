@@ -42,12 +42,6 @@ urlcolor=black
 
 \maketitle
 
-\begin{abstract}
-TODO\\
-wenn alles fertig ist\\
-werden es mal 3 Zeilen?
-\end{abstract}
-
 \section{Einleitung}
 Mit der fortschreitenden Nutzung der Computertechnik in allen Lebensbereichen steigt auch das zu bearbeitende Datenvolumen stetig an. Damit auf immer größeren Datenmengen weiterhin effizient Berechnungen ausgeführt werden können, wurde von Google\footnote{\url{http://www.google.com/}} ein Berechnungsmodell namens MapReduce entwickelt. Mit dieser Architektur ist es möglich, Berechnungen auf mehrere Computer zu verteilen und parallel ablaufen zu lassen.
 
@@ -63,7 +57,7 @@ Anschließend werden die Ergebnisse der Teilprobleme in der Reduce-Funktion wied
 Die Map-Funktion erwartet als Eingabe Schlüssel-Wert-Paare und gibt neue Schlüssel-Wert-Paare als Ergebnis aus.
 Die Reduce-Funktion erhält als Eingabe einen Schlüssel und alle dazugehörigen Werte.
 Diese Werte werden je nach vorgegebener Berechnung zusammengeführt und dem Schlüssel zugeordnet.
-Die Reduce gibt anschließend wiederum Schlüssel-Wert-Paare aus.
+Reduce gibt anschließend wiederum Schlüssel-Wert-Paare zurück.
 
 \subsection{Hadoop TODO}
 Hadoop stellt ein verteiltes Dateisystem bereit.
