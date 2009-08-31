@@ -49,7 +49,7 @@ werden es mal 3 Zeilen?
 \end{abstract}
 
 \section{Einleitung}
-Mit der fortschreitenden Entwicklung der Computertechnik steigt auch das zu bearbeitende Datenvolumen stetig an. Damit auf immer größeren Datenmengen weiterhin effizient Berechnungen ausgeführt werden können, wurde von Google\footnote{\url{http://www.google.com/}} ein Berechnungsmodell namens MapReduce entwickelt. Mit diesem Programmrahmen ist es möglich, Berechnungen auf mehere Rechner zu verteilen und parallel ablaufen zu lassen.
+Mit der fortschreitenden Entwicklung der Computertechnik steigt auch das zu bearbeitende Datenvolumen stetig an. Damit auf immer größeren Datenmengen weiterhin effizient Berechnungen ausgeführt werden können, wurde von Google\footnote{\url{http://www.google.com/}} ein Berechnungsmodell namens MapReduce entwickelt. Mit diesem Programmrahmen ist es möglich, Berechnungen auf mehrere Rechner zu verteilen und parallel ablaufen zu lassen.
 
 Im Seminar \emph{Map/Reduce Algorithms on Hadoop}\footnote{\url{http://www.hpi.uni-potsdam.de/naumann/lehre/ss_09/mapreduce_algorithms_on_hadoop.html}} haben wir uns mit dem, in Java implementierem, MapReduce-Framework \emph{Hadoop}\footnote{\url{http://hadoop.apache.org/}} auseinandergesetzt und einen Algorithmus implementiert, der eine Menge von Objekten anhand ihrer Ähnlichkeit gruppiert.
 
@@ -74,7 +74,7 @@ Das Hadoop MapReduce-Framework übernimmt die Zerteilung der Eingabedatei und ge
 Die einzelnen Rechner im Hadoop-Cluster bearbeiten anschließend diese Maptasks.
 Für jedes Schlüssel-Wert-Paar wird die Map-Funktion aufgerufen. Der Task-Tracker überwacht den Fortschritt auf den Nodes und teilt ihnen bei Bedarf weitere Tasks zu. Dabei werden Tasks bevorzugt auf den Rechnern ausgeführt, die bereits die dazu nötigen Daten haben, weil sie den entsprechenden Teil des verteilten Dateisystems verwalten.
 
-Der Job-Tracker überwacht den Gesamtfortschritt eines Map-Reduce-Schrittes, generiert die Map- und Reduce-Tasks und kümmert sich um die Ein- und Ausgabe.
+Der Job-Tracker überwacht den Gesamtfortschritt eines MapReduce-Schrittes, generiert die Map- und Reduce-Tasks und kümmert sich um die Ein- und Ausgabe.
 
 \subsection{Die Daten}
 Die Datenmenge, die uns zur Verfügung gestellt wurde, sind Ressourcen aus der \emph{DBPedia}\footnote{\url{http://dbpedia.org/}}.
@@ -103,27 +103,27 @@ Wir haben das partitionierende Clusteranalyseverfahren \emph{k-Means}\footnote{\
 
 Zu Beginn des Algorithmus wählt man zufällig die gewünschte Anzahl von Clustern aus der Objektmenge aus. Diese Objekte bilden die initialen Clusterzentren. Aus der zufälligen Auswahl der Clusterzentren ergibt sich die Konsequenz, dass bei verschiedenen Programmdurchläufen mit gleichen Eingabedateien unterschiedliche Cluster berechnet werden können. Nach der Wahl der Clusterzentren beginnt der iterative Teil des Algorithmus.
 
-Für jedes Objekt wird mit Hilfe des Abstandsmaßes der Abstand zu jedem Clusterzentrum berechnet. Anschließend wird das Objekt demjenigen Cluster zugerordnet, zu dessen Clusterzentrum es den geringsten Abstand aufweist.
+Für jedes Objekt wird mit Hilfe des Abstandsmaßes der Abstand zu jedem Clusterzentrum berechnet. Anschließend wird das Objekt demjenigen Cluster zugeordnet, zu dessen Clusterzentrum es den geringsten Abstand aufweist.
 Nachdem alle Objekte einem Cluster zugeordnet worden sind, wird das neue Clusterzentrum bestimmt, indem der Schwerpunkt aller dem Cluster zugeordneten Objekte berechnet wird.
 
 Dieser Vorgang wird solange wiederholt, bis nach einer Iteration kein Objekt mehr einem anderen Clusterzentrum zugeordnet wird. Alternativ kann auch eine prozentuale Schranke festgelegt werden (zum Beispiel: wiederhole bis weniger als 2\% der Objekte einem anderen Cluster zugeordnet werden).
 
 \subsection{Jaccard-Distanz}
-Die Jaccard-Distanz ist ein Abstandsmaß, dass die Ähnlichkeit zwischen Mengen angibt. Dabei sind zwei Mengen einander ähnlicher, je mehr Elemente sie gemeinam haben. Die Jaccard-Distanz von einer Menger zu sich selbst ist Null.
+Die Jaccard-Distanz ist ein Abstandsmaß, dass die Ähnlichkeit zwischen Mengen angibt. Dabei sind zwei Mengen einander ähnlicher, je mehr Elemente sie gemeinsam haben. Die Jaccard-Distanz von einer Menge zu sich selbst ist Null.
 
 %Die Jaccard-Distanz basiert auf dem Jaccard-Index, dem Quotienten aus Schnitt- und Vereinigungsmenge zweier Mengen.
 
 $$J_{\delta}(A,B) = %1 - J(A,B) = 
 { { |A \cup B| - |A \cap B| } \over |A \cup B| }$$
 
-Ein Vorteil der Jaccard-Distanz gegenüber dem euklidischen Abstandsmaß ist, dass Elemente, die in den jeweiligenMmengen enthalten sind, stärker berücksichtigt werden, als nicht enthaltene Elemente. Beim Euklidischen Abstand beeinflussen Elemente, die in beiden Mengen fehlen oder vorhanden sind, das Abstandsmaß gleich.
+Ein Vorteil der Jaccard-Distanz gegenüber dem euklidischen Abstandsmaß ist, dass Elemente, die in den jeweiligen Mengen enthalten sind, stärker berücksichtigt werden, als nicht enthaltene Elemente. Beim Euklidischen Abstand beeinflussen Elemente, die in beiden Mengen fehlen oder vorhanden sind, das Abstandsmaß gleich.
 
 \subsection{Fuzzy-Mengen}
 Da die Clusterzentren gemittelte Werte enthalten, können sie nicht wie die Subjekte als einfache Mengen dargestellt werden.
 Stattdessen werden Fuzzy-Mengen benutzt. Bei Fuzzy-Mengen kann ein Element zu einem gewissen Grad zwischen 0 und 1 enthalten sein.
 Dies wird durch die Funktion $\mu : M \times E \rightarrow [0,1] $ beschrieben. Dabei bedeutet $m(A,e) = 0$ soviel wie $ e \not\in A $ und $m(A,e) = 1$ entspricht $ e \in A $ aus der normalen Mengenlehre.
 
-Die Identitäten für Schnitt- Vereinungsmengen in der Mengenlehre \begin{align*}e \in (A \cap B) = (e \in A) \wedge (e \in B)
+Die Identitäten für Schnitt- Vereinigungsmengen in der Mengenlehre \begin{align*}e \in (A \cap B) = (e \in A) \wedge (e \in B)
 	\\ e \in (A \cup B) = (e \in A) \vee (e \in B) \end{align*} lauten für Fuzzy-Mengen  \begin{align*}\mu(e, A \cap B) = min(\mu(e, A), \mu(e, B))\\ \mu(e, A \cup B) = max(\mu(e, A), \mu(e, B))  \end{align*}.
 
 Damit lässt sich der Jaccard-Index numerisch auf folgende Weise berechnen:
@@ -149,7 +149,7 @@ Die meisten Hadoop-Klassen sind in Sequence Files serialisierbar.
 Das Hadoop-Framework enthält neben dem Text-InputFormat unter anderem auch ein InputFormat für Sequence Files, sowie die Möglichkeit, Sequence Files aufzusplitten um sie auf verschiedene Map-Tasks zu verteilen.
 
 \subsection{Generierung der Clusterzentren}
-Das erste Problem bei der Implementierung des \emph{k-Means} Algorithmus stellte die Generierung der initialen Clusterzentren dar. Im Hadoop-Framework werden eine Map- und eine Reduce-Funktion zu einem Job zusammengefasst und es ist möglich, in einem Programm mehrere Jobs hintereinander auszuführen. Dadurch bestand eine Möglichkeit darin, mittels eines Jobs die Zentren zu generieren und mit Hilfe eines zweiten Jobtyps den iterativen Teil des Algorithmus auszuführen. Die zweite von uns erarbeitete Idee war, die Clusterzentren vor dem Starten des Hadoop-Programmes seperat zu generieren und als weiteren Eingabeparameter mitzuliefern. Wir haben uns für das zweite Verfahren entschieden, da es zum einen zu diesem Zeitpunkt für uns leichter zu implementieren war und zum anderen durch die einmalige Generierung einen Geschwindigkeitsvorteil darstellte. Für eine finale Version des Programms wäre es jedoch von Vorteil, wenn der Benutzer nicht selbst die Clusterzentren generieren müsste.
+Das erste Problem bei der Implementierung des \emph{k-Means} Algorithmus stellte die Generierung der initialen Clusterzentren dar. Im Hadoop-Framework werden eine Map- und eine Reduce-Funktion zu einem Job zusammengefasst und es ist möglich, in einem Programm mehrere Jobs hintereinander auszuführen. Dadurch bestand eine Möglichkeit darin, mittels eines Jobs die Zentren zu generieren und mit Hilfe eines zweiten Jobtyps den iterativen Teil des Algorithmus auszuführen. Die zweite von uns erarbeitete Idee war, die Clusterzentren vor dem Starten des Hadoop-Programmes separat zu generieren und als weiteren Eingabeparameter mitzuliefern. Wir haben uns für das zweite Verfahren entschieden, da es zum einen zu diesem Zeitpunkt für uns leichter zu implementieren war und zum anderen durch die einmalige Generierung einen Geschwindigkeitsvorteil darstellte. Für eine finale Version des Programms wäre es jedoch von Vorteil, wenn der Benutzer nicht selbst die Clusterzentren generieren müsste.
 
 % hat auch Vorteile beim evaluieren
 
@@ -160,11 +160,11 @@ Das erste Problem bei der Implementierung des \emph{k-Means} Algorithmus stellte
 %- Nachteile: bricht das Map/Reduce Konzept\\
 %- andere Möglichkeit: kartesisches Produkt
 
-Um die Cluster in einer Iteration des \emph{k-Means}-Algorithmus neu zu bestimmen, muss der Abstand jedes Subjektes von jedem Zentrum berechnet werden. Die Eingabedaten müssen für die Verarbeitung mit Map-Reduce so aufgeteilt werden, dass dies möglich ist.
+Um die Cluster in einer Iteration des \emph{k-Means}-Algorithmus neu zu bestimmen, muss der Abstand jedes Subjektes von jedem Zentrum berechnet werden. Die Eingabedaten müssen für die Verarbeitung mit MapReduce so aufgeteilt werden, dass dies möglich ist.
 
-Anstatt das kartesische Produkt von Clusterzentren und Subjekten zu bilden und anschließend zu verteilen, wird eine Liste von Zentren den Mappern zu Beginn jeder Iteration als Parameter übergeben. Da die Anzahl der Cluster, und demzufolge auch die der Clusterzentren, viel kleiner als die Anzahl der Subjekte ist, bewirkt dieses Vorgehen einen sehr geringen Kommuniakationsaufwand. Da im Map-Schritt alle Zentren bekannt sind, kann das nächste Zentrum, und damit die Clusterzugehörigkeit jedes Subjektes, bereits im Map-Schritt bestimmt werden. 
+Anstatt das kartesische Produkt von Clusterzentren und Subjekten zu bilden und anschließend zu verteilen, wird eine Liste von Zentren den Mappern zu Beginn jeder Iteration als Parameter übergeben. Da die Anzahl der Cluster, und demzufolge auch die der Clusterzentren, viel kleiner als die Anzahl der Subjekte ist, bewirkt dieses Vorgehen einen sehr geringen Kommunikationsaufwand. Da im Map-Schritt alle Zentren bekannt sind, kann das nächste Zentrum, und damit die Clusterzugehörigkeit jedes Subjektes, bereits im Map-Schritt bestimmt werden. 
 
-Parameter können nicht direkt an die Mapper übergeben werden, da die Job-Konfiguarion nicht die Mapper kennt, sondern nur deren Klassennamen. Die Mapper werden erst auf den Knoten erzeugt. Um den Mappern zusätzliche Parameter zu übergeben, werden deshalb zusätzliche Einträge in der Konfiguration sowie der \emph{Distributed Cache} verwendet. Der \emph{Distributed Cache} bietet die Möglichkeit, größere Datenmengen an die Knoten zu übermitteln, bevor der eigentliche MapReduce-Zyklus beginnt. Dazu werden die Dateien, die zum \emph{Distributed Cache} hinzugefügt wurden, vom HDFS in das lokale Dateisystem auf den Knoten kopiert. Im Gegensatz zum HDFS stellt der \emph{Distributed Cache} sicher, dass jeder Knoten alle Dateien vollständig erhält, bevor ein Map-Reduce-Zyklus beginnt.
+Parameter können nicht direkt an die Mapper übergeben werden, da die Job-Konfiguarion nicht die Mapper kennt, sondern nur deren Klassennamen. Die Mapper werden erst auf den Knoten erzeugt. Um den Mappern zusätzliche Parameter zu übergeben, werden deshalb zusätzliche Einträge in der Konfiguration sowie der \emph{Distributed Cache} verwendet. Der \emph{Distributed Cache} bietet die Möglichkeit, größere Datenmengen an die Knoten zu übermitteln, bevor der eigentliche MapReduce-Zyklus beginnt. Dazu werden die Dateien, die zum \emph{Distributed Cache} hinzugefügt wurden, vom HDFS in das lokale Dateisystem auf den Knoten kopiert. Im Gegensatz zum HDFS stellt der \emph{Distributed Cache} sicher, dass jeder Knoten alle Dateien vollständig erhält, bevor ein MapReduce-Zyklus beginnt.
 
 Die Knoten können jederzeit auf die lokalen Dateien lesend zugreifen. In unserer Implementierung werden mit der Erzeugung der Mapper die Clusterzentren auf den Knoten ausgelesen und anschließend im Hauptspeicher gehalten.
 
@@ -175,7 +175,7 @@ Der iterative Teil des \emph{k-Means}-Algorithmus lässt sich relativ leicht auf
 Diese berechnet den Abstand des Subjektes zu jedem Clusterzentrum, welche mittels \emph{Distributed Cache} zur Verfügung stehen.
 
 Für die Abstandsberechnung haben wir ein Interface \emph{Distance} eingeführt, welches unter anderem die Funktion \emph{between} bereitstellt.
-Diese Funktion erwartet als Eingabe zwei Vektoren gleicher Länge und gibt eine reele Zahl zurück, welche den Abstand zwischen den beiden Vektoren repräsentiert.
+Diese Funktion erwartet als Eingabe zwei Vektoren gleicher Länge und gibt eine reelle Zahl zurück, welche den Abstand zwischen den beiden Vektoren repräsentiert.
 Wir haben mit dem \emph{Euklidischen Abstandsmaß} und der \emph{Jaccard Distance} zwei verschiedene Implementationen des Interfaces erstellt.
 Dem Anwender ist es selbst überlassen, welche Implementation er verwenden möchte. Er kann dies durch die Konfigurationsdatei einstellen.
 
