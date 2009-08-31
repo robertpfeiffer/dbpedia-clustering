@@ -66,9 +66,15 @@ Diese Werte werden je nach vorgegebener Berechnung zusammengeführt und dem Schl
 Die Reduce gibt anschließend wiederum Schlüssel-Wert-Paare aus.
 
 \subsection{Hadoop TODO}
-Das Hadoop Framework übernimmt die Zerteilung der Eingabedatei und generiert aus den einzelnen Teilen sogenannte Maptasks.
+Hadoop stellt ein verteiltes Dateisystem bereit.
+%Nodes
+%HDFS
+%Yahoo,Apache
+Das Hadoop MapReduce-Framework übernimmt die Zerteilung der Eingabedatei und generiert aus den einzelnen Teilen sogenannte Maptasks.
 Die einzelnen Rechner im Hadoop-Cluster bearbeiten anschließend diese Maptasks.
-Für jedes Schlüssel-Wert-Paar wird die Map-Funktion aufgerufen.
+Für jedes Schlüssel-Wert-Paar wird die Map-Funktion aufgerufen. Der Task-Tracker überwacht den Fortschritt auf den Nodes und teilt ihnen bei Bedarf weitere Tasks zu. Dabei werden Tasks bevorzugt auf den Rechnern ausgeführt, die bereits die dazu nötigen Daten haben, weil sie den entsprechenden Teil des verteilten Dateisystems verwalten.
+
+Der Job-Tracker überwacht den Gesamtfortschritt eines Map-Reduce-Schrittes, generiert die Map- und Reduce-Tasks und kümmert sich um die Ein- und Ausgabe.
 
 \subsection{Die Daten}
 Die Datenmenge, die uns zur Verfügung gestellt wurde, sind Ressourcen aus der \emph{DBPedia}\footnote{\url{http://dbpedia.org/}}.
@@ -103,14 +109,17 @@ Nachdem alle Objekte einem Cluster zugeordnet worden sind, wird das neue Cluster
 Dieser Vorgang wird solange wiederholt, bis nach einer Iteration kein Objekt mehr einem anderen Clusterzentrum zugeordnet wird. Alternativ kann auch eine prozentuale Schranke festgelegt werden (zum Beispiel: wiederhole bis weniger als 2\% der Objekte einem anderen Cluster zugeordnet werden).
 
 \subsection{Jaccard-Distanz}
-Die Jaccard-Distanz ist ein Abstandsmaß, dass die Ähnlichkeit zwischen Mengen angibt. Dabei sind zwei mengen einander ähnlicher, je mehr elemente sie gemeinam haben. Die Jaccard-Distanz von einer Menger zu sich selbst ist Null.
+Die Jaccard-Distanz ist ein Abstandsmaß, dass die Ähnlichkeit zwischen Mengen angibt. Dabei sind zwei Mengen einander ähnlicher, je mehr Elemente sie gemeinam haben. Die Jaccard-Distanz von einer Menger zu sich selbst ist Null.
 
-$$J_{\delta}(A,B) = 1 - J(A,B) = { { |A \cup B| - |A \cap B| } \over |A \cup B| }$$
+%Die Jaccard-Distanz basiert auf dem Jaccard-Index, dem Quotienten aus Schnitt- und Vereinigungsmenge zweier Mengen.
 
-Ein Vorteil der Jaccard-Distanz gegenüber dem euklidischen Abstandsmaß ist, dass Elemente, die in den jeweiligen mengen enthalten sind, stärker berücksichtigt werden, als nicht enthaltene Elemente. Beim Euklidischen Abstand beeinflussen Elemente, die in beiden Mengen fehlen oder vorhanden sind, das Abstandsmaß gleich.
+$$J_{\delta}(A,B) = %1 - J(A,B) = 
+{ { |A \cup B| - |A \cap B| } \over |A \cup B| }$$
+
+Ein Vorteil der Jaccard-Distanz gegenüber dem euklidischen Abstandsmaß ist, dass Elemente, die in den jeweiligenMmengen enthalten sind, stärker berücksichtigt werden, als nicht enthaltene Elemente. Beim Euklidischen Abstand beeinflussen Elemente, die in beiden Mengen fehlen oder vorhanden sind, das Abstandsmaß gleich.
 
 \subsection{Fuzzy-Mengen}
-Da die Clusterzentren gemittelte Werte enthalte, können sie nicht wie die Subjekte als einfache Mengen dargestellt werden.
+Da die Clusterzentren gemittelte Werte enthalten, können sie nicht wie die Subjekte als einfache Mengen dargestellt werden.
 Stattdessen werden Fuzzy-Mengen benutzt. Bei Fuzzy-Mengen kann ein Element zu einem gewissen Grad zwischen 0 und 1 enthalten sein.
 Dies wird durch die Funktion $\mu : M \times E \rightarrow [0,1] $ beschrieben. Dabei bedeutet $m(A,e) = 0$ soviel wie $ e \not\in A $ und $m(A,e) = 1$ entspricht $ e \in A $ aus der normalen Mengenlehre.
 
