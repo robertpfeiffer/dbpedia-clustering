@@ -59,16 +59,15 @@ Die Reduce-Funktion erhält als Eingabe einen Schlüssel und alle dazugehörigen
 Diese Werte werden je nach vorgegebener Berechnung zusammengeführt und dem Schlüssel zugeordnet.
 Reduce gibt anschließend wiederum Schlüssel-Wert-Paare zurück.
 
-\subsection{Hadoop TODO}
-Hadoop stellt ein verteiltes Dateisystem bereit.
-%Nodes
-%HDFS
-%Yahoo,Apache
-Das Hadoop MapReduce-Framework übernimmt die Zerteilung der Eingabedatei und generiert aus den einzelnen Teilen sogenannte Maptasks.
-Die einzelnen Rechner im Hadoop-Cluster bearbeiten anschließend diese Maptasks.
-Für jedes Schlüssel-Wert-Paar wird die Map-Funktion aufgerufen. Der Task-Tracker überwacht den Fortschritt auf den Nodes und teilt ihnen bei Bedarf weitere Tasks zu. Dabei werden Tasks bevorzugt auf den Rechnern ausgeführt, die bereits die dazu nötigen Daten haben, weil sie den entsprechenden Teil des verteilten Dateisystems verwalten.
-
-Der Job-Tracker überwacht den Gesamtfortschritt eines MapReduce-Schrittes, generiert die Map- und Reduce-Tasks und kümmert sich um die Ein- und Ausgabe.
+\subsection{Hadoop}
+Hadoop ist ein in Java implementiertes Open Source Framework, welches auf dem MapReduce-Modell basiert.
+Die Kernkomponenten stellen Schnittstellen für verteilte Dateioperationen und Ein-/Ausgabe sowie ein verteiltes Dateisystem (HDFS) bereit.
+Eine Aufgabe, die auf der Hadoop-Plattform ausgeführt werden soll, ist ein Job.
+Dieser besteht aus einer Map- sowie einer Reduce-Funktion.
+Ein Job-Tracker überwacht den Gesamtfortschritt eines MapReduce-Jobs,
+generiert die Map- und Reduce-Tasks und verteilt diese an die einzelnen Nodes im Hadoop-Cluster.
+% Das Hadoop Framework übernimmt die Zerlegung der Eingabedatei und ruft für jedes Schlüssel-Wert-Paar die angegebene Map-Funktion auf.
+% Der Task-Tracker überwacht den Fortschritt auf den Nodes und teilt ihnen bei Bedarf weitere Tasks zu. 
 
 \subsection{DBPedia}
 Die Datenmenge, die uns zur Verfügung gestellt wurde, ist eine Teilmenge von Ressourcen aus der \emph{DBPedia}.
