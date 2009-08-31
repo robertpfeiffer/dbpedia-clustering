@@ -86,7 +86,7 @@ Für viele Clusterverfahren wird ein Abstandsmaß benötigt. Dieses gibt für zw
 Als Beispiele sind das \emph{Euklidische Abstandsmaß} und die \emph{Jaccard-Distanz} zu nennen.
 
 \subsubsection{k-Means}
-Wir haben das partitionierende Clusteranalyseverfahren \emph{k-Means}\footnote{\url{http://de.wikipedia.org/wiki/K-Means-Algorithmus}} angewendet. % vielleicht Literatur statt weblink
+Wir haben das partitionierende Clusteranalyseverfahren \emph{k-Means} angewendet.
 \emph{k-Means} zeichnet sich durch seine hohe Geschwindigkeit aus, liefert jedoch nicht zwingend die optimale Lösung. Desweiteren muss man bei \emph{k-Means} die Anzahl der gewünschten Cluster im Vorfeld vorgeben.
 
 Zu Beginn des Algorithmus wählt man zufällig die gewünschte Anzahl von Clustern aus der Objektmenge aus. Diese Objekte bilden die initialen Clusterzentren. Die zufällige Auswahl der Clusterzentren bewirkt, dass bei verschiedenen Programmdurchläufen mit gleichen Eingabedateien unterschiedliche Cluster berechnet werden können. Nach der Wahl der Clusterzentren beginnt der iterative Teil des Algorithmus.
@@ -211,7 +211,8 @@ Die Gesamtkomplexität liegt damit in $O(k \cdot s + s)$
 
 Diese theoritische Herleitung der Laufzeitkomplexität wurde in Testreihen mit unterschiedlichen variablen Größen bestätigt.
 
-Bei vorangegangenen Tests wurden starke Unterschiede in der Laufzeit festgestellt, die sich darauf zurückführen lassen, dass die Rechner im Cluster unterschiedlich schnell und unterschiedlich ausgelastet sind. Deshalb wurde die Splitsize so konfiguriert, dass die Eingabe auf ca. 24 Map-Tasks verteilt werden konnte. Dadurch wird gewährleistet, dass keiner der 8 Knoten des Clusters auf die anderen lange warten muss.
+\subsubsection{Konfiguration}
+Bei vorangegangenen Tests wurden starke Unterschiede in der Laufzeit festgestellt, die sich darauf zurückführen lassen, dass die Rechner im Cluster unterschiedlich schnell und unterschiedlich ausgelastet sind. Nach näherer Untersuchung wurde herausgefunden, dass 2 Knoten im Cluster um den Faktor 8 schneller sind, als die übrigen 6 Rechner. Deshalb wurde die Splitsize so konfiguriert, dass die Eingabe auf ca. 22 Map-Tasks verteilt werden konnte. Dadurch wird gewährleistet, dass keiner der 8 Knoten des Clusters auf die anderen lange warten muss.
 
 \subsubsection{Unterschiedliche Subjektanzahl}
 Bei dieser Testreihe wurden jeweils Einagbedateien mit 3.500, 7.000, 14.000, 35.000, 70.000, 175.000 und 350.000 Subjekten für den Clustering-Algorithmus verwendet.
@@ -242,13 +243,13 @@ Diese Messreihe in Abbildung \ref{fig:centers} zeigt, dass die Laufzeit des Algo
 Die beiden vorherigen Testreihen wurden mit einer festen Anzahl von Iterationen ausgeführt, um die Laufzeit vergleichen zu können. In dieser Testreihe soll ermittelt werden, wie viele Iterationen nötig sind, bis die durchschnittliche prozentuale Verschiebung der Clusterzentren unter eine definierte Schranke fällt.
 Dazu wurden drei Testfälle mit 35.000 Subjekten und 50, 100 bzw. 150 Clustern betrachtet. Bei dem Testfall mit 50 Clustern lag die Abbruchschranke bei 2\% durchschnittlichen Clusterzentrenverschiebungen, bei 100 Clustern bei 1\% und bei 150 Clustern bei 0,5\%.
 Durch die logarithmische Skalierung nicht auf den ersten Blick ersichtlich, konvergierten die 3 Testfälle trotz unterschiedlicher Clusteranzahl annähernd gleich schnell.
+Wie aus Abbildung \ref{fig:iterations} hervorgeht, nähern sich die Cluster schnell einem relativ stabilen Zustand an.
 \begin{figure}[!ht]
 \centering
 \includegraphics[width=0.99\textwidth]{charts/iterations_log.png}
 \caption{Abbruch}
 \label{fig:iterations}
 \end{figure}
-Wie aus Abbildung \ref{fig:iterations} hervorgeht, nähern sich die Cluster schnell einem relativ stabilen Zustand an.
 
 \section{Fazit}
 % - Erfahrungen mit verteiltem Rechnen
@@ -267,6 +268,8 @@ Wie aus Abbildung \ref{fig:iterations} hervorgeht, nähern sich die Cluster schn
   Dean, Jeffrey; Ghemawat, Sanjay.\\
   {\em MapReduce: Simplified Data Processing on Large Clusters}.\\
   San Francisco, CA, 2004
+\bibitem[k-Means]{k-Means}
+  \url{http://de.wikipedia.org/wiki/K-Means-Algorithmus}
   
 \end{thebibliography}
 \end{document}
