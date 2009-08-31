@@ -78,7 +78,7 @@ Die ca. 44.000 verschiedenen Attribute der DBPedia sind in eine Ontologie eingeo
 Da alle Ressourcen aus dieser Ontologie stammen, kann man davon ausgehen, dass gleiche Attribute die gleiche Semantik haben. Dadurch lassen sich aus dem Gruppieren der Subjekte nach ähnlichen Attributmengen möglicherweise semantische Rückschlüsse ziehen.
 
 \subsubsection{Clustering}
-Algorithmen, beziehungsweise Verfahren, die eine Menge von Objekten zu Gruppen (Cluster) mit jeweils ähnlichen Eigenschaften zusammenfassen, bezeichnet man als Clusteranalyseverfahren.
+Algorithmen, beziehungsweise Verfahren, die eine Menge von Objekten zu Gruppen (Cluster) mit jeweils ähnlichen Eigenschaften zusammenfassen, bezeichnet man als Clusteranalyseverfahren. % Heuristik?
 Es gibt eine ganze Reihe von unterschiedlichen Ansätzen zur Analyse, die alle unterschiedliche Vor- und Nachteile haben.
 Grundsätzlich unterscheidet man zwischen partitionierenden und hierarchischen Analyseverfahren.
 
@@ -90,7 +90,7 @@ Als Beispiele sind das \emph{Euklidische Abstandsmaß} und die \emph{Jaccard-Dis
 Wir haben das partitionierende Clusteranalyseverfahren \emph{k-Means}\footnote{\url{http://de.wikipedia.org/wiki/K-Means-Algorithmus}} angewendet. % vielleicht Literatur statt weblink
 \emph{k-Means} zeichnet sich durch seine hohe Geschwindigkeit aus, liefert jedoch nicht zwingend die optimale Lösung. Desweiteren muss man bei \emph{k-Means} die Anzahl der gewünschten Cluster im Vorfeld vorgeben.
 
-Zu Beginn des Algorithmus wählt man zufällig die gewünschte Anzahl von Clustern aus der Objektmenge aus. Diese Objekte bilden die initialen Clusterzentren. Aus der zufälligen Auswahl der Clusterzentren ergibt sich die Konsequenz, dass bei verschiedenen Programmdurchläufen mit gleichen Eingabedateien unterschiedliche Cluster berechnet werden können. Nach der Wahl der Clusterzentren beginnt der iterative Teil des Algorithmus.
+Zu Beginn des Algorithmus wählt man zufällig die gewünschte Anzahl von Clustern aus der Objektmenge aus. Diese Objekte bilden die initialen Clusterzentren. Die zufällige Auswahl der Clusterzentren bewirkt, dass bei verschiedenen Programmdurchläufen mit gleichen Eingabedateien unterschiedliche Cluster berechnet werden können. Nach der Wahl der Clusterzentren beginnt der iterative Teil des Algorithmus.
 
 Für jedes Objekt wird mit Hilfe eines Abstandsmaßes der Abstand zu jedem Clusterzentrum berechnet. Anschließend wird das Objekt demjenigen Cluster zugeordnet, zu dessen Clusterzentrum es den geringsten Abstand aufweist.
 Nachdem alle Objekte einem Cluster zugeordnet worden sind, wird das neue Clusterzentrum bestimmt, indem der Schwerpunkt aller dem Cluster zugeordneten Objekte berechnet wird.
@@ -233,7 +233,7 @@ Bei der zweiten Testreihe lag die Anzahl der Subjekte konstant bei 35.000. Die A
 Diese Messreihe zeigt, dass die Laufzeit des Algortithmus proportional zur Anzahl der Cluster ist.
 
 \subsection{Ermittelung der Abbruchbedingung}
-Die Laufzeitabschätzung geht von einer konstanten Anzahl von Iterationen bis zur 
+Die Laufzeitabschätzung geht von einer konstanten Anzahl von Iterationen bis zur
 \begin{figure}[!ht]
 \centering
 \includegraphics[width=0.99\textwidth]{charts/iterations_log.png}
