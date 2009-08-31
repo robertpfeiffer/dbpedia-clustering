@@ -70,7 +70,6 @@ generiert die Map- und Reduce-Tasks und verteilt diese an die einzelnen Nodes im
 % Der Task-Tracker überwacht den Fortschritt auf den Nodes und teilt ihnen bei Bedarf weitere Tasks zu. 
 
 \subsection{DBPedia}
-Die Datenmenge, die uns zur Verfügung gestellt wurde, ist eine Teilmenge von Ressourcen aus der \emph{DBPedia}.
 Das \emph{DBPedia}-Projekt\footnote{\url{http://dbpedia.org/}} extrahiert Informationen aus der Online-Enzyklopädie \emph{Wikipedia}\footnote{\url{http://www.wikipedia.org/}}, bereitet diese auf und stellt diese strukturiert zur freien Verfügung.
 Als Hauptquelle für Informationen in der \emph{DBPedia} sind die Infoboxen zu nennen, die in vielen \emph{Wikipedia}-Artikeln auf der rechten Seite existieren.
 
@@ -83,7 +82,9 @@ Algorithmen, beziehungsweise Verfahren, die eine Menge von Objekten zu Gruppen (
 Es gibt eine ganze Reihe von unterschiedlichen Ansätzen zur Analyse, die alle unterschiedliche Vor- und Nachteile haben.
 Grundsätzlich unterscheidet man zwischen partitionierenden und hierarchischen Analyseverfahren.
 
-Für viele Clusterverfahren wird ein Abstandsmaß benötigt. Dieses gibt für zwei Objekte einen Wert zurück, der angibt, wie weit die beiden Objekte voneinander entfernt sind. Kleinere Werte beschreiben üblicherweise geringere Abstände. Es gibt verschiedene Abstandsmaße, die für unterschiedlichen Daten unterschiedlich gute Ergebnisse liefern. Als Beispiele sind das \emph{Euklidische Abstandsmaß} und die \emph{Jaccard-Distanz} zu nennen.
+Für viele Clusterverfahren wird ein Abstandsmaß benötigt. Dieses gibt für zwei Objekte einen Wert zurück, der angibt, wie weit die beiden Objekte voneinander entfernt sind. Kleinere Werte beschreiben üblicherweise geringere Abstände. 
+%Es gibt verschiedene Abstandsmaße, die für unterschiedlichen Daten unterschiedlich gute Ergebnisse liefern.
+Als Beispiele sind das \emph{Euklidische Abstandsmaß} und die \emph{Jaccard-Distanz} zu nennen.
 
 \subsection{k-Means}
 Wir haben das partitionierende Clusteranalyseverfahren \emph{k-Means}\footnote{\url{http://de.wikipedia.org/wiki/K-Means-Algorithmus}} angewendet. % vielleicht Literatur statt weblink
@@ -91,7 +92,7 @@ Wir haben das partitionierende Clusteranalyseverfahren \emph{k-Means}\footnote{\
 
 Zu Beginn des Algorithmus wählt man zufällig die gewünschte Anzahl von Clustern aus der Objektmenge aus. Diese Objekte bilden die initialen Clusterzentren. Aus der zufälligen Auswahl der Clusterzentren ergibt sich die Konsequenz, dass bei verschiedenen Programmdurchläufen mit gleichen Eingabedateien unterschiedliche Cluster berechnet werden können. Nach der Wahl der Clusterzentren beginnt der iterative Teil des Algorithmus.
 
-Für jedes Objekt wird mit Hilfe des Abstandsmaßes der Abstand zu jedem Clusterzentrum berechnet. Anschließend wird das Objekt demjenigen Cluster zugeordnet, zu dessen Clusterzentrum es den geringsten Abstand aufweist.
+Für jedes Objekt wird mit Hilfe eines Abstandsmaßes der Abstand zu jedem Clusterzentrum berechnet. Anschließend wird das Objekt demjenigen Cluster zugeordnet, zu dessen Clusterzentrum es den geringsten Abstand aufweist.
 Nachdem alle Objekte einem Cluster zugeordnet worden sind, wird das neue Clusterzentrum bestimmt, indem der Schwerpunkt aller dem Cluster zugeordneten Objekte berechnet wird.
 
 Dieser Vorgang wird solange wiederholt, bis nach einer Iteration kein Objekt mehr einem anderen Clusterzentrum zugeordnet wird. Alternativ kann auch eine prozentuale Schranke festgelegt werden (zum Beispiel: wiederhole bis weniger als 2\% der Objekte einem anderen Cluster zugeordnet werden).
@@ -107,8 +108,8 @@ $$J_{\delta}(A,B) = %1 - J(A,B) =
 Ein Vorteil der Jaccard-Distanz gegenüber dem euklidischen Abstandsmaß ist, dass Elemente, die in den jeweiligen Mengen enthalten sind, stärker berücksichtigt werden, als nicht enthaltene Elemente. Beim Euklidischen Abstand beeinflussen Elemente, die in beiden Mengen fehlen oder vorhanden sind, das Abstandsmaß gleich.
 
 \subsection{Fuzzy-Mengen}
-Da die Clusterzentren gemittelte Werte enthalten, können sie nicht wie die Subjekte als einfache Mengen dargestellt werden.
-Stattdessen werden Fuzzy-Mengen benutzt. Bei Fuzzy-Mengen kann ein Element zu einem gewissen Grad zwischen 0 und 1 enthalten sein.
+Da die Clusterzentren nach der ersten Iteration gemittelte Werte enthalten, können sie nicht wie die Subjekte als einfache Mengen dargestellt werden.
+Stattdessen werden Fuzzy-Mengen benutzt, in denen ein Element zu einem gewissen Grad zwischen 0 und 1 enthalten sein kann.
 Dies wird durch die Funktion $\mu : M \times E \rightarrow [0,1] $ beschrieben. Dabei bedeutet $m(A,e) = 0$ soviel wie $ e \not\in A $ und $m(A,e) = 1$ entspricht $ e \in A $ aus der normalen Mengenlehre.
 
 Die Identitäten für Schnitt- Vereinigungsmengen in der Mengenlehre \begin{align*}e \in (A \cap B) = (e \in A) \wedge (e \in B)
@@ -128,16 +129,20 @@ $$J_{\delta}(A,B) = \frac{\sum\limits_{p \in P}max\bigl(\mu(p, A)\mu(p, B)\bigr)
 %    - komprimiert\\
 %- Nachteile:\\
 %    - kodiertes Format, daher für Menschen nicht lesbar\\
- %   - keine Information über die Gesamtgröße
-Die Eingabedateien enthalten die Subjekte in einem Binärformat. Dabei wird jedes Subjekt durch ein Array von Bits repräsentiert, wobei die Stelle im Array immer ein Attribut repräsentiert. Wenn an einer Stelle ein 1-Bit steht, dann besitzt die Ressource das Attribut.
+%   - keine Information über die Gesamtgröße
+Die uns zur Verfügung gestellte Datenmenge ist eine Teilmenge von Ressourcen aus der \emph{DBPedia}.
+Da die Werte der RDF-Tripel für das Clustern keine Relevanz besitzen, wurden diese entfernt.
+Die Eingabedatei enthält die Subjekte in einem Binärformat. Dabei wird jedes Subjekt durch ein Array von Bits repräsentiert, wobei die Stelle im Array immer ein Attribut repräsentiert. Wenn an einer Stelle ein 1-Bit steht, dann besitzt die Ressource das Attribut, andernfalls nicht.
 
-\subsection{Sequence Files}
-Sequence Files sind ein Dateiformat von Hadoop. Sie enthalten Schlüssel-Wert-Paare von serialisierten Objekten. Die Schlüssel-Wert-Paare in einer sequence-File müssen jeweils vom gleichen Typ sein 
-Die meisten Hadoop-Klassen sind in Sequence Files serialisierbar.
-Das Hadoop-Framework enthält neben dem Text-InputFormat unter anderem auch ein InputFormat für Sequence Files, sowie die Möglichkeit, Sequence Files aufzusplitten um sie auf verschiedene Map-Tasks zu verteilen.
+Da Hadoop die Eingabe in kleinere Teile aufspalten können muss, standen wir vor der Wahl entweder einen entsprechenden Binärparser zu schreiben, oder die Eingabe in ein anderes Format zu überführen.
+Da erstes eine recht aufwändige Aufgabe ist, entschieden wir uns dazu, das \emph{Sequence File} Format zu benutzen, welches speziell für Hadoop entwickelt wurde, und aus Schlüssel-Wert-Paaren von serialisierten Objekten besteht.
+\emph{Sequence Files} können von Hadoop aufgesplittet werden und sind komprimierbar. 
+Die Originaldatei mit einer Größe von mehr als 120GB konnte somit auf unter 100MB komprimiert werden.
+Dies ist vor allem bei der Übertragung der Eingabe auf die einzelnen Nodes im Hadoop-Cluster von großem Vorteil.
+Auf der anderen Seite sind die Dateien, unter anderem wegen der Kompression, für den Menschen nicht lesbar.
 
 \subsection{Generierung der Clusterzentren}
-Das erste Problem bei der Implementierung des \emph{k-Means} Algorithmus stellte die Generierung der initialen Clusterzentren dar. Im Hadoop-Framework werden eine Map- und eine Reduce-Funktion zu einem Job zusammengefasst und es ist möglich, in einem Programm mehrere Jobs hintereinander auszuführen. Dadurch bestand eine Möglichkeit darin, mittels eines Jobs die Zentren zu generieren und mit Hilfe eines zweiten Jobtyps den iterativen Teil des Algorithmus auszuführen. Die zweite von uns erarbeitete Idee war, die Clusterzentren vor dem Starten des Hadoop-Programmes separat zu generieren und als weiteren Eingabeparameter mitzuliefern. Wir haben uns für das zweite Verfahren entschieden, da es zum einen zu diesem Zeitpunkt für uns leichter zu implementieren war und zum anderen durch die einmalige Generierung einen Geschwindigkeitsvorteil darstellte. Für eine finale Version des Programms wäre es jedoch von Vorteil, wenn der Benutzer nicht selbst die Clusterzentren generieren müsste.
+Das erste Problem bei der Implementierung des \emph{k-Means} Algorithmus stellte die Generierung der initialen Clusterzentren dar. Hadoop erlaubt es, in einem Programm mehrere Jobs hintereinander auszuführen. Dadurch bestand eine Möglichkeit darin, mittels eines Jobs die Zentren zu generieren und mit Hilfe eines zweiten Jobtyps den iterativen Teil des Algorithmus auszuführen. Die zweite von uns erarbeitete Idee war, die Clusterzentren vor dem Starten des Hadoop-Programmes separat zu generieren und als weiteren Eingabeparameter mitzuliefern. Wir haben uns für dieses Verfahren entschieden, da es zum einen zu diesem Zeitpunkt für uns leichter zu implementieren war und zum anderen durch die einmalige Generierung einen Geschwindigkeitsvorteil darstellt. Für eine finale Version des Programms wäre es jedoch von Vorteil, wenn der Benutzer nicht selbst die Clusterzentren generieren müsste.
 
 % hat auch Vorteile beim evaluieren
 
@@ -148,17 +153,19 @@ Das erste Problem bei der Implementierung des \emph{k-Means} Algorithmus stellte
 %- Nachteile: bricht das Map/Reduce Konzept\\
 %- andere Möglichkeit: kartesisches Produkt
 
-Um die Cluster in einer Iteration des \emph{k-Means}-Algorithmus neu zu bestimmen, muss der Abstand jedes Subjektes von jedem Zentrum berechnet werden. Die Eingabedaten müssen für die Verarbeitung mit MapReduce so aufgeteilt werden, dass dies möglich ist.
+Um die Cluster in einer Iteration des \emph{k-Means}-Algorithmus neu zu bestimmen, muss der Abstand jedes Subjektes von jedem Zentrum berechnet werden. Dafür müssen alle Clusterzentren auf jedem Node zur Verfügung stehen.
 
-Anstatt das kartesische Produkt von Clusterzentren und Subjekten zu bilden und anschließend zu verteilen, wird eine Liste von Zentren den Mappern zu Beginn jeder Iteration als Parameter übergeben. Da die Anzahl der Cluster, und demzufolge auch die der Clusterzentren, viel kleiner als die Anzahl der Subjekte ist, bewirkt dieses Vorgehen einen sehr geringen Kommunikationsaufwand. Da im Map-Schritt alle Zentren bekannt sind, kann das nächste Zentrum, und damit die Clusterzugehörigkeit jedes Subjektes, bereits im Map-Schritt bestimmt werden. 
+Anstatt das kartesische Produkt von Clusterzentren und Subjekten zu bilden und anschließend zu verteilen, bestand die Idee den Mappern zu Beginn jeder Iterationvon die Zentren als Parameter zu übergeben. Da die Anzahl der Cluster, und demzufolge auch die der Clusterzentren, viel kleiner als die Anzahl der Subjekte ist, bewirkt dieses Vorgehen einen sehr viel geringeren Kommunikationsaufwand.
+% Da im Map-Schritt alle Zentren bekannt sind, kann das nächste Zentrum, und damit die Clusterzugehörigkeit jedes Subjektes, bereits im Map-Schritt bestimmt werden.
+% Parameter können jedoch nicht direkt an die Mapper übergeben werden, da die Job-Konfiguarion nicht die Mapper kennt, sondern nur deren Klassennamen. 
+% Die Mapper werden erst auf den Knoten erzeugt. Um den Mappern zusätzliche Parameter zu übergeben, werden deshalb zusätzliche Einträge in der Konfiguration sowie der \emph{Distributed Cache} verwendet. 
+Der \emph{Distributed Cache} bietet die Möglichkeit, größere Datenmengen an die Knoten zu übermitteln, bevor der eigentliche MapReduce-Zyklus beginnt. Dazu werden die Dateien, die zum \emph{Distributed Cache} hinzugefügt wurden, vom HDFS in das lokale Dateisystem auf den Knoten kopiert. Im Gegensatz zum HDFS stellt der \emph{Distributed Cache} sicher, dass jeder Knoten alle Dateien vollständig erhält, bevor ein MapReduce-Zyklus beginnt.
 
-Parameter können nicht direkt an die Mapper übergeben werden, da die Job-Konfiguarion nicht die Mapper kennt, sondern nur deren Klassennamen. Die Mapper werden erst auf den Knoten erzeugt. Um den Mappern zusätzliche Parameter zu übergeben, werden deshalb zusätzliche Einträge in der Konfiguration sowie der \emph{Distributed Cache} verwendet. Der \emph{Distributed Cache} bietet die Möglichkeit, größere Datenmengen an die Knoten zu übermitteln, bevor der eigentliche MapReduce-Zyklus beginnt. Dazu werden die Dateien, die zum \emph{Distributed Cache} hinzugefügt wurden, vom HDFS in das lokale Dateisystem auf den Knoten kopiert. Im Gegensatz zum HDFS stellt der \emph{Distributed Cache} sicher, dass jeder Knoten alle Dateien vollständig erhält, bevor ein MapReduce-Zyklus beginnt.
+% Die Knoten können jederzeit auf die lokalen Dateien lesend zugreifen. In unserer Implementierung werden mit der Erzeugung der Mapper die Clusterzentren auf den Knoten ausgelesen und anschließend im Hauptspeicher gehalten.
 
-Die Knoten können jederzeit auf die lokalen Dateien lesend zugreifen. In unserer Implementierung werden mit der Erzeugung der Mapper die Clusterzentren auf den Knoten ausgelesen und anschließend im Hauptspeicher gehalten.
-
-\subsection{Berechnung der Cluster}
+\subsection{Berechnung der Clusterzentren}
 \label{sec:BerechnungDerCluster}
-Nachdem die Clusterzentren mittels des \emph{Distributed Cache} auf die einzelnen Knoten verteilt wurden, beginnt die eigentliche Berechnung.
+% Nachdem die Clusterzentren mittels des \emph{Distributed Cache} auf die einzelnen Knoten verteilt wurden, beginnt die eigentliche Berechnung des .
 Der iterative Teil des \emph{k-Means}-Algorithmus lässt sich relativ leicht auf das MapReduce-Schema abbilden. Für jedes Subjekt wird eine Map-Funktion aufgerufen. 
 Diese berechnet den Abstand des Subjektes zu jedem Clusterzentrum, welche mittels \emph{Distributed Cache} zur Verfügung stehen.
 
