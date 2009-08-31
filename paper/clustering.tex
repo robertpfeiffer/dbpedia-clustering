@@ -139,7 +139,6 @@ Da ersteres eine recht aufwändige Aufgabe ist, entschieden wir uns dazu, das \e
 \emph{Sequence Files} können von Hadoop aufgesplittet werden und sind komprimierbar. 
 Die Originaldatei mit einer Größe von mehr als 120GB konnte somit auf unter 100MB komprimiert werden.
 Dies ist vor allem bei der Übertragung der Eingabe auf die einzelnen Nodes im Hadoop-Cluster von großem Vorteil.
-Auf der anderen Seite sind die Dateien, unter anderem wegen der Kompression, für den Menschen nicht lesbar.
 
 \subsubsection{Generierung der Clusterzentren}
 Das erste Problem bei der Implementierung des \emph{k-Means} Algorithmus stellte die Generierung der initialen Clusterzentren dar. Hadoop erlaubt es, in einem Programm mehrere Jobs hintereinander auszuführen. Dadurch bestand eine Möglichkeit darin, mittels eines Jobs die Zentren zu generieren und mit Hilfe eines zweiten Jobtyps den iterativen Teil des Algorithmus auszuführen. Die zweite von uns erarbeitete Idee war, die Clusterzentren vor dem Starten des Hadoop-Programmes separat zu generieren und als weiteren Eingabeparameter mitzuliefern. Wir haben uns für dieses Verfahren entschieden, da es zum einen zu diesem Zeitpunkt für uns leichter zu implementieren war und zum anderen durch die einmalige Generierung einen Geschwindigkeitsvorteil darstellt. Für eine finale Version des Programms wäre es jedoch von Vorteil, wenn der Benutzer nicht selbst die Clusterzentren generieren müsste.
@@ -198,17 +197,17 @@ Die Umsetzung stellte sich bei unserer Implementation als Problem heraus, da aus
 % Diese Informationen stehen nur zu Beginn des Reduce-Schrittes zur Verfügung, nicht aber nach Abschluss des Jobs.
 Da das Mitführen der Zuordnungen sowie das dauerhafte Speichern sowohl die zwischen den einzelnen Knoten zu übertragenen Datenmengen stark erhöht, als auch in einer komplexeren Programmstruktur gemündet hätte, entschieden wir uns gegen diese Lösung. 
 Stattdessen berechnen wir den Fortschritt über die prozentuale Veränderung der Clusterzentren. Bevor die alten Clusterzentren im \emph{Distributed Cache} durch die neuen ersetzt werden, wird für jedes neu berechnete Clusterzentrum der Abstand zum alten Clusterzentrum berechnet.
-Die größtmögliche Entfernung von zwei Vektoren entspricht einer Veränderung von 100\%. Sinkt der Durchschnitt aller Veränderungen unter eine, vom Benutzer definierte, Schranke, so wird der Zyklus abgebrochen.
+Die größtmögliche Entfernung von zwei Vektoren entspricht einer Veränderung von 100\%. Sinkt der Durchschnitt aller Veränderungen unter eine vom Benutzer definierte Schranke, so wird der Zyklus abgebrochen.
 
 \section{Evaluierung}
 
-\subsection{Abschätzung}
+\subsubsection{Abschätzung}
 Die Laufzeit unserer Implementierung ist abhängig von der Anzahl der Subjekte und der Anzahl der Cluster. Da im Map-Teil die Abstände aller $k$ Cluster zu allen $s$ Subjekten berechnet werden, liegt die Laufzeitkomplexität des gesamten Map-Teils schrittes in $O(s \cdot k)$. Im Reduce-Teil werden alle Cluster gemittelt. Jeder Reduce-Schritt berechnet den Mittelwert eines Clusters. Je kleiner ein Cluster ist, desto schneller lässt sich sein Mittelwert berechnen, doch da jedes Subjekt zu genau einem dieser Cluster gehört, werden alle Subjekte jeweils einmal in eine Berechnung eines Mittelwertes einbezogen. Damit liegt die Komplexität des gesamten Reduce-Teils in $O(s)$.
 Die Gesamtkomplexität liegt damit in $O(k \cdot s + s)$
 
 Diese theoritische Herleitung der Laufzeitkomplexität wurde in Testreihen mit unterschiedlichen variablen Größen bestätigt.
 
-\subsection{Anzahl der Subjekte}
+\subsubsection{Anzahl der Subjekte}
 Bei dieser Testreihe wurden jeweils Einagbedateien mit 3.500, 7.000, 14.000, 35.000, 70.000, 175.000 und 350.000 Subjekten für den Clustering-Algorithmus verwendet.
 Die Anzahl der Cluster war dabei konstant 100.
 Bei vorangegangenen Tests wurden starke Unterschiede in der Laufzeit festgestellt, die sich darauf zurückfuhren lassen, dass die Rechner im Cluster unterschiedlich schnell und unterschiedlich ausgelastet sind. Deshalb wurde die Splitsize so konfiguriert, dass die Eingabe auf circa 24 Map-Tasks verteilt werden konnte. Dadurch wird gewährleistet, dass keiner der 8 Rechner des Clusters auf die anderen lange warten muss.
@@ -221,7 +220,7 @@ Es wurden jeweils 5 K-Means-Iterationen und ein Output-Job, also insgesamt 6 Had
 \end{figure}
 Diese Messreihe zeigt, dass die Laufzeit des Algortithmus proportional zur Anzahl der Subjekte ist.
 
-\subsection{Anzahl der Cluster}
+\subsubsection{Anzahl der Cluster}
 Bei der zweiten Testreihe lag die Anzahl der Subjekte konstant bei 35.000. Die Anzahl der Cluster wurde auf 50,100,150,300,500 und 1.000 variiert. Dazu wurden jeweils unterschiedliche initiale Clusterzentren generiert.
 \begin{figure}[!ht]
 \centering
@@ -231,7 +230,7 @@ Bei der zweiten Testreihe lag die Anzahl der Subjekte konstant bei 35.000. Die A
 \end{figure}
 Diese Messreihe zeigt, dass die Laufzeit des Algortithmus proportional zur Anzahl der Cluster ist.
 
-\subsection{Ermittelung der Abbruchbedingung}
+\subsubsection{Ermittelung der Abbruchbedingung}
 Die Laufzeitabschätzung geht von einer konstanten Anzahl von Iterationen bis zur 
 \begin{figure}[!ht]
 \centering
@@ -257,7 +256,6 @@ Die Laufzeitabschätzung geht von einer konstanten Anzahl von Iterationen bis zu
   Dean, Jeffrey; Ghemawat, Sanjay.\\
   {\em MapReduce: Simplified Data Processing on Large Clusters}.\\
   San Francisco, CA, 2004
-   
+  
 \end{thebibliography}
-
 \end{document}
