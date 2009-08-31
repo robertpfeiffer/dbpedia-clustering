@@ -202,27 +202,31 @@ Die größtmögliche Entfernung von zwei Vektoren entspricht einer Veränderung 
 
 \section{Evaluierung}
 
-\subsubsection{Abschätzung}
-Die Laufzeit unserer Implementierung ist abhängig von der Anzahl der Subjekte und der Anzahl der Cluster. Da im Map-Teil die Abstände aller $k$ Cluster zu allen $s$ Subjekten berechnet werden, liegt die Laufzeitkomplexität des gesamten Map-Teils schrittes in $O(s \cdot k)$. Im Reduce-Teil werden alle Cluster gemittelt. Jeder Reduce-Schritt berechnet den Mittelwert eines Clusters. Je kleiner ein Cluster ist, desto schneller lässt sich sein Mittelwert berechnen, doch da jedes Subjekt zu genau einem dieser Cluster gehört, werden alle Subjekte jeweils einmal in eine Berechnung eines Mittelwertes einbezogen. Damit liegt die Komplexität des gesamten Reduce-Teils in $O(s)$.
+\subsubsection{Laufzeitabschätzung}
+Die Laufzeit unserer Implementierung ist abhängig von der Anzahl der Subjekte und der Anzahl der Cluster. Da im Map-Schritt die Abstände aller $k$ Cluster zu allen $s$ Subjekten berechnet werden, liegt die Laufzeitkomplexität des gesamten Map-Teils schrittes in $O(s \cdot k)$. 
+Im Reduce-Teil werden alle Cluster gemittelt. Jede Reduce-Funktion berechnet den Mittelwert eines Clusters. 
+Je kleiner ein Cluster ist, desto schneller lässt sich sein Schwerpunkt berechnen, doch da jedes Subjekt zu genau einem dieser Cluster gehört, werden alle Subjekte jeweils einmal in eine Berechnung eines Schwerpunktes einbezogen. 
+Damit liegt die Komplexität des gesamten Reduce-Schrittes in $O(s)$.
 Die Gesamtkomplexität liegt damit in $O(k \cdot s + s)$
 
 Diese theoritische Herleitung der Laufzeitkomplexität wurde in Testreihen mit unterschiedlichen variablen Größen bestätigt.
 
-\subsubsection{Anzahl der Subjekte}
+Bei vorangegangenen Tests wurden starke Unterschiede in der Laufzeit festgestellt, die sich darauf zurückführen lassen, dass die Rechner im Cluster unterschiedlich schnell und unterschiedlich ausgelastet sind. Deshalb wurde die Splitsize so konfiguriert, dass die Eingabe auf ca. 24 Map-Tasks verteilt werden konnte. Dadurch wird gewährleistet, dass keiner der 8 Knoten des Clusters auf die anderen lange warten muss.
+
+\subsubsection{Unterschiedliche Subjektanzahl}
 Bei dieser Testreihe wurden jeweils Einagbedateien mit 3.500, 7.000, 14.000, 35.000, 70.000, 175.000 und 350.000 Subjekten für den Clustering-Algorithmus verwendet.
-Die Anzahl der Cluster war dabei konstant 100.
-Bei vorangegangenen Tests wurden starke Unterschiede in der Laufzeit festgestellt, die sich darauf zurückführen lassen, dass die Rechner im Cluster unterschiedlich schnell und unterschiedlich ausgelastet sind. Deshalb wurde die Splitsize so konfiguriert, dass die Eingabe auf circa 24 Map-Tasks verteilt werden konnte. Dadurch wird gewährleistet, dass keiner der 8 Knoten des Clusters auf die anderen lange warten muss.
+Die Anzahl der Cluster betrug dabei konstant 100.
 Es wurden jeweils 5 K-Means-Iterationen und ein Output-Job, also insgesamt 6 Hadoop-Jobs ausgeführt. Dadurch fallen Schwankungen bei einzelnen Tasks weniger ins Gewicht.
 \begin{figure}[!ht]
 \centering
 \includegraphics[width=0.99\textwidth]{charts/subjects.png}
-\caption{Unterschiedliche Eingabegrößen}
+\caption{Unterschiedliche Subjektanzahl}
 \label{fig:subjects}
 \end{figure}
 Diese Messreihe in Abbildung \ref{fig:subjects} zeigt, dass die Laufzeit des Algortithmus proportional zur Anzahl der Subjekte ist.
 
-\subsubsection{Anzahl der Cluster}
-Bei der zweiten Testreihe lag die Anzahl der Subjekte konstant bei 35.000. Die Anzahl der Cluster wurde auf 50, 100, 150, 300, 500 und 1.000 variiert. % nur 50-1000 ?
+\subsubsection{Unterschiedliche Clusteranzahl}
+Bei der zweiten Testreihe lag die Anzahl der Subjekte konstant bei 35.000. Die Anzahl der Cluster wurde zwischen 50, 100, 150, 300, 500 und 1.000 variiert. % nur 50-1000 ?
 Dazu wurden jeweils unterschiedliche initiale Clusterzentren generiert.
 Es wurden wiederum 5 K-Means-Iterationen und ein Output-Job ausgeführt.
 \begin{figure}[!ht]
@@ -234,7 +238,9 @@ Es wurden wiederum 5 K-Means-Iterationen und ein Output-Job ausgeführt.
 Diese Messreihe in Abbildung \ref{fig:centers} zeigt, dass die Laufzeit des Algortithmus proportional zur Anzahl der Cluster ist.
 
 \subsubsection{Ermittelung der Abbruchbedingung}
-Die Laufzeitabschätzung geht von einer konstanten Anzahl von Iterationen bis zur Konvergenz aus. Um diesen Abstand zu bestimmen, wurde gemessen, wie stark sich die Cluster in jeder Iteration verändern. Dazu wurden drei Testfälle mit 35.000 Subjekten und zwischen 50 ind 150 Clustern betrachtet. Bei dem Testfall mit 50 Clustern lag die Abbruchschrank bei 2\% durchschnittlichen Clusterzentrenverschiebungen, bei 100 Clustern bei 1\% und bei 150 Clustern bei 0,5\%.
+%Die Laufzeitabschätzung geht von einer konstanten Anzahl von Iterationen bis zur Konvergenz aus. Um diesen Abstand zu bestimmen, wurde gemessen, wie stark sich die Cluster in jeder Iteration verändern.
+Die beiden vorherigen Testreihen wurden mit einer festen Anzahl von Iterationen ausgeführt, um die Laufzeit vergleichen zu können. In dieser Testreihe soll ermittelt werden, wie viele Iterationen nötig sind, bis die durchschnittliche prozentuale Verschiebung der Clusterzentren unter eine definierte Schranke fällt.
+Dazu wurden drei Testfälle mit 35.000 Subjekten und 50, 100 bzw. 150 Clustern betrachtet. Bei dem Testfall mit 50 Clustern lag die Abbruchschranke bei 2\% durchschnittlichen Clusterzentrenverschiebungen, bei 100 Clustern bei 1\% und bei 150 Clustern bei 0,5\%.
 Durch die logarithmische Skalierung nicht auf den ersten Blick ersichtlich, konvergierten die 3 Testfälle trotz unterschiedlicher Clusteranzahl annähernd gleich schnell.
 \begin{figure}[!ht]
 \centering
