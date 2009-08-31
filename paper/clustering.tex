@@ -74,8 +74,7 @@ Das \emph{DBPedia}-Projekt\footnote{\url{http://dbpedia.org/}} extrahiert Inform
 Als Hauptquelle für Informationen in der \emph{DBPedia} sind die Infoboxen zu nennen, die in vielen \emph{Wikipedia}-Artikeln auf der rechten Seite existieren.
 
 Die Daten werden als RDF-Tripel der Form $(Subject, Attribut, Wert)$ in der DBPedia gehalten (z.B. $(Berlin, populationTotal, 3429300)$).
-Die ca. 44.000 verschiedenen Attribute der DBPedia sind in eine Ontologie eingeordnet.
-Da alle Ressourcen aus dieser Ontologie stammen, kann man davon ausgehen, dass gleiche Attribute die gleiche Semantik haben. Dadurch lassen sich aus dem Gruppieren der Subjekte nach ähnlichen Attributmengen möglicherweise semantische Rückschlüsse ziehen.
+Es gibt ca. 44.000 verschiedene Attribute in der DBPedia, wobei davon auszugehen ist, dass gleiche Attribute auch die gleiche Semantik haben. Dadurch lassen sich aus dem Gruppieren der Subjekte nach ähnlichen Attributmengen möglicherweise semantische Rückschlüsse in Bezug auf die Subjekt-Gruppen ziehen.
 
 \subsubsection{Clustering}
 Algorithmen, beziehungsweise Verfahren, die eine Menge von Objekten zu Gruppen (Cluster) mit jeweils ähnlichen Eigenschaften zusammenfassen, bezeichnet man als Clusteranalyseverfahren.
@@ -136,7 +135,7 @@ Da die Werte der RDF-Tripel für das Clustern keine Relevanz besitzen, wurden di
 Die Eingabedatei enthält die Subjekte in einem Binärformat. Dabei wird jedes Subjekt durch ein Array von Bits repräsentiert, wobei die Stelle im Array immer ein Attribut repräsentiert. Wenn an einer Stelle ein 1-Bit steht, dann besitzt die Ressource das Attribut, andernfalls nicht.
 
 Da Hadoop die Eingabe in kleinere Teile aufspalten können muss, standen wir vor der Wahl entweder einen entsprechenden Binärparser zu schreiben, oder die Eingabe in ein anderes Format zu überführen.
-Da erstes eine recht aufwändige Aufgabe ist, entschieden wir uns dazu, das \emph{Sequence File} Format zu benutzen, welches speziell für Hadoop entwickelt wurde, und aus Schlüssel-Wert-Paaren von serialisierten Objekten besteht.
+Da ersteres eine recht aufwändige Aufgabe ist, entschieden wir uns dazu, das \emph{Sequence File} Format zu benutzen, welches speziell für Hadoop entwickelt wurde, und aus Schlüssel-Wert-Paaren von serialisierten Objekten besteht.
 \emph{Sequence Files} können von Hadoop aufgesplittet werden und sind komprimierbar. 
 Die Originaldatei mit einer Größe von mehr als 120GB konnte somit auf unter 100MB komprimiert werden.
 Dies ist vor allem bei der Übertragung der Eingabe auf die einzelnen Nodes im Hadoop-Cluster von großem Vorteil.
@@ -156,7 +155,7 @@ Das erste Problem bei der Implementierung des \emph{k-Means} Algorithmus stellte
 
 Um die Cluster in einer Iteration des \emph{k-Means}-Algorithmus neu zu bestimmen, muss der Abstand jedes Subjektes von jedem Zentrum berechnet werden. Dafür müssen alle Clusterzentren auf jedem Node zur Verfügung stehen.
 
-Anstatt das kartesische Produkt von Clusterzentren und Subjekten zu bilden und anschließend zu verteilen, bestand die Idee den Mappern zu Beginn jeder Iterationvon die Zentren als Parameter zu übergeben. Da die Anzahl der Cluster, und demzufolge auch die der Clusterzentren, viel kleiner als die Anzahl der Subjekte ist, bewirkt dieses Vorgehen einen sehr viel geringeren Kommunikationsaufwand.
+Anstatt das kartesische Produkt von Clusterzentren und Subjekten zu bilden und anschließend zu verteilen, bestand die Idee darin, den Mappern zu Beginn jeder Iterationvon die Zentren als Parameter zu übergeben. Da die Anzahl der Cluster, und demzufolge auch die der Clusterzentren, viel kleiner als die Anzahl der Subjekte ist, bewirkt dieses Vorgehen einen sehr viel geringeren Kommunikationsaufwand.
 % Da im Map-Schritt alle Zentren bekannt sind, kann das nächste Zentrum, und damit die Clusterzugehörigkeit jedes Subjektes, bereits im Map-Schritt bestimmt werden.
 % Parameter können jedoch nicht direkt an die Mapper übergeben werden, da die Job-Konfiguarion nicht die Mapper kennt, sondern nur deren Klassennamen. 
 % Die Mapper werden erst auf den Knoten erzeugt. Um den Mappern zusätzliche Parameter zu übergeben, werden deshalb zusätzliche Einträge in der Konfiguration sowie der \emph{Distributed Cache} verwendet. 
